@@ -1,0 +1,92 @@
+# Drone flight through Cesium tiles -> Cosmos 3 appearance variations -> VIO dataset.
+# Positions are local ENU metres around the Cesium georeference origin (X east, Y north, Z up).
+# Thresholds under qa: are fixed before a batch, not tuned after.
+
+flights:
+  marina_bay_pass:
+    site: marina_bay                     # pipeline/common/cesium_support.py SITES
+    source: google                       # cesium/build_cesium_stage.py --source
+    speed_mps: 10.0
+    yaw_mode: velocity                   # velocity | look_at
+    scene_description: >-
+      Aerial view from a small drone flying over Marina Bay, Singapore: calm bay water, waterfront
+      promenades, dense modern high-rise towers, the Marina Bay Sands hotel, trees and roads.
+    waypoints:                           # over the bay, heading south-east towards Marina Bay Sands
+      - [-330.0, 330.0, 100.0]
+      - [-280.0, 285.0, 103.0]
+      - [-235.0, 245.0, 106.0]
+  sample_orbit:                          # no-token test flight around the public sample tileset
+    site: cesium_sample                  # a ~1.4 km dragon centred on the origin
+    source: sample
+    speed_mps: 40.0
+    yaw_mode: look_at
+    look_at: [0.0, 0.0, 0.0]
+    scene_description: >-
+      Aerial view from a drone circling a giant sculpture of a coiled Chinese dragon standing alone
+      in an open landscape.
+    package:                             # per-flight overrides of the package: section
+      depth_near_m: 2000.0
+      depth_far_m: 6000.0
+    waypoints:
+      - [0.0, -3200.0, 1200.0]
+      - [700.0, -3100.0, 1250.0]
+      - [1350.0, -2850.0, 1300.0]
+
+camera:
+  width: 832                             # Cosmos 3 480p tier, 16:9
+  height: 480
+  focal_length_mm: 14.0
+  horizontal_aperture_mm: 20.955         # ~73.6 deg horizontal FOV
+  clip: [0.5, 20000.0]
+  fps: 30
+  mount: fixed                           # fixed (hard-mounted, tilts with the body) | gimbal (yaw only)
+  mount_pitch_deg: 30.0                  # look-down angle relative to the body x axis
+
+imu:
+  rate_hz: 200
+  # Continuous-time noise densities and random walks (EuRoC ADIS16448-like); set enabled: false for clean IMU.
+  enabled: true
+  gyro_noise_density: 1.6968e-4          # rad/s/sqrt(Hz)
+  gyro_random_walk: 1.9393e-5            # rad/s^2/sqrt(Hz)
+  accel_noise_density: 2.0e-3            # m/s^2/sqrt(Hz)
+  accel_random_walk: 3.0e-3              # m/s^3/sqrt(Hz)
+  seed: 7
+
+render:
+  warmup_stride: 10                      # warm-up pass visits every Nth pose to fill Cesium's cache
+  tile_timeout_s: 20.0                   # max wait per frame for tiles to finish loading
+  settle_updates: 4                      # extra renderer updates after tiles are idle
+  min_clearance_m: 5.0                   # depth closer than this flags a frame (Cesium has no colliders)
+
+package:
+  max_frames: 297                        # hosted Cosmos 3 480p limit
+  depth_near_m: 5.0
+  depth_far_m: 3000.0
+  depth_convention: near_bright          # near_bright | near_dark (settled empirically in M2)
+  canny: [60, 160]
+
+cosmos:
+  backend: nvidia_hosted                 # nvidia_hosted | vllm_omni | dry_run (local colour-grade stand-in for tests)
+  endpoint: https://ai.api.nvidia.com/v1/cosmos/nvidia/cosmos3-nano
+  resolution: "480_16_9"
+  controls: [depth, edge]
+  # Only documented request fields are sent; put anything else (e.g. guidance) in extra_fields
+  # once confirmed against the live API reference.
+  extra_fields: {}
+  timeout_s: 900
+  seeds: [1, 2]
+  conditions:
+    clear_noon: "Clear tropical midday, high sun, crisp hard shadows, saturated blue sky with a few cumulus clouds"
+    overcast: "Thick uniform overcast, soft shadowless light, grey sky, muted colours"
+    haze: "Heavy regional haze, reduced visibility, washed-out distant buildings, yellow-grey sky"
+    tropical_rain: "Heavy tropical downpour, rain streaks, wet reflective surfaces, dark storm clouds, low contrast"
+    dusk_low_sun: "Golden hour just before sunset, low sun from the west, long shadows, warm orange light, strong glare"
+    night_city: "Night, city lights on, illuminated building facades and streets, dark sky, artificial lighting only"
+    morning_mist: "Early morning, light mist over the water, soft pale light, low contrast, cool tones"
+
+qa:
+  edge_tolerance_px: 2
+  edge_f_score_min: 0.30                 # output edges vs sim edges
+  warp_error_ratio_max: 1.5              # reprojection photometric error, variant / original render
+  track_reproj_excess_px_max: 0.75       # median KLT reprojection error vs GT poses, minus the sim render's
+  track_length_ratio_min: 0.6            # mean track length, variant / original render

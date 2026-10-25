@@ -1,0 +1,98 @@
+# Site configuration for the photogrammetry -> Isaac Sim pipeline.
+# All paths are relative to the project root. Thresholds are fixed before a run, not tuned after.
+
+site: aukerman
+
+dataset:
+  images: datasets/aukerman/images
+  source: https://github.com/OpenDroneMap/odm_data_aukerman
+
+odm:
+  # Pinned image. Digest recorded so the build is reproducible.
+  image: opendronemap/odm:3.6.2
+  digest: sha256:a96f56dbc4f775e352fb2b3acc472bb59f456c0948a699eb1c433659dccfbdf7
+  project_dir: datasets/odm_project
+  args:
+    - --dsm
+    - --dtm
+    - --pc-quality
+    - medium
+    - --feature-quality
+    - high
+    - --mesh-size
+    - "300000"
+    - --max-concurrency
+    - "24"
+
+localize:
+  # Local origin: centre of the mesh footprint, Z at the median of the lowest-decile vertex heights.
+  ground_percentile: 10
+  dtm_cell_m: 1.0            # DTM resampling for the collision underlay
+
+blender:
+  min_part_faces: 50          # loose parts smaller than this are dropped
+  merge_distance: 0.001
+  # Collision-only ground from the DTM, this far below the DTM surface. Closes holes in the
+  # photogrammetry mesh without adding a second contact surface on open ground.
+  ground_underlay_offset: 0.05
+  collision_decimate_ratio: 0.5     # 0.1 gave 44 cm p95 visual-vs-collision drift (canopy); 0.5 gives ~8 cm at ~205k tris
+  fixture:
+    # Synthetic wall with a vertical gap, used to test that openings survive the collision pipeline.
+    # Placed relative to the local origin; Z is snapped to the mesh surface below.
+    xy: [0.0, 0.0]
+    yaw_deg: 0.0
+    wall_length: 6.0
+    wall_height: 3.0
+    wall_thickness: 0.2
+    gap_width: 1.0
+
+isaac:
+  root: ~/Downloads/isaac-sim-standalone-6.0.1-linux-x86_64
+  sun:
+    elevation_deg: 55.0
+    azimuth_deg: 135.0      # clockwise from north
+    intensity: 3000.0
+  dome_intensity: 600.0
+  physics_material:
+    static_friction: 0.8
+    dynamic_friction: 0.6
+    restitution: 0.0
+
+capture:
+  camera:
+    width: 1280
+    height: 960
+    focal_length_mm: 18.0
+    horizontal_aperture_mm: 20.955
+    clip: [0.05, 1000.0]
+  lidar_config: OS1
+  lidar_variant: OS1_REV6_32ch10hz1024res
+  settle_frames: 20
+  # Pose sets are generated from these parameters in 06_capture.py.
+  high_grid:
+    agl: 30.0
+    spacing: 40.0
+    oblique_pitch_deg: 45.0
+  low_pass:
+    agl: [2.0, 5.0]
+    count: 6
+  probes:
+    sphere_radius: 0.2
+    drop_height: 5.0
+    grid_spacing: 25.0
+    settle_seconds: 5.0
+    angular_damping: 1000.0
+  throughput_steps: 100
+
+validate:
+  frame_roundtrip_m: 0.001
+  georef_median_horizontal_m: 5.0
+  scale_rel_error: 0.005
+  import_bbox_m: 0.01
+  depth_median_m: 0.05
+  lidar_median_m: 0.05
+  lidar_p95_m: 0.20
+  contact_m: 0.03
+  contact_max_speed: 1.0       # m/s; faster probes are still falling and are excluded from the contact check
+  collision_drift_p95_m: 0.10
+  depth_sample_pixels: 4000

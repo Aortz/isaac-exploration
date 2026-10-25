@@ -1,0 +1,7 @@
+datasets/
+build/
+reports/
+.venv/
+__pycache__/
+*.blend1
+third_party/

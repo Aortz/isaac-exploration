@@ -115,13 +115,16 @@ uv run python cosmos/f4_generate.py --flight marina_bay_pass --conditions clear_
 | Stage | Script | Output |
 |---|---|---|
 | f0 | `cesium/build_cesium_stage.py` | `build/cesium/<site>_<source>.usda` |
-| f1 | `flight/f1_trajectory.py` | `build/flight/<flight>/` camera poses (TUM, OpenCV frame + USD frame), 200 Hz IMU (noisy + clean + true biases), body ground truth |
-| f2 | `flight/f2_render.py` | `render/frames/` RGB + depth per frame. Each frame waits until Cesium has no tiles loading |
+| f1 | `flight/f1_trajectory.py` | `build/flight/<flight>/` camera poses (TUM, OpenCV frame + USD frame), 200 Hz IMU (noisy with motor vibration + clean + true biases), body ground truth |
+| f2 | `flight/f2_render.py` | `render/frames/` RGB + depth per frame under a cloudy HDR sky (`render:` in the config). Each frame waits until Cesium has no tiles loading |
 | f3 | `cosmos/f3_package.py` | `build/cosmos/<flight>/clips/clip_NN/` rgb/depth/edge mp4 (832×480, 30 fps, ≤ 297 frames) + structured prompts |
 | f4 | `cosmos/f4_generate.py` | `variants/clip_NN/<condition>_s<seed>.mp4`, content-hash cache in `build/cosmos/cache/` (no repeat billing) |
 | f5 | `cosmos/f5_qa.py` | `qa/report.md`: edge F-score, warp-error ratio with ground-truth depth + poses, KLT reprojection vs ground-truth poses, contact sheets |
 | f6 | `cosmos/f6_export.py` | `build/vio_datasets/<flight>/clip_NN/<variant>/mav0/` in EuRoC layout |
 
+- **Keys:** put `CESIUM_ION_TOKEN` and `NVIDIA_API_KEY` in a `.env` file in the project root (gitignored); `env.sh` loads it.
+- **Motion model:** the drone is a kinematic flat-output trajectory (no motors, drag, wind or controller). The IMU adds thrust-dependent rotor vibration (`imu.vibration`). The noise densities written to `imu0/sensor.yaml` do not include vibration, so inflate them in the VIO config.
+- **Hosted Cosmos status (2026-10-29):** `cosmos3-nano` on build.nvidia.com returns 404 / "Function not found for account" for this account, and others report the same on NVIDIA's forum. Until access is granted, use self-hosting or the web Playground.
 - **Compute:** Cosmos3-Nano (16B) does not fit on the 16 GB RTX 5080. The default backend is the hosted build.nvidia.com endpoint. The self-hosted path (`vllm_omni`, Cosmos3-Nano-Sim-Transfer on an RTX PRO 6000 or H100) is stubbed in `cosmos/backends.py`.
 - **Unconfirmed request fields:** the hosted request uses the documented fields: `model_mode`, `prompt`, `resolution`, `num_frames`, `input_reference` and `transfer.<control>.video`. `seed` and `fps` are sent too but are not confirmed yet. Confirm against the live API reference on the first call.
 - **Depth video convention:** the encoding (`package.depth_convention`) is not documented by NVIDIA. Settle it with a near_bright vs near_dark A/B on the first real calls.

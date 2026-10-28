@@ -86,6 +86,35 @@ def add_noise(clean: np.ndarray, rate: float, dens: float, rw: float, rng) -> tu
     return clean + white + bias, bias
 
 
+def motor_vibration(td: np.ndarray, f_dense: np.ndarray, vcfg: dict, rng) -> tuple[np.ndarray, np.ndarray]:
+    """Frame vibration from four rotors, at the dense rate. Returns (gyro_vib, accel_vib) in body axes.
+
+    Rotor speed follows thrust (omega^2 ~ |specific force|), so the vibration frequency and amplitude
+    change as the vehicle accelerates and brakes. Each rotor runs slightly off the others (beating),
+    with tones at the shaft rate and blade-pass rate, plus broadband frame noise.
+    """
+    from scipy.signal import butter, sosfilt
+
+    dt = td[1] - td[0]
+    load = np.linalg.norm(f_dense, axis=1) / G                       # 1.0 at hover
+    acc_amp = np.asarray(vcfg["accel_amp_mps2"], float) * load[:, None]
+    gyro_amp = np.asarray(vcfg["gyro_amp_rads"], float) * load[:, None]
+    acc, gyro = np.zeros_like(f_dense), np.zeros_like(f_dense)
+    for _ in range(4):
+        freq = vcfg["rotor_hz_hover"] * np.sqrt(load) * (1 + rng.uniform(-0.03, 0.03))
+        phase = 2 * np.pi * np.cumsum(freq) * dt
+        for harmonic, weight in ((1, 1.0), (vcfg["blades"], 0.5)):
+            ph = rng.uniform(0, 2 * np.pi, 3)
+            tone = np.sin(harmonic * phase[:, None] + ph) * weight / 2   # four rotors, each half amplitude
+            acc += acc_amp * tone
+            gyro += gyro_amp * tone
+    sos = butter(2, [30.0, 400.0], btype="bandpass", fs=1.0 / dt, output="sos")
+    for out, rms in ((acc, vcfg["broadband_accel_mps2"]), (gyro, vcfg["broadband_gyro_rads"])):
+        band = sosfilt(sos, rng.normal(0.0, 1.0, out.shape), axis=0)
+        out += band / band.std(axis=0) * rms * load[:, None]
+    return gyro, acc
+
+
 def integrate_imu(t, gyro, acc, p0, v0, r0) -> np.ndarray:
     """Strapdown integration of a clean IMU (used only to check consistency)."""
     p, v, rot = p0.copy(), v0.copy(), R.from_matrix(r0)
@@ -145,8 +174,16 @@ def main() -> None:
     gyro, acc = w_dense[::step], f_dense[::step]
     rng = np.random.default_rng(imu.get("seed", 0))
     if imu.get("enabled", True):
-        gyro_n, b_g = add_noise(gyro, imu["rate_hz"], imu["gyro_noise_density"], imu["gyro_random_walk"], rng)
-        acc_n, b_a = add_noise(acc, imu["rate_hz"], imu["accel_noise_density"], imu["accel_random_walk"], rng)
+        gyro_n, acc_n = gyro, acc
+        if imu.get("vibration"):
+            # The sensor averages its internal samples over each output period (a crude anti-alias
+            # filter), so what survives decimation is attenuated and aliased, as on a real MEMS IMU.
+            gv, av = motor_vibration(td, f_dense, imu["vibration"], rng)
+            box = np.ones(step) / step
+            avg = lambda x: np.stack([np.convolve(x[:, k], box)[: len(x)] for k in range(3)], axis=1)[::step]  # noqa: E731
+            gyro_n, acc_n = gyro + avg(gv), acc + avg(av)
+        gyro_n, b_g = add_noise(gyro_n, imu["rate_hz"], imu["gyro_noise_density"], imu["gyro_random_walk"], rng)
+        acc_n, b_a = add_noise(acc_n, imu["rate_hz"], imu["accel_noise_density"], imu["accel_random_walk"], rng)
     else:
         gyro_n, acc_n = gyro, acc
         b_g, b_a = np.zeros_like(gyro), np.zeros_like(acc)

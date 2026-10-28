@@ -11,7 +11,10 @@ flights:
     scene_description: >-
       Aerial view from a small drone flying over Marina Bay, Singapore: calm bay water, waterfront
       promenades, dense modern high-rise towers, the Marina Bay Sands hotel, trees and roads.
-    waypoints:                           # over the bay, heading south-east towards Marina Bay Sands
+    package:                             # rendered depth spans ~85-600 m on this pass
+      depth_near_m: 50.0
+      depth_far_m: 2000.0
+    waypoints:                          # over the bay, heading south-east towards Marina Bay Sands
       - [-330.0, 330.0, 100.0]
       - [-280.0, 285.0, 103.0]
       - [-235.0, 245.0, 106.0]
@@ -51,10 +54,21 @@ imu:
   accel_noise_density: 2.0e-3            # m/s^2/sqrt(Hz)
   accel_random_walk: 3.0e-3              # m/s^3/sqrt(Hz)
   seed: 7
+  vibration:                             # motor/frame vibration (remove this block for none); amplitudes at hover
+    rotor_hz_hover: 120                  # shaft rate at hover; scales with sqrt(thrust)
+    blades: 2                            # blade-pass tone at blades x shaft rate
+    accel_amp_mps2: [0.8, 0.8, 1.5]      # per body axis (x fwd, y left, z up), all four rotors combined
+    gyro_amp_rads: [0.03, 0.03, 0.015]
+    broadband_accel_mps2: 0.4            # RMS frame noise, 30-400 Hz
+    broadband_gyro_rads: 0.01
 
 render:
   warmup_stride: 10                      # warm-up pass visits every Nth pose to fill Cesium's cache
-  tile_timeout_s: 20.0                   # max wait per frame for tiles to finish loading
+  tile_timeout_s: 60.0                   # max wait per frame for tiles to finish loading
+  max_screen_space_error: 8              # Cesium detail: lower = sharper tiles, slower streaming (Cesium default 16)
+  sky_hdr: /NVIDIA/Assets/Skies/Cloudy/kloofendal_48d_partly_cloudy_4k.hdr   # under the Isaac assets root
+  sky_intensity: 600                     # dome light lights the tiles and is the visible sky
+  sun_intensity: 0                       # tiles have daylight and shadows baked in; a sun would double them
   settle_updates: 4                      # extra renderer updates after tiles are idle
   min_clearance_m: 5.0                   # depth closer than this flags a frame (Cesium has no colliders)
 

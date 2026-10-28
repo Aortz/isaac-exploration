@@ -42,7 +42,10 @@ def simulation_app_config(headless: bool = True) -> dict:
     registry is first built, so enabling it later leaves the Cesium prim types without attributes.
     """
     return {"headless": headless,
-            "extra_args": ["--ext-folder", str(CESIUM_EXTS), "--enable", "cesium.omniverse"]}
+            "extra_args": ["--ext-folder", str(CESIUM_EXTS), "--enable", "cesium.omniverse",
+                           # Crash dumps hold process memory (the ion token): keep them local.
+                           "--/crashreporter/url=", "--/crashreporter/skipOldDumpUpload=true",
+                           "--/crashreporter/includeEnvironmentAsMetadata=false"]}
 
 
 def ensure_loaded() -> None:
@@ -53,21 +56,64 @@ def ensure_loaded() -> None:
 
 
 def open_stage(app, path: str | Path, token: str = ""):
-    """Open a Cesium stage. The ion token goes to the session layer only, never to the file."""
+    """Open a Cesium stage. The ion token goes to the session layer only, never to the file.
+
+    The token must be in place before Kit sees the stage: tilesets start loading on open, and a
+    tokenless ion request (401) sends cesium.omniverse 0.29 into its troubleshooting path, which
+    segfaults headless. So compose the stage in memory with a pre-filled session layer and attach it.
+    """
     import omni.usd
     from cesium.usd.plugins.CesiumUsdSchemas import IonServer
+    from pxr import Sdf, Usd, UsdUtils
 
     ctx = omni.usd.get_context()
-    ctx.open_stage(str(path))
-    while ctx.get_stage_loading_status()[2] > 0:
-        app.update()
-    stage = ctx.get_stage()
-    stage.SetEditTarget(stage.GetSessionLayer())
+    session = Sdf.Layer.CreateAnonymous("cesium_session")
+    stage = Usd.Stage.Open(Sdf.Layer.FindOrOpen(str(path)), session)
+    stage.SetEditTarget(session)
     if token:
         server = stage.GetPrimAtPath(ION_SERVER)
         if server.IsValid():
             IonServer(server).GetProjectDefaultIonAccessTokenAttr().Set(token)
+    stage_id = UsdUtils.StageCache.Get().Insert(stage).ToLongInt()
+    ctx.attach_stage_with_callback(stage_id=stage_id, on_finish_fn=lambda success, message: None)
+    while ctx.get_stage() is None or ctx.get_stage_loading_status()[2] > 0:
+        app.update()
+    stage = ctx.get_stage()
+    stage.SetEditTarget(stage.GetSessionLayer())
     return stage
+
+
+def apply_look(stage, rcfg: dict) -> dict:
+    """Session-layer render look: Cesium tile detail, HDR sky dome, sun. Returns what was applied.
+
+    Google tiles have daylight baked in, so the sky dome is the only light (soft, cloudy) and the
+    sun stays off unless rcfg asks for it.
+    """
+    from cesium.usd.plugins.CesiumUsdSchemas import Tileset
+    from pxr import Sdf, UsdLux
+
+    applied = {}
+    if "max_screen_space_error" in rcfg:
+        for prim in stage.Traverse():
+            if prim.IsA(Tileset):
+                Tileset(prim).GetMaximumScreenSpaceErrorAttr().Set(float(rcfg["max_screen_space_error"]))
+        applied["max_screen_space_error"] = rcfg["max_screen_space_error"]
+    dome = UsdLux.DomeLight(stage.GetPrimAtPath("/World/Lighting/Dome"))
+    if dome and rcfg.get("sky_hdr"):
+        from isaacsim.storage.native import get_assets_root_path
+
+        url = get_assets_root_path(skip_check=True) + rcfg["sky_hdr"]
+        dome.CreateTextureFileAttr().Set(Sdf.AssetPath(url))
+        dome.CreateTextureFormatAttr().Set(UsdLux.Tokens.latlong)
+        applied["sky_hdr"] = url
+    if dome and "sky_intensity" in rcfg:
+        dome.GetIntensityAttr().Set(float(rcfg["sky_intensity"]))
+        applied["sky_intensity"] = rcfg["sky_intensity"]
+    sun = UsdLux.DistantLight(stage.GetPrimAtPath("/World/Lighting/Sun"))
+    if sun and "sun_intensity" in rcfg:
+        sun.GetIntensityAttr().Set(float(rcfg["sun_intensity"]))
+        applied["sun_intensity"] = rcfg["sun_intensity"]
+    return applied
 
 
 def set_viewport_camera(camera_path: str) -> bool:
@@ -94,16 +140,26 @@ def tile_stats() -> dict:
                                             "tileset_cached_bytes")}
 
 
-def wait_for_tiles(app, timeout_s: float, min_updates: int = 2) -> tuple[dict, bool, int]:
-    """Step the app until Cesium has no tiles loading (or timeout). Returns (stats, settled, updates)."""
+def wait_for_tiles(app, timeout_s: float, min_updates: int = 3,
+                   require_rendered: bool = True) -> tuple[dict, bool, int]:
+    """Step the app until Cesium has no tiles loading (or timeout). Returns (stats, settled, updates).
+
+    Idle has to hold for min_updates consecutive updates: the statistics trail the camera by an
+    update or so, so after a big camera jump the first "idle" still describes the old view (and
+    right after the stage opens nothing is loading *yet*). require_rendered also waits for at
+    least one tile on screen.
+    """
     t0 = time.time()
-    n = 0
+    n = streak = 0
     while True:
         app.update()
         n += 1
         s = tile_stats()
         idle = s["tiles_loading_worker"] == 0 and s["tiles_loading_main"] == 0
-        if n >= min_updates and idle:
+        if require_rendered and s["tiles_rendered"] == 0:
+            idle = False
+        streak = streak + 1 if idle else 0
+        if streak >= min_updates:
             return s, True, n
         if time.time() - t0 > timeout_s:
             return s, False, n

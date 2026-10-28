@@ -61,6 +61,7 @@ def main() -> None:
         raise SystemExit("CESIUM_ION_TOKEN is not set; ion tilesets will not stream")
 
     stage = cs.open_stage(app, stage_path, args.token)
+    look = cs.apply_look(stage, rcfg)
     rtx = RtxCamera(CAMERA)
     ucam = UsdGeom.Camera(stage.GetPrimAtPath(CAMERA))
     ucam.GetFocalLengthAttr().Set(cam["focal_length_mm"])
@@ -129,7 +130,7 @@ def main() -> None:
 
     summary = {
         "flight": args.flight, "stage": str(stage_path), "frames": int(len(poses)),
-        "viewport_bound": viewport_bound,
+        "viewport_bound": viewport_bound, "look": look,
         "camera_prim_attributes": {k: (v if isinstance(v, (int, float, str, bool)) or v is None else str(v))
                                    for k, v in attrs.items()},
         "intrinsics": {"width": W, "height": H, "fx": fx_usd, "fy": fy_usd, "cx": W / 2, "cy": H / 2}, "warmup_s": round(warmup_s, 1),

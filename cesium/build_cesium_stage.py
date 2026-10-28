@@ -31,6 +31,7 @@ from pipeline.common.cesium_support import (  # noqa: E402
     ION_SERVER,
     SAMPLE_URL,
     SITES,
+    open_stage,
     simulation_app_config,
 )
 
@@ -242,13 +243,10 @@ def main() -> None:
     del file_stage
     print(f"CESIUM_STAGE {out}  origin=({lat}, {lon}, {height})  tilesets={tilesets}")
 
-    ctx = omni.usd.get_context()
-    ctx.open_stage(str(out))
-    while ctx.get_stage_loading_status()[2] > 0:
-        app.update()
-    stage = ctx.get_stage()
     # Verification-only edits (token, camera, marker) go to the session layer so the file stays clean.
-    stage.SetEditTarget(stage.GetSessionLayer())
+    # The token has to be there before Kit sees the stage (see open_stage).
+    token = args.token if args.verify and args.source in ION_ASSETS else ""
+    stage = open_stage(app, out, token)
     for _ in range(30):
         app.update()
     report = {"stage": str(out), "origin": [lat, lon, height], "source": args.source, "tilesets": tilesets,
@@ -258,8 +256,6 @@ def main() -> None:
         if args.source in ION_ASSETS:
             if not args.token:
                 report["stream"] = {"skipped": "no ion token (set CESIUM_ION_TOKEN)"}
-            else:
-                CesiumIonServer(stage.GetPrimAtPath(ION_SERVER)).GetProjectDefaultIonAccessTokenAttr().Set(args.token)
         if "stream" not in report:
             report["stream"] = stream(stage, args.verify_seconds, out.with_suffix(".png"))
 

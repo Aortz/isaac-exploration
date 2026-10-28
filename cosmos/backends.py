@@ -16,6 +16,7 @@ import hashlib
 import json
 import os
 import subprocess
+import tempfile
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -34,8 +35,17 @@ class TransferJob:
     controls: list[str]
 
 
-def _data_uri(path: Path) -> str:
-    return "data:video/mp4;base64," + base64.b64encode(path.read_bytes()).decode()
+def _data_uri(path: Path, num_frames: int | None = None) -> str:
+    """Base64 data URI of an mp4, cut to its first num_frames (keeps probe requests small)."""
+    data = path.read_bytes()
+    if num_frames is not None:
+        with tempfile.TemporaryDirectory() as tmp:
+            cut = Path(tmp) / "cut.mp4"
+            subprocess.run(["ffmpeg", "-loglevel", "error", "-i", str(path), "-frames:v", str(num_frames),
+                            "-c:v", "libx264", "-preset", "slow", "-crf", "12", "-pix_fmt", "yuv420p",
+                            "-movflags", "+faststart", str(cut)], check=True)
+            data = cut.read_bytes()
+    return "data:video/mp4;base64," + base64.b64encode(data).decode()
 
 
 def _sha(path: Path) -> str:
@@ -74,9 +84,10 @@ class NvidiaHostedBackend(CosmosBackend):
             raise RuntimeError("NVIDIA_API_KEY is not set (create one at build.nvidia.com)")
 
     def request_body(self, job: TransferJob) -> dict:
-        transfer = {}
+        # The chunk size bounds the output length, so ask for the whole clip in one chunk.
+        transfer = {"num_video_frames_per_chunk": job.num_frames}
         for c in job.controls:
-            transfer[c] = {"video": _data_uri(job.clip_dir / f"{c}.mp4")}
+            transfer[c] = {"video": _data_uri(job.clip_dir / f"{c}.mp4", job.num_frames)}
         body = {
             "model_mode": "video2video",
             "prompt": json.dumps(job.prompt),
@@ -84,7 +95,7 @@ class NvidiaHostedBackend(CosmosBackend):
             "num_frames": job.num_frames,
             "fps": job.fps,
             "seed": job.seed,
-            "input_reference": _data_uri(job.clip_dir / "rgb.mp4"),
+            "input_reference": _data_uri(job.clip_dir / "rgb.mp4", job.num_frames),
             "transfer": transfer,
         }
         body.update(self.cfg.get("extra_fields", {}))

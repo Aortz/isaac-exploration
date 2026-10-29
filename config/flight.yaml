@@ -45,6 +45,27 @@ camera:
   mount: fixed                           # fixed (hard-mounted, tilts with the body) | gimbal (yaw only)
   mount_pitch_deg: 30.0                  # look-down angle relative to the body x axis
 
+rig:                                     # 4-fisheye rig (flight/rig_fisheye.py), all hard-mounted
+  camera_hz: 30
+  width: 640
+  height: 480
+  # OpenCV fisheye (= Kalibr/OpenVINS "equidistant"): r = f * theta_d, theta_d = theta (1 + k1 theta^2 + ...).
+  # f = 160 px puts theta = 86 deg at the top/bottom edge (172 deg vertical) and 90 deg at r = 251 px.
+  # The RTX renderer stops at theta = 90 deg, so each image is a 180 deg circle with black corners.
+  fx: 160.0
+  fy: 160.0
+  k: [0.0, 0.0, 0.0, 0.0]
+  depth: false                           # also render distance_to_camera per camera (slower)
+  # An image shows the pose set 3 renderer updates earlier (flight/rig_fisheye.py --lag-test).
+  # lockstep waits for 3 consecutive tile-idle updates, which covers that, so no extra settle.
+  settle_updates: 0
+  freerun_lag_frames: [1, 1, 0, 0]       # measured lag for 1, 2, 3, 4 updates per free-running frame
+  cameras:                               # name: [yaw left of forward deg, pitch down deg]
+    cam0_front: [0.0, 20.0]
+    cam1_left: [90.0, 20.0]
+    cam2_back: [180.0, 20.0]
+    cam3_right: [-90.0, 20.0]
+
 imu:
   rate_hz: 200
   # Continuous-time noise densities and random walks (EuRoC ADIS16448-like); set enabled: false for clean IMU.

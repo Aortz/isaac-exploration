@@ -98,6 +98,13 @@ def apply_look(stage, rcfg: dict) -> dict:
             if prim.IsA(Tileset):
                 Tileset(prim).GetMaximumScreenSpaceErrorAttr().Set(float(rcfg["max_screen_space_error"]))
         applied["max_screen_space_error"] = rcfg["max_screen_space_error"]
+    if "frustum_culling" in rcfg:
+        # Cesium picks tiles for the viewport camera only; with culling off it also loads what
+        # cameras looking elsewhere from the same spot need (multi-camera rigs).
+        for prim in stage.Traverse():
+            if prim.IsA(Tileset):
+                Tileset(prim).GetEnableFrustumCullingAttr().Set(bool(rcfg["frustum_culling"]))
+        applied["frustum_culling"] = rcfg["frustum_culling"]
     dome = UsdLux.DomeLight(stage.GetPrimAtPath("/World/Lighting/Dome"))
     if dome and rcfg.get("sky_hdr"):
         from isaacsim.storage.native import get_assets_root_path

@@ -129,3 +129,20 @@ uv run python cosmos/f4_generate.py --flight marina_bay_pass --conditions clear_
 - **Unconfirmed request fields:** the hosted request uses the documented fields: `model_mode`, `prompt`, `resolution`, `num_frames`, `input_reference` and `transfer.<control>.video`. `seed` and `fps` are sent too but are not confirmed yet. Confirm against the live API reference on the first call.
 - **Depth video convention:** the encoding (`package.depth_convention`) is not documented by NVIDIA. Settle it with a near_bright vs near_dark A/B on the first real calls.
 - **Licensing:** Google 3D tiles terms may restrict caching and ML use of derived data; check before training on outputs. The hosted Cosmos API runs under NVIDIA's trial terms.
+
+## 4-fisheye rig, rates and ROS 2
+
+`flight/rig_fisheye.py` flies the F1 trajectory with four hard-mounted OpenCV-fisheye cameras (front, left, back and right, 20° down; `rig:` in `config/flight.yaml`). The RTX renderer stops at 90° off-axis, so each image is a 180° circle. Cesium frustum culling is turned off so all four directions get tiles.
+
+```bash
+source ros2/ros_env.sh                                   # Isaac's bundled ROS 2 Jazzy, no system ROS needed
+$ISAAC_ROOT/python.sh ros2/measure_rates.py &            # subscriber: wall rate, sim-stamp rate, camera sync
+$ISAAC_ROOT/python.sh flight/rig_fisheye.py --flight marina_bay_pass --mode lockstep --ros2
+$ISAAC_ROOT/python.sh flight/rig_fisheye.py --flight marina_bay_pass --mode freerun --ros2 --max-fps 15
+$ISAAC_ROOT/python.sh flight/rig_fisheye.py --flight marina_bay_pass --lag-test    # image-vs-pose lag per update count
+```
+
+- **Topics:** `/clock`, `/imu/data` (200 Hz), `/<cam>/image_raw` and `/<cam>/camera_info` (`equidistant`), `/tf`, `/tf_static`, `/ground_truth/odom`. Kalibr-style `camchain.yaml` (readable by OpenVINS) is written next to `rates.json`.
+- **lockstep:** sim time advances 1/camera_hz per frame, and only after all cameras have a finished frame. All four images share one stamp, IMU and `/clock` lead the images, and consumers use `use_sim_time`. On the RTX 5080 this ran at 7.7 frames/s wall (31 images/s), which is 30 Hz on the sim clock.
+- **freerun:** one renderer update per frame. An image shows the pose set 3 updates earlier (measured with `--lag-test`), so images are stamped with the pose they show (`rig.freerun_lag_frames`).
+- **Hard freeze:** an uncapped freerun froze the whole machine once (2026-10-29), with nothing in the kernel log. Use `--max-fps`.

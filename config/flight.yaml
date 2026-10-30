@@ -18,6 +18,29 @@ flights:
       - [-330.0, 330.0, 100.0]
       - [-280.0, 285.0, 103.0]
       - [-235.0, 245.0, 106.0]
+  marina_bay_loop:                       # ~75 s loop over the bay for VIO (OpenVINS), with hover for static init
+    site: marina_bay
+    source: google
+    speed_mps: 10.0
+    yaw_mode: velocity
+    hover_start_s: 4.0
+    hover_end_s: 3.0
+    scene_description: >-
+      Aerial view from a small drone circling over Marina Bay, Singapore: calm bay water, waterfront
+      promenades, modern high-rise towers, the Marina Bay Sands hotel, trees and roads.
+    package:
+      depth_near_m: 50.0
+      depth_far_m: 2000.0
+    waypoints:                           # stays >= 150 m west of Marina Bay Sands (origin), 105-125 m up
+      - [-330.0, 330.0, 110.0]
+      - [-260.0, 400.0, 116.0]
+      - [-330.0, 470.0, 124.0]
+      - [-440.0, 440.0, 120.0]
+      - [-470.0, 350.0, 113.0]
+      - [-420.0, 260.0, 106.0]
+      - [-320.0, 240.0, 111.0]
+      - [-250.0, 300.0, 119.0]
+      - [-300.0, 360.0, 115.0]
   sample_orbit:                          # no-token test flight around the public sample tileset
     site: cesium_sample                  # a ~1.4 km dragon centred on the origin
     source: sample

@@ -148,14 +148,18 @@ def main() -> None:
     knots = np.concatenate([[0.0], np.cumsum(seg)]) / fl["speed_mps"] * 1.25
     spline = make_interp_spline(knots, wp, k=5, bc_type=([(1, np.zeros(3)), (2, np.zeros(3))],
                                                          [(1, np.zeros(3)), (2, np.zeros(3))]))
-    duration = knots[-1]
+    moving = knots[-1]
+    # Optional hover before take-off and after arrival (VIO static initialisation needs a still start).
+    hover0, hover1 = float(fl.get("hover_start_s", 0.0)), float(fl.get("hover_end_s", 0.0))
+    duration = hover0 + moving + hover1
 
     mode, target = fl.get("yaw_mode", "velocity"), fl.get("look_at")
     r_bc = body_to_camera_cv(cam["mount_pitch_deg"])
 
     def state(t):
-        p, v, a = spline(t), spline(t, 1), spline(t, 2)
-        psi = headings(t, p, v, mode, target, wp[1] - wp[0], wp[-1] - wp[-2], duration)
+        ts = np.clip(t - hover0, 0.0, moving)   # spline time; ends have zero velocity and acceleration
+        p, v, a = spline(ts), spline(ts, 1), spline(ts, 2)
+        psi = headings(ts, p, v, mode, target, wp[1] - wp[0], wp[-1] - wp[-2], moving)
         r_wb = flat_attitude(a, psi)
         if cam["mount"] == "gimbal":
             r_wc = np.einsum("nij,jk->nik", R.from_euler("z", psi).as_matrix(), r_bc)
@@ -230,7 +234,7 @@ def main() -> None:
     (out / "trajectory.json").write_text(json.dumps(meta, indent=2) + "\n")
     print(json.dumps({k: meta[k] for k in ("duration_s", "frames", "path_length_m", "max_speed_mps",
                                            "max_tilt_deg", "checks")}))
-    if wp_err > 1e-6 or drift > 0.01:
+    if wp_err > 1e-6 or drift > 0.01 * max(1.0, duration / 10.0):   # 1 cm per 10 s of flight
         raise SystemExit(f"trajectory self-check failed: waypoint err {wp_err:.2e} m, IMU drift {drift:.4f} m")
 
 

@@ -146,3 +146,25 @@ $ISAAC_ROOT/python.sh flight/rig_fisheye.py --flight marina_bay_pass --lag-test 
 - **lockstep:** sim time advances 1/camera_hz per frame, and only after all cameras have a finished frame. All four images share one stamp, IMU and `/clock` lead the images, and consumers use `use_sim_time`. On the RTX 5080 this ran at 7.7 frames/s wall (31 images/s), which is 30 Hz on the sim clock.
 - **freerun:** one renderer update per frame. An image shows the pose set 3 updates earlier (measured with `--lag-test`), so images are stamped with the pose they show (`rig.freerun_lag_frames`).
 - **Hard freeze:** an uncapped freerun froze the whole machine once (2026-10-29), with nothing in the kernel log. Use `--max-fps`.
+
+## OpenVINS on the fisheye rig
+
+OpenVINS runs in Docker (ROS 2 Jazzy, pinned commit) and subscribes live to the rig topics. Jazzy dropped some `.h` headers, so the Dockerfile patches them to `.hpp`.
+
+```bash
+ros2/openvins/build.sh                                            # once, ~10 min
+uv run python flight/f1_trajectory.py --flight marina_bay_loop    # 105 s loop, 4 s hover at the start for static init
+uv run python ros2/openvins/make_config.py                        # build/openvins/rig4/ (all 4 cams); --cameras cam0_front for mono
+ros2/openvins/run_openvins.sh rig4 build/openvins/rig4/run1 &     # starts OpenVINS, uses /clock
+source ros2/ros_env.sh && $ISAAC_ROOT/python.sh flight/rig_fisheye.py --flight marina_bay_loop --mode lockstep --ros2 --save-all
+docker kill -s INT openvins                                       # flushes ov_estimate.txt
+uv run python ros2/openvins/eval_vio.py --flight marina_bay_loop --run build/openvins/rig4/run1   # ATE (4-DoF aligned), eval.png
+uv run python flight/rig_video.py --flight marina_bay_loop --run rig_lockstep                    # grid.mp4 + per-camera mp4s
+```
+
+Config choices in `make_config.py`, each forced by this setup:
+- **Triangulation limits:** `fi_max_dist` is 1500 m and `fi_max_baseline` is 400. The defaults (60 m, 40) suit indoor rigs, and every feature seen from 100 m up is farther than 60 m, so all of them would be discarded.
+- **Feature detection:** the grid is 10×8 and the FAST threshold is 10. OpenVINS keeps the strongest corners in each cell before applying the mask, and on a fisheye those are the bright rim of the image circle, which the mask then rejects. The bay water also has little texture.
+- **Mask:** each mask keeps features within 80° of the optical axis.
+- **Initialisation:** ZUPT is on at the start with `init_max_disparity` of 2 px, so OpenVINS initialises during the start hover. Static init would otherwise wait for an acceleration jerk, and a slow take-off at altitude never produces one.
+- **IMU noise:** the noise densities fold in the measured motor vibration, then are doubled for margin.

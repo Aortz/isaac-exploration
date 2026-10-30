@@ -15,6 +15,7 @@ dependencies = [
     "imagecodecs>=2026.10.10",
     "opencv-python-headless>=5.0.0.93",
     "requests>=2.34.2",
+    "matplotlib>=3.11.2",
 ]
 
 [tool.uv]

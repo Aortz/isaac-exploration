@@ -42,6 +42,7 @@ ap.add_argument("--max-frames", type=int, default=0)
 ap.add_argument("--save-every", type=int, default=30, help="save the 4 images every N frames (0 = never)")
 ap.add_argument("--save-all", action="store_true", help="save every frame (for --lag-check runs)")
 ap.add_argument("--lag-test", action="store_true", help="measure image-vs-pose lag per renderer-update count, then exit")
+ap.add_argument("--imu-file", default="imu.csv", help="IMU stream to publish (imu_clean.csv = no noise/vibration)")
 ap.add_argument("--tag", default="", help="output folder suffix: rig_<mode>_<tag>")
 ap.add_argument("--token", default=os.environ.get("CESIUM_ION_TOKEN", ""))
 args = ap.parse_args()
@@ -240,7 +241,7 @@ def main() -> None:
     rcfg["frustum_culling"] = False
     fdir = BUILD / "flight" / args.flight
     gt = np.loadtxt(fdir / "groundtruth_200hz.csv", delimiter=",", comments="#")   # t p(3) q_wxyz(4) v(3)
-    imu = np.loadtxt(fdir / "imu.csv", delimiter=",", comments="#")
+    imu = np.loadtxt(fdir / args.imu_file, delimiter=",", comments="#")
     t_frames = np.arange(0.0, gt[-1, 0], 1.0 / rig["camera_hz"])
     if args.max_frames:
         t_frames = t_frames[: args.max_frames]

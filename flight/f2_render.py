@@ -27,12 +27,13 @@ ap.add_argument("--flight", required=True)
 ap.add_argument("--config", default=str(PROJECT_ROOT / "config" / "flight.yaml"))
 ap.add_argument("--stage", help="Cesium stage (default build/cesium/<site>_<source>.usda)")
 ap.add_argument("--max-frames", type=int, default=0, help="render only the first N frames (0 = all)")
+ap.add_argument("--gui", action="store_true", help="open the Isaac Sim window (viewport shows the first camera)")
 ap.add_argument("--token", default=os.environ.get("CESIUM_ION_TOKEN", ""))
 args = ap.parse_args()
 
 from isaacsim import SimulationApp  # noqa: E402
 
-app = SimulationApp(simulation_app_config(headless=True))
+app = SimulationApp(simulation_app_config(headless=not args.gui))
 
 import numpy as np  # noqa: E402
 import omni.timeline  # noqa: E402

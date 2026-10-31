@@ -214,6 +214,15 @@ def main() -> None:
     np.savetxt(out / "imu_bias.csv", np.column_stack([ti, b_g, b_a]), fmt="%.9f", delimiter=",",
                header="t,bgx,bgy,bgz,bax,bay,baz  (true IMU biases)")
 
+    if fl.get("dynamics") == "pegasus":
+        # Controller reference for flight/pegasus_fly.py (Pegasus NonlinearController column order).
+        # pegasus_post.py then replaces the kinematic outputs above with what the vehicle actually flew.
+        ts = np.clip(td - hover0, 0.0, moving)
+        jerk = spline(ts, 3) * ((td > hover0) & (td < hover0 + moving))[:, None]
+        psi = np.unwrap(np.arctan2(r_wb[:, 1, 0], r_wb[:, 0, 0]))
+        np.savetxt(out / "reference_1000hz.csv", np.column_stack([td, p, v, a, jerk, psi, np.gradient(psi, td)]),
+                   fmt="%.9f", delimiter=",", header="t,px,py,pz,vx,vy,vz,ax,ay,az,jx,jy,jz,yaw,yaw_rate  (world ENU)")
+
     # Consistency checks: spline hits the waypoints; clean IMU integrates back to the path.
     wp_err = float(np.abs(spline(knots) - wp).max())
     p_int = integrate_imu(ti, gyro, acc, p[0], v[0], r_wb[0])

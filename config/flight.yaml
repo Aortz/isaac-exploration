@@ -18,7 +18,7 @@ flights:
       - [-330.0, 330.0, 100.0]
       - [-280.0, 285.0, 103.0]
       - [-235.0, 245.0, 106.0]
-  marina_bay_loop:                       # ~75 s loop over the bay for VIO (OpenVINS), with hover for static init
+  marina_bay_loop: &marina_bay_loop      # ~105 s loop over the bay for VIO (OpenVINS), with hover for static init
     site: marina_bay
     source: google
     speed_mps: 10.0
@@ -41,6 +41,9 @@ flights:
       - [-320.0, 240.0, 111.0]
       - [-250.0, 300.0, 119.0]
       - [-300.0, 360.0, 115.0]
+  marina_bay_loop_pegasus:               # same loop, flown by a simulated Iris quadrotor (flight/pegasus_fly.py)
+    <<: *marina_bay_loop
+    dynamics: pegasus                    # the spline is the controller's reference; poses + IMU come from physics
   sample_orbit:                          # no-token test flight around the public sample tileset
     site: cesium_sample                  # a ~1.4 km dragon centred on the origin
     source: sample
@@ -88,6 +91,27 @@ rig:                                     # 4-fisheye rig (flight/rig_fisheye.py)
     cam1_left: [90.0, 20.0]
     cam2_back: [180.0, 20.0]
     cam3_right: [-90.0, 20.0]
+
+stereo:                                  # pinhole stereo pair (flight/rig_fisheye.py --stereo), e.g. for MAC-VO
+  width: 640                             # TartanAir geometry (MAC-VO's training data): 640x480, fx = fy = 320
+  height: 480
+  fx: 320.0
+  fy: 320.0
+  baseline_m: 0.5                        # left camera at body +y (left), right at -y; centred on the IMU
+  yaw_deg: 0.0                           # mount, as for rig.cameras: forward, pitched down
+  pitch_deg: 30.0
+
+pegasus:                                 # Pegasus Simulator multirotor (third_party/pegasus, Isaac Sim 6.0 port)
+  vehicle: Iris                          # pegasus.simulator.params.ROBOTS
+  physics_hz: 1000                       # = f1_trajectory DENSE_HZ; the IMU is box-averaged down to imu.rate_hz
+  preroll_s: 3.0                         # hover at the first waypoint before t = 0 so the spawn transient dies out
+  drag: [0.50, 0.30, 0.0]                # linear body drag coefficients (Pegasus default)
+  gains:                                 # Pegasus NonlinearController (Mellinger-style geometric tracking)
+    Kp: [10.0, 10.0, 10.0]
+    Kd: [8.5, 8.5, 8.5]
+    Ki: [1.5, 1.5, 1.5]
+    Kr: [3.5, 3.5, 3.5]
+    Kw: [0.5, 0.5, 0.5]
 
 imu:
   rate_hz: 200

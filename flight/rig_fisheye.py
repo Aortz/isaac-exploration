@@ -13,8 +13,11 @@ ROS 2 (--ros2; source ros2/ros_env.sh first, uses Isaac's bundled Jazzy):
   /clock, /imu/data (200 Hz, from F1 imu.csv), /<cam>/image_raw + /<cam>/camera_info (equidistant),
   /tf (world -> base_link ground truth), /tf_static (base_link -> <cam>_optical), /ground_truth/odom
 
+--stereo swaps the fisheyes for the pinhole stereo pair in `stereo:` (left/right, plumb_bob with zero
+distortion) and also writes stereo.json, times.csv and groundtruth_left.csv for offline stereo VO.
+
 Run: source ros2/ros_env.sh && $ISAAC_ROOT/python.sh flight/rig_fisheye.py --flight marina_bay_pass [--mode freerun] [--ros2]
-Writes build/flight/<flight>/rig_<mode>[_<tag>]/{rates.json, camchain.yaml, frames/}
+Writes build/flight/<flight>/rig_<mode>[_<tag>]/{rates.json, camchain.yaml, frames/}  (_stereo for --stereo)
 """
 
 from __future__ import annotations
@@ -44,12 +47,14 @@ ap.add_argument("--save-all", action="store_true", help="save every frame (for -
 ap.add_argument("--lag-test", action="store_true", help="measure image-vs-pose lag per renderer-update count, then exit")
 ap.add_argument("--imu-file", default="imu.csv", help="IMU stream to publish (imu_clean.csv = no noise/vibration)")
 ap.add_argument("--tag", default="", help="output folder suffix: rig_<mode>_<tag>")
+ap.add_argument("--stereo", action="store_true", help="render the pinhole stereo pair (config stereo:) instead")
+ap.add_argument("--gui", action="store_true", help="open the Isaac Sim window (viewport shows the first camera)")
 ap.add_argument("--token", default=os.environ.get("CESIUM_ION_TOKEN", ""))
 args = ap.parse_args()
 
 from isaacsim import SimulationApp  # noqa: E402
 
-app = SimulationApp(simulation_app_config(headless=True))
+app = SimulationApp(simulation_app_config(headless=not args.gui))
 
 import numpy as np  # noqa: E402
 import omni.timeline  # noqa: E402
@@ -75,7 +80,7 @@ def body_to_camera(yaw_deg: float, pitch_deg: float) -> np.ndarray:
 class RosOut:
     """Thin rclpy publisher set; every message is stamped with sim time."""
 
-    def __init__(self, cams: dict, rig: dict, extrinsics: dict):
+    def __init__(self, cams: dict, intr: dict, extrinsics: dict, offsets: dict):
         import rclpy
         from geometry_msgs.msg import TransformStamped
         from nav_msgs.msg import Odometry
@@ -101,17 +106,17 @@ class RosOut:
         for c in cams:
             ci = CameraInfo()
             ci.header.frame_id = f"{c}_optical"
-            ci.width, ci.height = rig["width"], rig["height"]
-            ci.distortion_model = "equidistant"
-            ci.d = [float(x) for x in rig["k"]]
-            fx, fy, cx, cy = rig["fx"], rig["fy"], rig["width"] / 2, rig["height"] / 2
+            ci.width, ci.height = intr["width"], intr["height"]
+            ci.distortion_model = intr["model"]
+            ci.d = [float(x) for x in intr["d"]]
+            fx, fy, cx, cy = intr["fx"], intr["fy"], intr["width"] / 2, intr["height"] / 2
             ci.k = [fx, 0.0, cx, 0.0, fy, cy, 0.0, 0.0, 1.0]
             ci.r = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
             ci.p = [fx, 0.0, cx, 0.0, 0.0, fy, cy, 0.0, 0.0, 0.0, 1.0, 0.0]
             self.info_msg[c] = ci
         tfs = []
         for c, r_bc in extrinsics.items():
-            tfs.append(self._tf(0.0, "base_link", f"{c}_optical", np.zeros(3), R.from_matrix(r_bc).as_quat()))
+            tfs.append(self._tf(0.0, "base_link", f"{c}_optical", offsets[c], R.from_matrix(r_bc).as_quat()))
         self.tf_static.publish(TFMessage(transforms=tfs))
 
     def _stamp(self, msg, t: float) -> None:
@@ -187,6 +192,26 @@ def write_camchain(path: Path, rig: dict, extrinsics: dict, imu_cfg: dict) -> No
     path.write_text("\n".join(lines) + "\n")
 
 
+def write_stereo(out: Path, intr: dict, extrinsics: dict, offsets: dict, t_frames, pos, rots) -> None:
+    """stereo.json + times.csv + groundtruth_left.csv (left camera, OpenCV frame, camera -> world ENU)."""
+    def t_body(c):
+        m = np.eye(4)
+        m[:3, :3], m[:3, 3] = extrinsics[c], offsets[c]
+        return m
+
+    t_bl, t_br = t_body("left"), t_body("right")
+    meta = {**{k: intr[k] for k in ("width", "height", "fx", "fy")}, "cx": intr["width"] / 2, "cy": intr["height"] / 2,
+            "baseline_m": float(np.linalg.norm(offsets["left"] - offsets["right"])), "camera_hz": round(1.0 / (t_frames[1] - t_frames[0]), 6),
+            "T_body_left": t_bl.tolist(), "T_left_right": (np.linalg.inv(t_bl) @ t_br).tolist()}
+    (out / "stereo.json").write_text(json.dumps(meta, indent=2) + "\n")
+    np.savetxt(out / "times.csv", np.column_stack([np.arange(len(t_frames)), t_frames]), fmt=["%d", "%.9f"],
+               delimiter=",", header="frame,t_s", comments="")
+    r_wl = rots.as_matrix() @ extrinsics["left"]
+    p_wl = pos + rots.apply(offsets["left"])
+    np.savetxt(out / "groundtruth_left.csv", np.column_stack([t_frames, p_wl, R.from_matrix(r_wl).as_quat()]),
+               fmt="%.9f", delimiter=",", header="t_s,px,py,pz,qx,qy,qz,qw", comments="")
+
+
 def lag_test(sensors: dict, rig_xf, p0, r0, rcfg: dict, fdir: Path, n: int = 36, step_deg: float = 10.0) -> None:
     """How many renderer updates until a camera's image shows the pose just set?
 
@@ -257,28 +282,45 @@ def main() -> None:
     stage = cs.open_stage(app, stage_path, args.token)
     look = cs.apply_look(stage, rcfg)
 
-    W, H = rig["width"], rig["height"]
+    if args.stereo:
+        st = cfg["stereo"]
+        intr = {"width": st["width"], "height": st["height"], "fx": st["fx"], "fy": st["fy"],
+                "model": "plumb_bob", "d": [0.0] * 5}
+        b = st["baseline_m"] / 2
+        mounts = {"left": (st["yaw_deg"], st["pitch_deg"], [0.0, b, 0.0]),
+                  "right": (st["yaw_deg"], st["pitch_deg"], [0.0, -b, 0.0])}
+    else:
+        intr = {"width": rig["width"], "height": rig["height"], "fx": rig["fx"], "fy": rig["fy"],
+                "model": "equidistant", "d": rig["k"]}
+        mounts = {name: (yaw, pitch, [0.0, 0.0, 0.0]) for name, (yaw, pitch) in rig["cameras"].items()}
+    W, H = intr["width"], intr["height"]
     UsdGeom.Xform.Define(stage, RIG)
     rig_xf = XformPrim(RIG, reset_xform_op_properties=True)
-    extrinsics, sensors = {}, {}
-    for name, (yaw, pitch) in rig["cameras"].items():
+    extrinsics, offsets, sensors = {}, {}, {}
+    for name, (yaw, pitch, t_bc) in mounts.items():
         path = f"{RIG}/{name}"
-        cam = RtxCamera(path, schemas=["OmniLensDistortionOpenCvFisheyeAPI"], attributes={
-            "omni:lensdistortion:model": "opencvFisheye",
-            "omni:lensdistortion:opencvFisheye:fx": float(rig["fx"]),
-            "omni:lensdistortion:opencvFisheye:fy": float(rig["fy"]),
-            "omni:lensdistortion:opencvFisheye:cx": W / 2,
-            "omni:lensdistortion:opencvFisheye:cy": H / 2,
-            "omni:lensdistortion:opencvFisheye:imageSize": Gf.Vec2i(W, H),
-            **{f"omni:lensdistortion:opencvFisheye:k{i + 1}": float(k) for i, k in enumerate(rig["k"])}})
+        if args.stereo:
+            # Pinhole: fx = focal / horizontal aperture * width (square pixels).
+            ha = 20.955
+            cam = RtxCamera(path, attributes={"focalLength": intr["fx"] * ha / W, "horizontalAperture": ha,
+                                              "verticalAperture": ha * H / W})
+        else:
+            cam = RtxCamera(path, schemas=["OmniLensDistortionOpenCvFisheyeAPI"], attributes={
+                "omni:lensdistortion:model": "opencvFisheye",
+                "omni:lensdistortion:opencvFisheye:fx": float(rig["fx"]),
+                "omni:lensdistortion:opencvFisheye:fy": float(rig["fy"]),
+                "omni:lensdistortion:opencvFisheye:cx": W / 2,
+                "omni:lensdistortion:opencvFisheye:cy": H / 2,
+                "omni:lensdistortion:opencvFisheye:imageSize": Gf.Vec2i(W, H),
+                **{f"omni:lensdistortion:opencvFisheye:k{i + 1}": float(k) for i, k in enumerate(rig["k"])}})
         UsdGeom.Camera(stage.GetPrimAtPath(path)).GetClippingRangeAttr().Set(Gf.Vec2f(*cfg["camera"]["clip"]))
         r_bc = body_to_camera(yaw, pitch)
-        extrinsics[name] = r_bc
+        extrinsics[name], offsets[name] = r_bc, np.asarray(t_bc, float)
         q = R.from_matrix(r_bc @ CV_TO_USD).as_quat()  # x y z w
-        cam.set_local_poses(translations=np.zeros((1, 3)), orientations=np.array([[q[3], q[0], q[1], q[2]]]))
+        cam.set_local_poses(translations=offsets[name][None], orientations=np.array([[q[3], q[0], q[1], q[2]]]))
         sensors[name] = CameraSensor(cam, resolution=(H, W),
                                      annotators=["rgb"] + (["distance_to_camera"] if rig["depth"] else []))
-    first = next(iter(rig["cameras"]))
+    first = next(iter(mounts))
     cs.set_viewport_camera(f"{RIG}/{first}")
     omni.timeline.get_timeline_interface().play()
 
@@ -290,10 +332,14 @@ def main() -> None:
         lag_test(sensors, rig_xf, pos[0], rots[0], rcfg, fdir)
         return
 
-    out = fdir / (f"rig_{args.mode}_{args.tag}" if args.tag else f"rig_{args.mode}")
+    run_name = f"rig_{args.mode}" + ("_stereo" if args.stereo else "") + (f"_{args.tag}" if args.tag else "")
+    out = fdir / run_name
     (out / "frames").mkdir(parents=True, exist_ok=True)
-    write_camchain(out / "camchain.yaml", rig, extrinsics, imu_cfg)
-    ros = RosOut(rig["cameras"], rig, extrinsics) if args.ros2 else None
+    if args.stereo:
+        write_stereo(out, intr, extrinsics, offsets, t_frames, pos, rots)
+    else:
+        write_camchain(out / "camchain.yaml", rig, extrinsics, imu_cfg)
+    ros = RosOut(mounts, intr, extrinsics, offsets) if args.ros2 else None
 
     # Warm the tile cache along the path (as F2 does), then fly.
     t0 = time.time()
@@ -370,7 +416,7 @@ def main() -> None:
     frame_s = float(np.sum(timing["frame"]))
     report = {
         "flight": args.flight, "mode": args.mode, "ros2": args.ros2, "freerun_updates": args.updates, "frames": int(len(t_frames)),
-        "cameras": list(rig["cameras"]), "resolution": [W, H], "depth": rig["depth"],
+        "cameras": list(mounts), "resolution": [W, H], "depth": rig["depth"],
         "sim_camera_hz": rig["camera_hz"], "sim_duration_s": round(float(t_frames[-1]), 3),
         "warmup_s": round(warmup_s, 1), "wall_s": round(wall, 2),
         "max_fps_cap": args.max_fps,

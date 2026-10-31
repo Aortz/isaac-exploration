@@ -1,0 +1,23 @@
+{
+  "gate": "g2",
+  "env": "nurec_xgrid_wormhole",
+  "median_ncc": 0.97985,
+  "pass": true,
+  "threshold": 0.9,
+  "poses": [
+    {
+      "pose_index": 0,
+      "ncc": 0.9767,
+      "overlap_px": 47116,
+      "fisheye_mean": 77.9,
+      "pinhole_mean": 109.2
+    },
+    {
+      "pose_index": 4,
+      "ncc": 0.983,
+      "overlap_px": 47116,
+      "fisheye_mean": 14.3,
+      "pinhole_mean": 4.7
+    }
+  ]
+}

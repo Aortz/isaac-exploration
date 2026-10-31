@@ -1,5 +1,8 @@
 # Photogrammetry to Isaac Sim pipeline
 
+> **Results of the drone-simulation exploration** (test plan, flights, videos, scores): [demo/README.md](demo/README.md).
+> What changed over the exploration: [CHANGELOG.md](CHANGELOG.md).
+
 This pipeline turns overlapping drone photos into an Isaac Sim 6.0 test environment. Each run then checks the environment and writes a validation report. v1 runs on the public OpenDroneMap Aukerman sample (77 nadir photos with GPS EXIF).
 
 ```
@@ -219,3 +222,41 @@ uv run python macvo/stress_test.py --seq build/flight/marina_bay_loop_pegasus/ri
   - **Throughput:** the total stays at about 10 frames/s whatever the instance count (9.1 with 1, 9.9 with 4, 9.9 with 6), because one instance already keeps the GPU at 70–95%. Extra instances split the GPU rather than add capacity. That is about a third of one 30 Hz stream.
   - **Next to Isaac:** a running Isaac renderer takes about 3 GB of GPU memory, which leaves room for about 4 MAC-VO instances.
 - **Host RAM:** `stress_test.py` kills a round if host MemAvailable falls below `--min-free-ram-gib`, because a crash once took down the desktop. An earlier 8-instance round with `--preload` (all frames in RAM per instance) ran the 59 GB machine out of memory, and the kernel OOM killer took the terminal with it.
+
+## PX4 in the loop, motor lag and wind
+
+A flight with `controller: px4` is flown by PX4 v1.16 SITL (Docker image from `px4/Dockerfile`). PX4 runs its own EKF2 on the IMU, GPS, barometer and magnetometer that Pegasus simulates, plus its own position, attitude and rate controllers, exactly as on a real vehicle. `flight/px4_offboard.py` plays the companion computer:
+1. Sets the failsafe parameters needed to fly without RC (`pegasus.px4.params`).
+2. Waits for a GPS fix.
+3. Arms in OFFBOARD mode.
+4. Takes off from a ground slab at `ground_z`.
+5. Holds at the start point.
+6. Streams the reference as position, velocity, acceleration and yaw setpoints at 50 Hz of sim time.
+
+The flight clock (t = 0) starts after the hold, so the ground truth, IMU and renders cover only the reference, as in the other flights.
+
+```bash
+docker build -t isaac-exploration/px4:v1.16.0 px4/                         # once, ~15 min
+$ISAAC_ROOT/python.sh -m pip install --target third_party/isaac_pydeps pymavlink   # once
+uv run python flight/f1_trajectory.py --flight rm_p3_px4
+$ISAAC_ROOT/python.sh flight/pegasus_fly.py --flight rm_p3_px4             # starts the PX4 container itself
+uv run python flight/pegasus_post.py --flight rm_p3_px4 --extra-seeds 101 102
+```
+
+Opt-in vehicle effects (`flight/pegasus_models.py`), for either controller:
+- **Motor lag** (`motor_lag: true`, settings in `pegasus.motor`):
+  - Rotor speed follows the command through a first-order lag: 35 ms time constant spinning up, 60 ms spinning down.
+  - Pegasus' own thrust curve is instantaneous.
+- **Wind** (`wind:` per flight, defaults in `pegasus.wind_defaults`):
+  - Body drag acts on the velocity relative to the air.
+  - The air velocity combines a mean wind, Dryden-like turbulence (one first-order filter per axis, correlation time L / airspeed) and 1-cos discrete gusts at given flight times.
+  - The wind is logged with the state (`pegasus_state_1000hz.csv`, columns `wind_e,n,u`).
+
+Two fixes were needed to run Pegasus with PX4 at 1 kHz physics:
+- **Lockstep clock:** Pegasus only exchanges data with PX4 on steps with a new IMU sample (250 Hz), but advanced the PX4 clock by a single 1 ms step. PX4's clock then ran at a quarter of sim time, its rate-limited actuator outputs stopped matching the samples, and the lockstep wait hung. `lockstep_px4_backend()` carries the skipped steps' dt forward.
+- **Timing:** PX4 boots, gets GPS and takes off in about 39 s of sim time before the reference starts. At about 0.1× real time (PX4 lockstep plus 1 kHz physics), the 108 s P3 loop takes about 25 min.
+
+First result, the 20 s test of `rm_p3_px4` (4 m/s wind from the south-west, σ = 1 m/s turbulence, motor lag):
+- **Hover:** PX4 held the hover to 0.10 m, leaning 4° into the wind.
+- **Tracking:** it followed the loop to 0.50 m RMS (0.98 m max).
+- **Comparison:** the Pegasus geometric controller tracks to 0.24 m with perfect state and no wind.

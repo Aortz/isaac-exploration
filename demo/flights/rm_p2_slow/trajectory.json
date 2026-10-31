@@ -1,0 +1,105 @@
+{
+  "flight": "rm_p2_slow",
+  "site": null,
+  "source": null,
+  "env": "rivermark",
+  "duration_s": 102.756,
+  "frames": 3083,
+  "fps": 30,
+  "imu_rate_hz": 200,
+  "path_length_m": 159.31045225203175,
+  "max_speed_mps": 2.6236295149595628,
+  "max_tilt_deg": 5.546172452448874,
+  "intrinsics": {
+    "width": 832,
+    "height": 480,
+    "fx": 555.8577905034598,
+    "fy": 555.8577905034598,
+    "cx": 416.0,
+    "cy": 240.0
+  },
+  "T_body_camera_cv": [
+    [
+      0.0,
+      -0.49999999999999994,
+      0.8660254037844387,
+      0.0
+    ],
+    [
+      -1.0,
+      -0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      -0.8660254037844387,
+      -0.49999999999999994,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "camera_mount": "fixed",
+  "checks": {
+    "imu_integration_drift_m": 0.25415197828813
+  },
+  "dynamics": "pegasus",
+  "pegasus": {
+    "flight": "rm_p2_slow",
+    "env": "rivermark",
+    "vehicle": "Iris",
+    "mass_kg": 1.5,
+    "physics_hz": 1000,
+    "preroll_s": 3.0,
+    "steps": 105756,
+    "wall_s": 900.0,
+    "realtime_factor": 0.12,
+    "drag": [
+      0.5,
+      0.3,
+      0.0
+    ],
+    "gains": {
+      "Kp": [
+        10.0,
+        10.0,
+        10.0
+      ],
+      "Kd": [
+        8.5,
+        8.5,
+        8.5
+      ],
+      "Ki": [
+        1.5,
+        1.5,
+        1.5
+      ],
+      "Kr": [
+        3.5,
+        3.5,
+        3.5
+      ],
+      "Kw": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "pegasus_commit": "fcb99c0 (PegasusSimulator PR #144, Isaac Sim 6.0 port)"
+  },
+  "tracking": {
+    "pos_err_rms_m": 0.043323482133130004,
+    "pos_err_max_m": 0.09193999944056293,
+    "pos_err_final_m": 0.04454074148513143,
+    "rotor_ref_rad_s": [
+      655.63081914,
+      704.290634146
+    ]
+  }
+}

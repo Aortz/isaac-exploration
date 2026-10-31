@@ -1,0 +1,12 @@
+{
+  "frames": 3149,
+  "mode": "Fast",
+  "startup_s": 2.49,
+  "run_s": 354.29,
+  "fps_overall": 8.89,
+  "fps_steady": 9.11,
+  "first_frame_s": 1.43,
+  "cuda_max_allocated_MiB": 1439.3,
+  "cuda_max_reserved_MiB": 2324.0,
+  "torch_threads": 4
+}

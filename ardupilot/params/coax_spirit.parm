@@ -1,0 +1,43 @@
+# ArduCopter coaxial frame for the Pegasus Spirit-class model (flight/coax_vehicle.py), loaded after
+# ArduPilot's own copter-single.parm + copter-coax.parm SITL defaults. Replace with the real Spirit
+# .param file when available (keep the SIM_/ARMING_ lines and the SERVO ranges this model assumes).
+FRAME_CLASS 9
+# Outputs: SERVO1/2 roll/pitch cyclic (+-4500 cdeg -> 1000..2000 us), SERVO3/4 their mirrors (unused by
+# the model), SERVO5 = counter-clockwise rotor, SERVO6 = clockwise rotor.
+SERVO1_MIN 1000
+SERVO1_MAX 2000
+SERVO1_TRIM 1500
+SERVO2_MIN 1000
+SERVO2_MAX 2000
+SERVO2_TRIM 1500
+SERVO5_MIN 1000
+SERVO5_MAX 2000
+SERVO6_MIN 1000
+SERVO6_MAX 2000
+MOT_PWM_MIN 1000
+MOT_PWM_MAX 2000
+MOT_SPIN_ARM 0.10
+MOT_SPIN_MIN 0.15
+MOT_THST_HOVER 0.6
+MOT_THST_EXPO 0.0
+MOT_HOVER_LEARN 2
+# Rate loops sized from the model's authority (~2.6 N m roll/pitch per unit cyclic on 0.06 kg m^2,
+# ~2.3 N m yaw per unit differential on 0.025 kg m^2). First cut, not autotuned.
+ATC_RAT_RLL_P 0.15
+ATC_RAT_RLL_I 0.15
+ATC_RAT_RLL_D 0.004
+ATC_RAT_RLL_IMAX 0.5
+ATC_RAT_PIT_P 0.15
+ATC_RAT_PIT_I 0.15
+ATC_RAT_PIT_D 0.004
+ATC_RAT_PIT_IMAX 0.5
+ATC_RAT_YAW_P 0.15
+ATC_RAT_YAW_I 0.015
+ATC_RAT_YAW_D 0.0
+# Simulation conveniences: no RC, no ground station, no pre-arm hardware checks.
+ARMING_CHECK 0
+FS_THR_ENABLE 0
+FS_GCS_ENABLE 0
+WPNAV_SPEED 1500
+WPNAV_ACCEL 400
+GUID_OPTIONS 0

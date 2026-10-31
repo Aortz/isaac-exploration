@@ -16,6 +16,12 @@ RUN grep -rlE "(image_transport/image_transport|tf2_geometry_msgs/tf2_geometry_m
 RUN sed -i 's#create_subscription<sensor_msgs::msg::Imu>(topic_imu, rclcpp::SensorDataQoS(),#create_subscription<sensor_msgs::msg::Imu>(topic_imu, rclcpp::QoS(rclcpp::KeepLast(2000)).reliable(),#' \
         open_vins/ov_msckf/src/ros/ROS2Visualizer.cpp \
     && grep -q "KeepLast(2000)).reliable()" open_vins/ov_msckf/src/ros/ROS2Visualizer.cpp
+# After init, OpenVINS clones the state at every queued camera time. With 4 separate mono cameras
+# sharing a stamp the queue holds each time 4x, and cloning the same time twice calls exit(); keep
+# only increasing times.
+RUN sed -i 's#if (camera_queue_init.at(i) > timestamp) {#if (camera_queue_init.at(i) > timestamp \&\& (camera_timestamps_to_init.empty() || camera_queue_init.at(i) > camera_timestamps_to_init.back())) {#' \
+        open_vins/ov_msckf/src/core/VioManagerHelper.cpp \
+    && grep -q "camera_queue_init.at(i) > camera_timestamps_to_init.back()" open_vins/ov_msckf/src/core/VioManagerHelper.cpp
 WORKDIR /ws
 RUN . /opt/ros/jazzy/setup.sh && colcon build --packages-select ov_core ov_init ov_msckf \
         --cmake-args -DCMAKE_BUILD_TYPE=Release --parallel-workers 4 && rm -rf build log

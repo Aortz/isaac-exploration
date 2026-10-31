@@ -144,11 +144,29 @@ def main() -> None:
 
     wp = np.asarray(fl["waypoints"], dtype=float)
     seg = np.linalg.norm(np.diff(wp, axis=0), axis=1)
-    # Start and end at rest, so allow ~25 % more time than cruising the whole path at speed.
-    knots = np.concatenate([[0.0], np.cumsum(seg)]) / fl["speed_mps"] * 1.25
-    spline = make_interp_spline(knots, wp, k=5, bc_type=([(1, np.zeros(3)), (2, np.zeros(3))],
-                                                         [(1, np.zeros(3)), (2, np.zeros(3))]))
-    moving = knots[-1]
+    hover_yaw = fl.get("profile") == "hover_yaw"
+    if hover_yaw:
+        # Hold position, sweep yaw sinusoidally; the sweep fades in/out over half a period so the
+        # yaw rate starts and ends at zero.
+        centre = np.asarray(fl["center"], float)
+        moving = float(fl["sweep_s"])
+        amp, period = np.radians(fl["yaw_amplitude_deg"]), float(fl["yaw_period_s"])
+
+        def spline(ts, nu=0):
+            ts = np.atleast_1d(ts)
+            return np.tile(centre, (len(ts), 1)) if nu == 0 else np.zeros((len(ts), 3))
+
+        def sweep(ts):
+            ramp = np.clip(np.minimum(ts, moving - ts) / (period / 2), 0.0, 1.0)
+            env = ramp ** 3 * (10 - 15 * ramp + 6 * ramp ** 2)            # quintic smoothstep
+            return np.radians(fl["yaw0_deg"]) + amp * np.sin(2 * np.pi * ts / period) * env
+        knots = np.array([0.0, moving])
+    else:
+        # Start and end at rest, so allow ~25 % more time than cruising the whole path at speed.
+        knots = np.concatenate([[0.0], np.cumsum(seg)]) / fl["speed_mps"] * 1.25
+        spline = make_interp_spline(knots, wp, k=5, bc_type=([(1, np.zeros(3)), (2, np.zeros(3))],
+                                                             [(1, np.zeros(3)), (2, np.zeros(3))]))
+        moving = knots[-1]
     # Optional hover before take-off and after arrival (VIO static initialisation needs a still start).
     hover0, hover1 = float(fl.get("hover_start_s", 0.0)), float(fl.get("hover_end_s", 0.0))
     duration = hover0 + moving + hover1
@@ -159,7 +177,7 @@ def main() -> None:
     def state(t):
         ts = np.clip(t - hover0, 0.0, moving)   # spline time; ends have zero velocity and acceleration
         p, v, a = spline(ts), spline(ts, 1), spline(ts, 2)
-        psi = headings(ts, p, v, mode, target, wp[1] - wp[0], wp[-1] - wp[-2], moving)
+        psi = sweep(ts) if hover_yaw else headings(ts, p, v, mode, target, wp[1] - wp[0], wp[-1] - wp[-2], moving)
         r_wb = flat_attitude(a, psi)
         if cam["mount"] == "gimbal":
             r_wc = np.einsum("nij,jk->nik", R.from_euler("z", psi).as_matrix(), r_bc)
@@ -224,13 +242,13 @@ def main() -> None:
                    fmt="%.9f", delimiter=",", header="t,px,py,pz,vx,vy,vz,ax,ay,az,jx,jy,jz,yaw,yaw_rate  (world ENU)")
 
     # Consistency checks: spline hits the waypoints; clean IMU integrates back to the path.
-    wp_err = float(np.abs(spline(knots) - wp).max())
+    wp_err = 0.0 if hover_yaw else float(np.abs(spline(knots) - wp).max())
     p_int = integrate_imu(ti, gyro, acc, p[0], v[0], r_wb[0])
     drift = float(np.linalg.norm(p_int - p[::step], axis=1).max())
     fw = cam["width"]
     fx = cam["focal_length_mm"] / cam["horizontal_aperture_mm"] * fw
     meta = {
-        "flight": args.flight, "site": fl["site"], "source": fl["source"],
+        "flight": args.flight, "site": fl.get("site"), "source": fl.get("source"), "env": fl.get("env"),
         "duration_s": float(duration), "frames": int(len(tf)), "fps": cam["fps"], "imu_rate_hz": imu["rate_hz"],
         "path_length_m": float(seg.sum()), "max_speed_mps": float(np.linalg.norm(v, axis=1).max()),
         "max_tilt_deg": float(np.degrees(np.arccos(np.clip(r_wb[:, 2, 2], -1, 1))).max()),

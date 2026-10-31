@@ -1,0 +1,70 @@
+{
+  "flight": "marina_bay_pass",
+  "mode": "freerun",
+  "ros2": true,
+  "frames": 479,
+  "cameras": [
+    "cam0_front",
+    "cam1_left",
+    "cam2_back",
+    "cam3_right"
+  ],
+  "resolution": [
+    640,
+    480
+  ],
+  "depth": false,
+  "sim_camera_hz": 30,
+  "sim_duration_s": 15.933,
+  "warmup_s": 109.2,
+  "wall_s": 26.56,
+  "achieved_frames_per_s": 19.51,
+  "achieved_images_per_s": 78.02,
+  "realtime_factor": 0.649,
+  "renderer_updates_per_frame": {
+    "mean": 1.0,
+    "max": 1
+  },
+  "unsettled_frames": 0,
+  "imu_messages": 3187,
+  "timing": {
+    "pose": {
+      "mean_ms": 0.99,
+      "p50_ms": 0.97,
+      "p95_ms": 1.19,
+      "max_ms": 2.59
+    },
+    "render": {
+      "mean_ms": 43.29,
+      "p50_ms": 31.39,
+      "p95_ms": 123.6,
+      "max_ms": 541.37
+    },
+    "readback": {
+      "mean_ms": 5.28,
+      "p50_ms": 5.31,
+      "p95_ms": 5.79,
+      "max_ms": 29.69
+    },
+    "publish": {
+      "mean_ms": 1.7,
+      "p50_ms": 1.65,
+      "p95_ms": 2.11,
+      "max_ms": 2.9
+    },
+    "frame": {
+      "mean_ms": 51.27,
+      "p50_ms": 39.58,
+      "p95_ms": 133.69,
+      "max_ms": 549.93
+    }
+  },
+  "look": {
+    "max_screen_space_error": 8,
+    "frustum_culling": false,
+    "sky_hdr": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/NVIDIA/Assets/Skies/Cloudy/kloofendal_48d_partly_cloudy_4k.hdr",
+    "sky_intensity": 600,
+    "sun_intensity": 0
+  },
+  "note": "frame = pose + render + readback + publish; image saving is excluded"
+}

@@ -1,0 +1,53 @@
+cam0:
+  rostopic: /cam0_front/image_raw
+  camera_model: pinhole
+  distortion_model: equidistant
+  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]
+  intrinsics: [160.0, 160.0, 320.0, 240.0]
+  resolution: [640, 480]
+  T_cam_imu:
+  - [0.000000000, -1.000000000, 0.000000000, 0.000000000],
+    [-0.342020143, 0.000000000, -0.939692621, 0.000000000],
+    [0.939692621, 0.000000000, -0.342020143, 0.000000000],
+    [0.000000000, 0.000000000, 0.000000000, 1.000000000]
+  timeshift_cam_imu: 0.0
+cam1:
+  rostopic: /cam1_left/image_raw
+  camera_model: pinhole
+  distortion_model: equidistant
+  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]
+  intrinsics: [160.0, 160.0, 320.0, 240.0]
+  resolution: [640, 480]
+  T_cam_imu:
+  - [1.000000000, -0.000000000, 0.000000000, 0.000000000],
+    [-0.000000000, -0.342020143, -0.939692621, 0.000000000],
+    [0.000000000, 0.939692621, -0.342020143, 0.000000000],
+    [0.000000000, 0.000000000, 0.000000000, 1.000000000]
+  timeshift_cam_imu: 0.0
+cam2:
+  rostopic: /cam2_back/image_raw
+  camera_model: pinhole
+  distortion_model: equidistant
+  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]
+  intrinsics: [160.0, 160.0, 320.0, 240.0]
+  resolution: [640, 480]
+  T_cam_imu:
+  - [0.000000000, 1.000000000, 0.000000000, 0.000000000],
+    [0.342020143, -0.000000000, -0.939692621, 0.000000000],
+    [-0.939692621, 0.000000000, -0.342020143, 0.000000000],
+    [0.000000000, 0.000000000, 0.000000000, 1.000000000]
+  timeshift_cam_imu: 0.0
+cam3:
+  rostopic: /cam3_right/image_raw
+  camera_model: pinhole
+  distortion_model: equidistant
+  distortion_coeffs: [0.0, 0.0, 0.0, 0.0]
+  intrinsics: [160.0, 160.0, 320.0, 240.0]
+  resolution: [640, 480]
+  T_cam_imu:
+  - [-1.000000000, -0.000000000, 0.000000000, 0.000000000],
+    [-0.000000000, 0.342020143, -0.939692621, 0.000000000],
+    [0.000000000, -0.939692621, -0.342020143, 0.000000000],
+    [0.000000000, 0.000000000, 0.000000000, 1.000000000]
+  timeshift_cam_imu: 0.0
+# IMU (body FLU): rate_hz 200, noise densities in imu0 of the EuRoC export; motor vibration is extra, inflate them for VIO

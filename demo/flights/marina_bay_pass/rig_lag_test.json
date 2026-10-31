@@ -1,0 +1,31 @@
+{
+  "test": "spin in place, all cameras",
+  "step_deg": 10.0,
+  "frames": 35,
+  "by_updates_per_frame": {
+    "1": {
+      "lag_frames_histogram": {
+        "1": 140
+      },
+      "lag_0_fraction": 0.0
+    },
+    "2": {
+      "lag_frames_histogram": {
+        "1": 140
+      },
+      "lag_0_fraction": 0.0
+    },
+    "3": {
+      "lag_frames_histogram": {
+        "0": 140
+      },
+      "lag_0_fraction": 1.0
+    },
+    "4": {
+      "lag_frames_histogram": {
+        "0": 140
+      },
+      "lag_0_fraction": 1.0
+    }
+  }
+}

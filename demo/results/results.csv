@@ -1,0 +1,29 @@
+case,profile,env,flight,lighting,sut,run,status,path_m,ate_rmse_m,ate_pct,final_err_m,final_pct,rot_rmse_deg,scale_sim3,rpe10_pct,t_first_s,verdict,notes
+TC-E1-P1,P1,rivermark,rm_p1_hover,default,openvins,s7_live,ok,0.1447,4.5827,,11.0451,,0.965,0.0009,,6.0333,report,no path length (hover)
+TC-E1-P1,P1,rivermark,rm_p1_hover,default,openvins,s101_replay,ok,0.164,0.2626,,0.0996,,1.6303,0.0273,,3.6333,report,no path length (hover)
+TC-E1-P1,P1,rivermark,rm_p1_hover,default,openvins,s102_replay,ok,0.1636,3.3532,,1.0843,,0.6859,0.0025,,3.6667,report,no path length (hover)
+TC-E1-P1,P1,rivermark,rm_p1_hover,default,macvo,fast,ok,0.2078,0.3756,,0.4034,,45.8103,0.0288,,0.0,report,"no path length (hover),G4"
+TC-E1-P1,P1,rivermark,rm_p1_hover,default,macvo,fast,ok,0.2078,0.3771,,0.405,,0.6901,0.0288,,0.0,report,"no path length (hover),G4 (rescored: hover alignment fix)"
+TC-E1-P2,P2,rivermark,rm_p2_slow,default,openvins,s7_live,ok,132.6563,16.987,12.8052,46.0444,34.7096,25.977,0.699,63.6817,19.3667,FAIL,diverged
+TC-E1-P2,P2,rivermark,rm_p2_slow,default,openvins,s101_replay,ok,159.244,53.2058,33.4115,105.6962,66.3737,10.9067,0.3115,183.4547,2.2333,FAIL,diverged
+TC-E1-P2,P2,rivermark,rm_p2_slow,default,openvins,s102_replay,ok,132.9074,28.2583,21.2616,93.6163,70.4372,39.572,0.4455,109.392,19.2333,FAIL,diverged
+TC-E1-P2,P2,rivermark,rm_p2_slow,default,macvo,fast,ok,159.273,1.5811,0.9927,3.3331,2.0927,4.3481,1.0334,5.3352,0.0,FAIL,"rot,G4"
+TC-E1-P3,P3,rivermark,rm_p3_nominal,default,openvins,s7_live,ok,500.0713,63.7516,12.7485,119.141,23.8248,7.7841,0.5551,73.013,4.1333,FAIL,diverged
+TC-E1-P3,P3,rivermark,rm_p3_nominal,default,openvins,s101_replay,ok,500.0713,108.2676,21.6504,199.6012,39.9146,9.8944,0.4127,121.5488,4.1333,FAIL,diverged
+TC-E1-P3,P3,rivermark,rm_p3_nominal,default,openvins,s102_replay,ok,500.0713,19.2515,3.8497,46.1641,9.2315,3.8611,0.8281,22.8926,4.1333,FAIL,"ate,drift,rot"
+TC-E1-P3,P3,rivermark,rm_p3_nominal,default,macvo,fast,ok,500.1208,3.7338,0.7466,7.6512,1.5299,3.2559,1.0193,3.5387,0.0,FAIL,"rot,G4"
+TC-E1-P3-px4,P3,rivermark,rm_p3_px4,default,openvins,s7_live,error rc=0,,,,,,,,,,FAIL,no estimate
+TC-E1-P3-px4,P3,rivermark,rm_p3_px4,default,openvins,s101_replay,error rc=0,,,,,,,,,,FAIL,no estimate
+TC-E1-P3-px4,P3,rivermark,rm_p3_px4,default,openvins,s102_replay,ok,472.4642,637.1323,134.853,1374.6504,290.9533,20.6232,0.0939,713.4442,10.4,FAIL,diverged
+TC-E1-P3-px4,P3,rivermark,rm_p3_px4,default,macvo,fast,ok,501.3428,2.3258,0.4639,5.2964,1.0564,2.4704,0.9998,2.967,0.0,PASS,G4
+TC-E1-P4,P4,rivermark,rm_p4_aggressive,default,openvins,s7_live,ok,606.4597,1.073,0.1769,1.5747,0.2596,0.8024,0.9902,4.2588,4.1,report,
+TC-E1-P4,P4,rivermark,rm_p4_aggressive,default,openvins,s101_replay,ok,606.4588,1.2297,0.2028,1.479,0.2439,0.8106,0.9923,6.066,4.1333,report,
+TC-E1-P4,P4,rivermark,rm_p4_aggressive,default,openvins,s102_replay,ok,606.4588,1.1682,0.1926,2.0075,0.331,0.8206,0.9948,5.9861,4.1333,report,
+TC-E1-P4,P4,rivermark,rm_p4_aggressive,default,macvo,fast,ok,606.5088,1.1192,0.1845,0.6449,0.1063,1.3784,0.9966,2.6293,0.0,report,G4
+TC-E1-P5,P5,rivermark,rm_p5_lowtex,default,openvins,s7_live,ok,456.098,3195.8866,700.7017,6874.8452,1507.3175,82.9085,0.0147,2765.3706,14.4,FAIL,diverged
+TC-E1-P5,P5,rivermark,rm_p5_lowtex,default,openvins,s101_replay,ok,456.098,160.6919,35.2319,478.2964,104.867,25.4543,0.2796,171.7755,14.4,FAIL,diverged
+TC-E1-P5,P5,rivermark,rm_p5_lowtex,default,openvins,s102_replay,ok,456.098,126.1522,27.659,368.2243,80.7336,24.9539,0.3409,135.6807,14.4,FAIL,diverged
+TC-E1-P5,P5,rivermark,rm_p5_lowtex,default,macvo,fast,ok,476.8517,8.4269,1.7672,17.2741,3.6225,5.0547,1.0367,2.9404,0.0,report,"drift,rot"
+TC-E1-P6,P6,rivermark,rm_p6_close,default,openvins,s7_live,ok,78.12,26.5876,34.0343,28.4458,36.413,154.6614,69.9569,100.4757,16.1667,FAIL,diverged
+TC-E1-P6,P6,rivermark,rm_p6_close,default,openvins,s101_replay,ok,78.12,26.5755,34.0188,28.4288,36.3912,145.9244,1244.6135,100.4901,16.1667,FAIL,diverged
+TC-E1-P6,P6,rivermark,rm_p6_close,default,openvins,s102_replay,ok,78.12,26.5781,34.0221,28.4365,36.401,140.1853,1359.1358,100.481,16.1667,FAIL,diverged

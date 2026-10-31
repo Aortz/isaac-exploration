@@ -1,0 +1,262 @@
+<title>Sim Fidelity Field Kit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a flight-test card. Narrow reading column, one section per data source, a checklist row per item. */
+:root {
+  --bg: #f5f6f3;
+  --panel: #ffffff;
+  --ink: #1b2620;
+  --muted: #5b675f;
+  --rule: #d8ddd6;
+  --accent: #b5651d;
+  --accent-soft: #f4e6d8;
+  --must: #a33a2b;
+  --must-bg: #f7e1dd;
+  --should: #7a5a12;
+  --should-bg: #f5ecd3;
+  --nice: #3f5f4c;
+  --nice-bg: #e2ece5;
+  --code-bg: #eef1ec;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --body: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131915; --panel: #1b231e; --ink: #e4e9e3; --muted: #9aa69d; --rule: #2e3a32;
+    --accent: #e39a54; --accent-soft: #3a2a1b;
+    --must: #f0a092; --must-bg: #3d211c; --should: #e7c46f; --should-bg: #3a3017;
+    --nice: #9fcbae; --nice-bg: #1f3227; --code-bg: #222c25; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131915; --panel: #1b231e; --ink: #e4e9e3; --muted: #9aa69d; --rule: #2e3a32;
+  --accent: #e39a54; --accent-soft: #3a2a1b;
+  --must: #f0a092; --must-bg: #3d211c; --should: #e7c46f; --should-bg: #3a3017;
+  --nice: #9fcbae; --nice-bg: #1f3227; --code-bg: #222c25; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font: 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+main { max-width: 860px; margin: 0 auto; display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 5vw, 3.1rem); font-weight: 700; letter-spacing: 0.01em; }
+h2 { font-size: 1.7rem; font-weight: 600; }
+h3 { font-size: 1.15rem; font-weight: 600; letter-spacing: 0.02em; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+header { display: grid; gap: 14px; border-bottom: 2px solid var(--ink); padding-bottom: 24px; }
+header .lede { font-size: 1.1rem; color: var(--muted); }
+code, .file { font-family: var(--mono); font-size: 0.84em; background: var(--code-bg); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; font-size: 0.92rem; color: var(--muted); }
+.chip { font-family: var(--mono); font-size: 0.68rem; font-weight: 500; letter-spacing: 0.08em; padding: 2px 7px; border-radius: 3px; white-space: nowrap; }
+.must { color: var(--must); background: var(--must-bg); }
+.should { color: var(--should); background: var(--should-bg); }
+.nice { color: var(--nice); background: var(--nice-bg); }
+
+.mvp { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 20px 22px; display: grid; gap: 12px; }
+.mvp ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+
+section { display: grid; gap: 16px; }
+.sec-head { display: grid; gap: 6px; }
+.sec-head .why { color: var(--muted); }
+.feeds { font-size: 0.88rem; color: var(--muted); }
+.feeds b { color: var(--ink); font-weight: 600; }
+
+ul.items { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+ul.items li { border-bottom: 1px solid var(--rule); }
+ul.items label { display: grid; grid-template-columns: 22px 1fr auto; gap: 12px; padding: 12px 4px; cursor: pointer; align-items: start; }
+ul.items input { margin: 4px 0 0; width: 18px; height: 18px; accent-color: var(--accent); }
+ul.items input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.item-body { min-width: 0; display: grid; gap: 3px; }
+.item-title { font-weight: 600; }
+.item-how { font-size: 0.93rem; color: var(--muted); }
+ul.items input:checked ~ .item-body .item-title { text-decoration: line-through; text-decoration-color: var(--muted); }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--panel); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 0.92rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+
+pre { margin: 0; background: var(--code-bg); padding: 14px 16px; font: 0.82rem/1.55 var(--mono); overflow-x: auto; border-radius: 4px; }
+.progress { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+footer { border-top: 1px solid var(--rule); padding-top: 16px; font-size: 0.88rem; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main>
+  <header>
+    <div class="eyebrow">Field test brief · drone simulation</div>
+    <h1>Sim Fidelity Field Kit</h1>
+    <p class="lede">What to bring back from field tests so our Isaac Sim / Pegasus models fly like the real aircraft, and so every simulated test can be checked against a real one. Written for the Spirit coaxial program; most of it applies to any airframe.</p>
+    <div class="legend">
+      <span><span class="chip must">MUST</span> blocks a calibrated model</span>
+      <span><span class="chip should">SHOULD</span> big accuracy gain</span>
+      <span><span class="chip nice">NICE</span> when time allows</span>
+      <span class="progress" id="progress"></span>
+    </div>
+  </header>
+
+  <div class="mvp">
+    <h3>If you only have one field day</h3>
+    <ol>
+      <li>Export the full ArduPilot parameter file and note the firmware version.</li>
+      <li>Weigh the aircraft in the configuration you fly, and record the payload and battery setup.</li>
+      <li>One flight log with logging set as below: 60 s hover, then the System ID manoeuvres, then a few forward-flight speed steps.</li>
+      <li>Camera intrinsics, camera–IMU extrinsics and time offset from Kalibr, plus a 2-hour static IMU log.</li>
+      <li>One ROS 2 bag of the nominal loop (profile P3) with RTK ground truth and a wind reading.</li>
+    </ol>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">01 · once per airframe</div>
+      <h2>Vehicle configuration</h2>
+      <p class="why">Today the coaxial model runs on estimates: 4.0 kg, inertia (0.06, 0.06, 0.025) kg·m², ±10° swashplate, 0.15 m hub height. Real values replace every one of them.</p>
+      <p class="feeds">Feeds <b>pegasus.vehicles.coax_spirit</b> in <span class="file">config/flight.yaml</span> and <span class="file">ardupilot/params/coax_spirit.parm</span>.</p>
+    </div>
+    <ul class="items">
+      <li><label><input type="checkbox" id="v1"><span class="item-body"><span class="item-title">ArduPilot parameter file (.param) and firmware version / git hash</span><span class="item-how">Mission Planner: Config → Full Parameter List → Save. One file per aircraft and payload configuration. It tells us the frame class, gains, filters and output mapping.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="v2"><span class="item-body"><span class="item-title">Rotor head facts</span><span class="item-how">Fixed-pitch or collective pitch? Which rotor(s) the swashplate tilts, servo count and their angles, max cyclic tilt in degrees, rotor spacing, rotor diameter and blade count, which motor spins clockwise.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="v3"><span class="item-body"><span class="item-title">All-up mass for every configuration you fly</span><span class="item-how">Scale reading in grams with battery, payload modules and landing gear fitted. Note which modules are on.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="v4"><span class="item-body"><span class="item-title">Centre of gravity and rotor-hub height above it</span><span class="item-how">Balance on a knife edge along two axes; measure hub plane height from the CG with a ruler. Photos with a scale in frame help.</span></span><span class="chip should">SHOULD</span></label></li>
+      <li><label><input type="checkbox" id="v5"><span class="item-body"><span class="item-title">Moments of inertia</span><span class="item-how">Bifilar (roll, pitch) and trifilar (yaw) pendulum: record string length, spacing and 20-swing periods. CAD mass properties are a usable fallback.</span></span><span class="chip should">SHOULD</span></label></li>
+      <li><label><input type="checkbox" id="v6"><span class="item-body"><span class="item-title">Motor, ESC, battery spec sheets</span><span class="item-how">Motor KV, ESC model and protocol, battery cell type and count, capacity, internal resistance if known.</span></span><span class="chip nice">NICE</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">02 · bench</div>
+      <h2>Propulsion test stand</h2>
+      <p class="why">Thrust, torque and spin-up time are what the flight controller fights against. The coaxial model needs the upper/lower rotor split, which only a bench run of the pair together shows.</p>
+      <p class="feeds">Feeds <b>thrust_coeff, torque_coeff, lower_rotor_efficiency, max_rotor_speed_rad_s, motor_tau_s</b>.</p>
+    </div>
+    <ul class="items">
+      <li><label><input type="checkbox" id="b1"><span class="item-body"><span class="item-title">Thrust and torque vs throttle and RPM, coaxial pair running together</span><span class="item-how">Sweep 0–100 % in 10 % steps, hold 3 s each, log thrust (N), torque (N·m), RPM of each rotor, voltage, current. Repeat with each rotor alone.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="b2"><span class="item-body"><span class="item-title">Throttle step response</span><span class="item-how">Steps 40→60→40 % with RPM logged at 100 Hz or faster, spin-up and spin-down separately. Gives the motor time constants.</span></span><span class="chip should">SHOULD</span></label></li>
+      <li><label><input type="checkbox" id="b3"><span class="item-body"><span class="item-title">Battery sag at hover current</span><span class="item-how">Voltage over a full pack at the hover current from the sweep. Lets us model thrust loss late in a flight.</span></span><span class="chip nice">NICE</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">03 · every flight</div>
+      <h2>Flight logs and System ID</h2>
+      <p class="why">Logs let us fit the model to the real response and compare simulated and real flights axis by axis. System ID manoeuvres are the fastest way to get clean data for that.</p>
+      <p class="feeds">Feeds the vehicle model fit, rate-loop checks, drag coefficients and the IMU vibration model.</p>
+    </div>
+    <ul class="items">
+      <li><label><input type="checkbox" id="f1"><span class="item-body"><span class="item-title">DataFlash .bin logs with fast attitude, rate and output logging</span><span class="item-how">Set <code>LOG_BITMASK</code> to include ATTITUDE_FAST, RCIN, RCOU (servo + motor outputs), PID, IMU and ESC telemetry (RPM). Keep <code>LOG_DISARMED</code> = 0.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="f2"><span class="item-body"><span class="item-title">60 s steady hover, then System ID mode on each axis</span><span class="item-how">ArduCopter <code>SID_AXIS</code> roll, pitch, yaw, then throttle; chirp from 0.5 to 15 Hz over 20 s at a small magnitude. Calm air if possible; note the wind if not.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="f3"><span class="item-body"><span class="item-title">Forward-flight speed steps</span><span class="item-how">Straight legs at 3, 6, 10, 15 m/s, 10 s each, out and back (cancels wind). Gives drag and the attitude needed at each speed.</span></span><span class="chip should">SHOULD</span></label></li>
+      <li><label><input type="checkbox" id="f4"><span class="item-body"><span class="item-title">Raw IMU batch sampler for vibration</span><span class="item-how"><code>INS_LOG_BAT_MASK</code> = 1, <code>INS_LOG_BAT_OPT</code> = 0 (pre-filter). One hover and one forward leg. We fit the vibration spectrum the simulated IMU adds.</span></span><span class="chip should">SHOULD</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">04 · once per sensor rig</div>
+      <h2>Camera and IMU calibration</h2>
+      <p class="why">The simulated rig is exact by construction. VIO results only transfer to the real aircraft if lens models, mounting and timing in sim match the real rig.</p>
+      <p class="feeds">Feeds <b>rig</b> and <b>stereo</b> in <span class="file">config/flight.yaml</span>, the <b>imu</b> noise block, and the OpenVINS config.</p>
+    </div>
+    <ul class="items">
+      <li><label><input type="checkbox" id="c1"><span class="item-body"><span class="item-title">Camera intrinsics for every camera</span><span class="item-how">Kalibr with an AprilGrid; fisheyes with the equidistant model (<code>pinhole-equi</code>), stereo pair with radtan. Keep the reprojection-error report.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="c2"><span class="item-body"><span class="item-title">Camera–IMU extrinsics and time offset</span><span class="item-how">Kalibr camera-IMU calibration: excite all six axes for about 60 s in front of the target. Report T_cam_imu and timeshift for each camera.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="c3"><span class="item-body"><span class="item-title">Static IMU log for Allan variance</span><span class="item-how">2–3 hours on a still surface at full IMU rate, temperature logged. Gives noise density and bias random walk for each axis.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="c4"><span class="item-body"><span class="item-title">How cameras are synchronised and exposed</span><span class="item-how">Hardware trigger or software timestamps, rolling or global shutter, readout time, exposure mode (auto / fixed), frame rate actually achieved.</span></span><span class="chip should">SHOULD</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">05 · test-plan flights</div>
+      <h2>Ground-truthed datasets</h2>
+      <p class="why">The direct sim-to-real check: the same profiles we fly in sim, flown for real with ground truth, run through OpenVINS and MAC-VO with the same scoring.</p>
+      <p class="feeds">Feeds <b>testplan/</b> scoring and <span class="file">docs/test_plans.md</span> profiles P1–P7.</p>
+    </div>
+    <ul class="items">
+      <li><label><input type="checkbox" id="d1"><span class="item-body"><span class="item-title">ROS 2 bag (MCAP) of raw sensors</span><span class="item-how">All camera image topics (uncompressed or lossless), camera_info, IMU at full rate, /tf_static. Same topic names as the sim rig makes replay trivial.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="d2"><span class="item-body"><span class="item-title">Ground truth at centimetre level</span><span class="item-how">RTK GNSS + INS outdoors (or total-station tracking); motion capture indoors. Time-synced to the sensors by PPS/PTP, with the sync method written down.</span></span><span class="chip must">MUST</span></label></li>
+      <li><label><input type="checkbox" id="d3"><span class="item-body"><span class="item-title">Fly the test-plan profiles</span><span class="item-how">P1 hover + yaw sweep · P2 slow loop · P3 nominal loop 6 m/s · P4 aggressive figure-8 · P5 low-texture leg · P6 close pass · P7 same loop at different times of day. Start every flight with a 4 s still hover.</span></span><span class="chip should">SHOULD</span></label></li>
+      <li><label><input type="checkbox" id="d4"><span class="item-body"><span class="item-title">Repeat runs</span><span class="item-how">Three runs of P3 back to back. Real run-to-run spread is the bar the simulated spread is judged against.</span></span><span class="chip nice">NICE</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">06 · every field day</div>
+      <h2>Site, wind and conditions</h2>
+      <p class="why">The wind model takes a mean, a turbulence level and gusts. A capture of the site lets us rebuild it as a NuRec scene and fly the same place in sim.</p>
+      <p class="feeds">Feeds <b>wind:</b> blocks in flight configs and new <b>environments</b> entries.</p>
+    </div>
+    <ul class="items">
+      <li><label><input type="checkbox" id="s1"><span class="item-body"><span class="item-title">Wind log during each flight</span><span class="item-how">Anemometer on a mast near the flight area, ideally 3D sonic at 10 Hz or faster, height above ground noted. A handheld reading every few minutes is the minimum.</span></span><span class="chip should">SHOULD</span></label></li>
+      <li><label><input type="checkbox" id="s2"><span class="item-body"><span class="item-title">Site capture for a digital twin</span><span class="item-how">Overlapping photos (more than 70 % overlap) from walking and drone orbits at the flight altitudes, or a lidar scan; RTK ground control points for geo-reference.</span></span><span class="chip should">SHOULD</span></label></li>
+      <li><label><input type="checkbox" id="s3"><span class="item-body"><span class="item-title">Conditions</span><span class="item-how">Local time, cloud cover, sun position or shadows, temperature, precipitation, any glare or haze seen in the footage.</span></span><span class="chip nice">NICE</span></label></li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div class="eyebrow">07 · handoff</div>
+      <h2>Per-flight record and folder layout</h2>
+      <p class="why">Data we cannot match to a configuration is data we cannot use. One row per flight in a shared sheet, one folder per flight.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Flight ID</td><td><code>2026-11-04_site-A_spirit-02_f03</code></td></tr>
+          <tr><td>Vehicle, payload, all-up mass</td><td>Spirit #02 · EO camera + 1 battery · 4.12 kg</td></tr>
+          <tr><td>Firmware and parameter file</td><td>Copter 4.6.3 · <code>spirit02_eo_2026-11-04.param</code></td></tr>
+          <tr><td>Battery ID and start voltage</td><td>B07 · 50.1 V</td></tr>
+          <tr><td>Profile flown</td><td>P3 nominal loop, 40 m AGL, 6 m/s</td></tr>
+          <tr><td>Wind</td><td>4 m/s from 220°, gusts 7 m/s</td></tr>
+          <tr><td>Files</td><td>.bin log, .mcap bag, ground-truth file, notes</td></tr>
+          <tr><td>Anomalies</td><td>GPS glitch at 02:10; landed early on low battery</td></tr>
+        </tbody>
+      </table>
+    </div>
+<pre>2026-11-04_site-A_spirit-02_f03/
+  vehicle.param            ardupilot full parameter export
+  flight.bin               dataflash log
+  sensors.mcap             ros 2 bag: cameras, imu, camera_info, tf_static
+  groundtruth.csv          t, x, y, z, qx, qy, qz, qw (+ frame and sync method in notes)
+  wind.csv                 t, speed, direction (+ sensor height)
+  notes.md                 the row above, plus anything odd</pre>
+  </section>
+
+  <footer>Prepared for the isaac-exploration simulation pipeline. Questions about any item go to the simulation team; every item maps to one setting in the pipeline, so missing items just mean we keep an estimate for that part.</footer>
+</main>
+
+<script>
+(function () {
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('ul.items input[type="checkbox"]'));
+  var key = "sim-fidelity-field-kit";
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(key) || "{}"); } catch (e) { saved = {}; }
+  var out = document.getElementById("progress");
+  function update() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    out.textContent = done + " / " + boxes.length + " collected";
+  }
+  boxes.forEach(function (b) {
+    if (saved[b.id]) b.checked = true;
+    b.addEventListener("change", function () {
+      saved[b.id] = b.checked;
+      try { localStorage.setItem(key, JSON.stringify(saved)); } catch (e) {}
+      update();
+    });
+  });
+  update();
+})();
+</script>

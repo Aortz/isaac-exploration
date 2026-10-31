@@ -41,6 +41,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--flight", required=True)
     ap.add_argument("--config", default=str(PROJECT_ROOT / "config" / "flight.yaml"))
+    ap.add_argument("--extra-seeds", type=int, nargs="*", default=[], help="also write imu_seed<N>.csv per seed")
     args = ap.parse_args()
     cfg = load_config(args.config)
     cam, imu, hz = cfg["camera"], cfg["imu"], int(cfg["pegasus"]["physics_hz"])
@@ -65,15 +66,19 @@ def main() -> None:
     idx = np.arange(0, len(t), step)
     ti, gyro, acc = t[idx], gyro_d[idx], acc_d[idx]
 
-    rng = np.random.default_rng(imu.get("seed", 0))
-    gyro_n, acc_n = gyro, acc
-    b_g, b_a = np.zeros_like(gyro), np.zeros_like(acc)
-    if imu.get("enabled", True):
-        if imu.get("vibration"):
-            gv, av = motor_vibration(t, f_dense, imu["vibration"], rng)
-            gyro_n, acc_n = gyro + centred_mean(gv, step)[idx], acc + centred_mean(av, step)[idx]
-        gyro_n, b_g = add_noise(gyro_n, imu["rate_hz"], imu["gyro_noise_density"], imu["gyro_random_walk"], rng)
-        acc_n, b_a = add_noise(acc_n, imu["rate_hz"], imu["accel_noise_density"], imu["accel_random_walk"], rng)
+    def noisy(seed: int):
+        rng = np.random.default_rng(seed)
+        g, a_ = gyro, acc
+        bg, ba = np.zeros_like(gyro), np.zeros_like(acc)
+        if imu.get("enabled", True):
+            if imu.get("vibration"):
+                gv, av = motor_vibration(t, f_dense, imu["vibration"], rng)
+                g, a_ = gyro + centred_mean(gv, step)[idx], acc + centred_mean(av, step)[idx]
+            g, bg = add_noise(g, imu["rate_hz"], imu["gyro_noise_density"], imu["gyro_random_walk"], rng)
+            a_, ba = add_noise(a_, imu["rate_hz"], imu["accel_noise_density"], imu["accel_random_walk"], rng)
+        return g, a_, bg, ba
+
+    gyro_n, acc_n, b_g, b_a = noisy(imu.get("seed", 0))
 
     q_wb = rot[idx].as_quat()
     np.savetxt(fdir / "groundtruth_200hz.csv", np.column_stack([ti, p[idx], q_wb[:, [3, 0, 1, 2]], v[idx]]),
@@ -83,6 +88,12 @@ def main() -> None:
     np.savetxt(fdir / "imu_clean.csv", np.column_stack([ti, gyro, acc]), fmt="%.9f", delimiter=",", header=hdr)
     np.savetxt(fdir / "imu_bias.csv", np.column_stack([ti, b_g, b_a]), fmt="%.9f", delimiter=",",
                header="t,bgx,bgy,bgz,bax,bay,baz  (true IMU biases)")
+    # Extra noise realisations of the same flight, for repeat VIO runs (testplan: imu_seed<N>.csv).
+    for seed in args.extra_seeds:
+        g, a_, bg, ba = noisy(seed)
+        np.savetxt(fdir / f"imu_seed{seed}.csv", np.column_stack([ti, g, a_]), fmt="%.9f", delimiter=",", header=hdr)
+        np.savetxt(fdir / f"imu_bias_seed{seed}.csv", np.column_stack([ti, bg, ba]), fmt="%.9f", delimiter=",",
+                   header="t,bgx,bgy,bgz,bax,bay,baz  (true IMU biases)")
 
     # Pinhole F1 camera poses (hard mount only: the gimbal option has no physical model here).
     r_bc = body_to_camera_cv(cam["mount_pitch_deg"])
@@ -100,6 +111,14 @@ def main() -> None:
     e = np.linalg.norm(p - p_ref, axis=1)
     p_int = integrate_imu(ti, gyro, acc, p[0], v[0], r_wb[0])
     drift = float(np.linalg.norm(p_int - p[idx], axis=1).max())
+    # Whole-flight drift grows with t^2 from tiny attitude errors (0.02 deg of coning loss under PX4's
+    # fast attitude corrections already gives ~20 m over 100 s), so the data check restarts the
+    # integration from ground truth every 10 s and reports the worst 10 s window.
+    win, drift10 = int(10 * imu["rate_hz"]), 0.0
+    for a in range(0, len(ti) - 1, win):
+        b = min(a + win + 1, len(ti))
+        pw = integrate_imu(ti[a:b], gyro[a:b], acc[a:b], p[idx][a], v[idx][a], r_wb[idx][a])
+        drift10 = max(drift10, float(np.linalg.norm(pw - p[idx][a:b], axis=1).max()))
     seg = np.linalg.norm(np.diff(p, axis=0), axis=1)
     tilt = np.degrees(np.arccos(np.clip(r_wb[:, 2, 2], -1, 1)))
     meta = json.loads((fdir / "trajectory.json").read_text())
@@ -110,7 +129,7 @@ def main() -> None:
         "tracking": {"pos_err_rms_m": float(np.sqrt((e ** 2).mean())), "pos_err_max_m": float(e.max()),
                      "pos_err_final_m": float(e[-1]),
                      "rotor_ref_rad_s": [float(log[:, 14:18].min()), float(log[:, 14:18].max())]},
-        "checks": {"imu_integration_drift_m": drift},
+        "checks": {"imu_integration_drift_m": drift, "imu_drift_10s_m": drift10},
     })
     (fdir / "trajectory.json").write_text(json.dumps(meta, indent=2) + "\n")
     print(json.dumps({k: meta[k] for k in ("duration_s", "frames", "path_length_m", "max_speed_mps",

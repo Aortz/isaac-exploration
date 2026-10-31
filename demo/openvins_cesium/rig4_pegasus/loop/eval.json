@@ -1,0 +1,17 @@
+{
+  "flight": "marina_bay_loop_pegasus",
+  "run": "build/openvins/rig4_pegasus/loop",
+  "poses": 3022,
+  "time_span_s": [
+    4.2,
+    104.9
+  ],
+  "first_estimate_after_s": 4.2,
+  "path_length_m": 846.4,
+  "ate_rmse_m": 7.519,
+  "ate_max_m": 14.262,
+  "final_error_m": 3.607,
+  "final_error_pct_of_path": 0.426,
+  "rotation_error_deg_rmse": 2.787,
+  "alignment_yaw_deg": 140.366
+}

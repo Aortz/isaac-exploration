@@ -1,0 +1,59 @@
+{
+  "topics": {
+    "/cam0_front/image_raw": {
+      "count": 479,
+      "wall_hz": 18.11,
+      "sim_hz": 30.0,
+      "stamp_step_min_ms": 33.333,
+      "stamp_step_max_ms": 33.333,
+      "non_monotonic": 0
+    },
+    "/cam1_left/image_raw": {
+      "count": 479,
+      "wall_hz": 18.11,
+      "sim_hz": 30.0,
+      "stamp_step_min_ms": 33.333,
+      "stamp_step_max_ms": 33.333,
+      "non_monotonic": 0
+    },
+    "/cam2_back/image_raw": {
+      "count": 479,
+      "wall_hz": 18.11,
+      "sim_hz": 30.0,
+      "stamp_step_min_ms": 33.333,
+      "stamp_step_max_ms": 33.333,
+      "non_monotonic": 0
+    },
+    "/cam3_right/image_raw": {
+      "count": 479,
+      "wall_hz": 18.11,
+      "sim_hz": 30.0,
+      "stamp_step_min_ms": 33.333,
+      "stamp_step_max_ms": 33.333,
+      "non_monotonic": 0
+    },
+    "/clock": {
+      "count": 3506,
+      "wall_hz": 132.7,
+      "sim_hz": 219.98,
+      "stamp_step_min_ms": 1.667,
+      "stamp_step_max_ms": 5.0,
+      "non_monotonic": 0
+    },
+    "/imu/data": {
+      "count": 3187,
+      "wall_hz": 120.62,
+      "sim_hz": 200.0,
+      "stamp_step_min_ms": 5.0,
+      "stamp_step_max_ms": 5.0,
+      "non_monotonic": 0
+    }
+  },
+  "sync": {
+    "frames_on_all_cameras": 479,
+    "frames_on_some_cameras": 479,
+    "stamp_skew_s": 0.0,
+    "arrival_spread_ms_p50": 1.483,
+    "arrival_spread_ms_max": 11.832
+  }
+}

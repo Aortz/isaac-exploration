@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# @name Pegasus coaxial helicopter SITL (Spirit-class, flight/coax_vehicle.py)
+#
+# @type Helicopter
+# @class Copter
+#
+# Two counter-rotating fixed-pitch rotors (motor 1 clockwise, motor 2 counter-clockwise) and a
+# two-servo swashplate: servo 1 = pitch cyclic, servo 2 = roll cyclic (CA_SP0_ANG 0 / 90 deg).
+# Mounted into the PX4 container by flight/pegasus_fly.py (PX4_SIM_MODEL=pegasus_coax).
+
+. ${R}etc/init.d/rc.heli_defaults
+
+param set-default CA_AIRFRAME 12
+param set-default CA_SP0_COUNT 2
+param set-default CA_SP0_ANG0 0
+param set-default CA_SP0_ARM_L0 1.0
+param set-default CA_SP0_ANG1 90
+param set-default CA_SP0_ARM_L1 1.0
+
+param set-default PWM_MAIN_FUNC1 101
+param set-default PWM_MAIN_FUNC2 102
+param set-default PWM_MAIN_FUNC3 201
+param set-default PWM_MAIN_FUNC4 202
+
+param set-default COM_SPOOLUP_TIME 3
+
+# Rate loop for the model's actuator authority (first cut; see flight/coax_vehicle.py constants):
+# about 2.6 N m of roll/pitch per unit cyclic on 0.06 kg m^2, about 4 N m of yaw per unit differential.
+param set-default MC_ROLLRATE_P 0.15
+param set-default MC_ROLLRATE_I 0.15
+param set-default MC_ROLLRATE_D 0.003
+param set-default MC_ROLLRATE_FF 0.0
+param set-default MC_PITCHRATE_P 0.15
+param set-default MC_PITCHRATE_I 0.15
+param set-default MC_PITCHRATE_D 0.003
+param set-default MC_PITCHRATE_FF 0.0
+param set-default MC_YAWRATE_P 0.08
+param set-default MC_YAWRATE_I 0.05
+param set-default MC_YAWRATE_D 0.0
+param set-default MPC_THR_HOVER 0.6

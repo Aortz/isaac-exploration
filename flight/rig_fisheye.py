@@ -47,6 +47,7 @@ ap.add_argument("--save-all", action="store_true", help="save every frame (for -
 ap.add_argument("--lag-test", action="store_true", help="measure image-vs-pose lag per renderer-update count, then exit")
 ap.add_argument("--imu-file", default="imu.csv", help="IMU stream to publish (imu_clean.csv = no noise/vibration)")
 ap.add_argument("--tag", default="", help="output folder suffix: rig_<mode>_<tag>")
+ap.add_argument("--lighting", default="default", help="environment lighting variant (environments.<env>.lighting)")
 ap.add_argument("--stereo", action="store_true", help="render the pinhole stereo pair (config stereo:) instead")
 ap.add_argument("--gui", action="store_true", help="open the Isaac Sim window (viewport shows the first camera)")
 ap.add_argument("--token", default=os.environ.get("CESIUM_ION_TOKEN", ""))
@@ -54,7 +55,14 @@ args = ap.parse_args()
 
 from isaacsim import SimulationApp  # noqa: E402
 
-app = SimulationApp(simulation_app_config(headless=not args.gui))
+from pipeline.common.config import load_config as _load  # noqa: E402
+
+_cfg0 = _load(args.config)
+_fl0 = _cfg0["flights"][args.flight]
+_app_cfg = simulation_app_config(headless=not args.gui)
+if "env" in _fl0:   # e.g. Gaussian-splat environments need extra renderer settings at startup
+    _app_cfg["extra_args"] += _cfg0["environments"][_fl0["env"]].get("kit_args", [])
+app = SimulationApp(_app_cfg)
 
 import numpy as np  # noqa: E402
 import omni.timeline  # noqa: E402
@@ -67,6 +75,7 @@ from scipy.spatial.transform import Slerp  # noqa: E402
 
 from flight.f1_trajectory import CV_TO_USD, body_to_camera_cv  # noqa: E402
 from pipeline.common import cesium_support as cs  # noqa: E402
+from pipeline.common import environments as envs  # noqa: E402
 from pipeline.common.config import BUILD, load_config  # noqa: E402
 
 RIG = "/World/Rig"
@@ -212,7 +221,7 @@ def write_stereo(out: Path, intr: dict, extrinsics: dict, offsets: dict, t_frame
                fmt="%.9f", delimiter=",", header="t_s,px,py,pz,qx,qy,qz,qw", comments="")
 
 
-def lag_test(sensors: dict, rig_xf, p0, r0, rcfg: dict, fdir: Path, n: int = 36, step_deg: float = 10.0) -> None:
+def lag_test(sensors: dict, rig_xf, p0, r0, rcfg: dict, fdir: Path, wait, n: int = 36, step_deg: float = 10.0) -> None:
     """How many renderer updates until a camera's image shows the pose just set?
 
     The rig spins in place by step_deg per frame (big, unambiguous image change; no tile changes).
@@ -233,7 +242,7 @@ def lag_test(sensors: dict, rig_xf, p0, r0, rcfg: dict, fdir: Path, n: int = 36,
     ref = []
     for k in range(n):
         pose(k)
-        cs.wait_for_tiles(app, rcfg["tile_timeout_s"])
+        wait()
         for _ in range(rcfg["settle_updates"] + 4):
             app.update()
         ref.append(grab())
@@ -260,9 +269,9 @@ def lag_test(sensors: dict, rig_xf, p0, r0, rcfg: dict, fdir: Path, n: int = 36,
 
 
 def main() -> None:
-    cs.ensure_loaded()
     cfg = load_config(args.config)
     fl, rig, rcfg, imu_cfg = cfg["flights"][args.flight], cfg["rig"], dict(cfg["render"]), cfg["imu"]
+    env = cfg["environments"][fl["env"]] if "env" in fl else None
     rcfg["frustum_culling"] = False
     fdir = BUILD / "flight" / args.flight
     gt = np.loadtxt(fdir / "groundtruth_200hz.csv", delimiter=",", comments="#")   # t p(3) q_wxyz(4) v(3)
@@ -276,14 +285,35 @@ def main() -> None:
     vel = np.stack([np.interp(t_frames, gt[:, 0], gt[:, 8 + k]) for k in range(3)], axis=1)
     rots = slerp(t_frames)
 
-    stage_path = BUILD / "cesium" / f"{fl['site']}_{fl['source']}.usda"
-    if fl["source"] in ("google", "osm") and not args.token:
-        raise SystemExit("CESIUM_ION_TOKEN is not set; ion tilesets will not stream")
-    stage = cs.open_stage(app, stage_path, args.token)
-    look = cs.apply_look(stage, rcfg)
+    clip = cfg["camera"]["clip"]
+    stereo_cfg = dict(cfg["stereo"])
+    if env:
+        # Isaac USD environment: static geometry, so a lockstep frame is a fixed number of updates.
+        stage = envs.open_env(app, env)
+        look = envs.apply_lighting(stage, env, args.lighting)
+        clip = env.get("clip", clip)
+        stereo_cfg.update(env.get("stereo", {}))
+        rcfg["settle_updates"] = 0
+
+        def wait():
+            return envs.settle(app, env["settle_updates"])
+
+        def warm():
+            return envs.settle(app, env["warmup_updates"])
+    else:
+        cs.ensure_loaded()
+        stage_path = BUILD / "cesium" / f"{fl['site']}_{fl['source']}.usda"
+        if fl["source"] in ("google", "osm") and not args.token:
+            raise SystemExit("CESIUM_ION_TOKEN is not set; ion tilesets will not stream")
+        stage = cs.open_stage(app, stage_path, args.token)
+        look = cs.apply_look(stage, rcfg)
+
+        def wait():
+            return cs.wait_for_tiles(app, rcfg["tile_timeout_s"])
+        warm = wait
 
     if args.stereo:
-        st = cfg["stereo"]
+        st = stereo_cfg
         intr = {"width": st["width"], "height": st["height"], "fx": st["fx"], "fy": st["fy"],
                 "model": "plumb_bob", "d": [0.0] * 5}
         b = st["baseline_m"] / 2
@@ -313,7 +343,7 @@ def main() -> None:
                 "omni:lensdistortion:opencvFisheye:cy": H / 2,
                 "omni:lensdistortion:opencvFisheye:imageSize": Gf.Vec2i(W, H),
                 **{f"omni:lensdistortion:opencvFisheye:k{i + 1}": float(k) for i, k in enumerate(rig["k"])}})
-        UsdGeom.Camera(stage.GetPrimAtPath(path)).GetClippingRangeAttr().Set(Gf.Vec2f(*cfg["camera"]["clip"]))
+        UsdGeom.Camera(stage.GetPrimAtPath(path)).GetClippingRangeAttr().Set(Gf.Vec2f(*clip))
         r_bc = body_to_camera(yaw, pitch)
         extrinsics[name], offsets[name] = r_bc, np.asarray(t_bc, float)
         q = R.from_matrix(r_bc @ CV_TO_USD).as_quat()  # x y z w
@@ -329,10 +359,11 @@ def main() -> None:
         rig_xf.set_world_poses(positions=pos[k][None], orientations=np.array([[q[3], q[0], q[1], q[2]]]))
 
     if args.lag_test:
-        lag_test(sensors, rig_xf, pos[0], rots[0], rcfg, fdir)
+        lag_test(sensors, rig_xf, pos[0], rots[0], rcfg, fdir, wait)
         return
 
-    run_name = f"rig_{args.mode}" + ("_stereo" if args.stereo else "") + (f"_{args.tag}" if args.tag else "")
+    run_name = (f"rig_{args.mode}" + ("_stereo" if args.stereo else "")
+                + (f"_{args.lighting}" if args.lighting != "default" else "") + (f"_{args.tag}" if args.tag else ""))
     out = fdir / run_name
     (out / "frames").mkdir(parents=True, exist_ok=True)
     if args.stereo:
@@ -345,7 +376,7 @@ def main() -> None:
     t0 = time.time()
     for k in range(0, len(t_frames), rcfg["warmup_stride"]):
         place_rig(k)
-        cs.wait_for_tiles(app, rcfg["tile_timeout_s"])
+        warm()
     warmup_s = time.time() - t0
 
     timing = {k: [] for k in ("pose", "render", "readback", "publish", "frame")}
@@ -361,7 +392,7 @@ def main() -> None:
         place_rig(k)
         f1 = time.perf_counter()
         if args.mode == "lockstep":
-            _, settled, n = cs.wait_for_tiles(app, rcfg["tile_timeout_s"])
+            _, settled, n = wait()
             for _ in range(settle):
                 app.update()
             n += settle

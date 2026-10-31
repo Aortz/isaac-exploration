@@ -1,0 +1,17 @@
+{
+  "flight": "marina_bay_loop",
+  "run": "build/openvins/front1/smoke",
+  "poses": 476,
+  "time_span_s": [
+    4.1,
+    19.93
+  ],
+  "first_estimate_after_s": 4.1,
+  "path_length_m": 132.3,
+  "ate_rmse_m": 12.237,
+  "ate_max_m": 19.109,
+  "final_error_m": 11.29,
+  "final_error_pct_of_path": 8.535,
+  "rotation_error_deg_rmse": 6.404,
+  "alignment_yaw_deg": -140.16
+}

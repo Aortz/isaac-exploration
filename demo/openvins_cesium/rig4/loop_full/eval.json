@@ -1,0 +1,17 @@
+{
+  "flight": "marina_bay_loop",
+  "run": "build/openvins/rig4/loop_full",
+  "poses": 3025,
+  "time_span_s": [
+    4.1,
+    104.9
+  ],
+  "first_estimate_after_s": 4.1,
+  "path_length_m": 844.6,
+  "ate_rmse_m": 94.838,
+  "ate_max_m": 122.353,
+  "final_error_m": 74.022,
+  "final_error_pct_of_path": 8.764,
+  "rotation_error_deg_rmse": 8.64,
+  "alignment_yaw_deg": 146.676
+}

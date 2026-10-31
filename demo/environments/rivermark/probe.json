@@ -1,0 +1,36 @@
+{
+  "usd": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/Isaac/Environments/Outdoor/Rivermark/rivermark.usd",
+  "load_s": 30.2,
+  "meters_per_unit": 1.0,
+  "up_axis": "Z",
+  "bounds_all": [
+    -1007.1,
+    -1411.3,
+    -1.5,
+    1251.6,
+    1340.1,
+    423.2
+  ],
+  "core_xy_p2_p98": [
+    -388.2,
+    -397.9,
+    341.8,
+    487.7
+  ],
+  "object_top_z_percentiles": {
+    "50": 10.0,
+    "90": 15.1,
+    "99": 17.5,
+    "99.9": 28.4
+  },
+  "ground_z_p5": 5.17,
+  "prims": 257478,
+  "gprims": 99724,
+  "colliders": 4818,
+  "lights": 669,
+  "lights_by_type": {
+    "DomeLight": [
+      "/World/main/Sky"
+    ]
+  }
+}

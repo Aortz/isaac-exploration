@@ -1,0 +1,198 @@
+{
+  "seq": "/home/aortz/Coding-Projects/isaac-exploration/build/flight/marina_bay_loop_pegasus/rig_lockstep_stereo",
+  "mode": "Fast",
+  "frames_per_instance": 300,
+  "threads": 2,
+  "no_mapping": false,
+  "preload": false,
+  "camera_hz": 30.0,
+  "rounds": [
+    {
+      "instances": 1,
+      "ok": 1,
+      "failed": 0,
+      "wall_s": 40.2,
+      "fps_per_instance_mean": 9.13,
+      "fps_per_instance_min": 9.13,
+      "fps_aggregate": 9.13,
+      "fps_aggregate_wall": 7.46,
+      "aggregate_vs_camera_hz": 0.304,
+      "gpu_mem_baseline_MiB": 902.0,
+      "gpu_mem_peak_MiB": 3560.0,
+      "gpu_mem_per_instance_MiB": 2658.0,
+      "gpu_util_mean_pct": 70.6,
+      "host_mem_available_min_GiB": 49.5,
+      "ram_guard_tripped": false,
+      "per_instance": [
+        {
+          "exit": 0,
+          "fps_steady": 9.13,
+          "fps_overall": 8.53,
+          "cuda_max_reserved_MiB": 2324.0
+        }
+      ]
+    },
+    {
+      "instances": 4,
+      "ok": 4,
+      "failed": 0,
+      "wall_s": 128.7,
+      "fps_per_instance_mean": 2.48,
+      "fps_per_instance_min": 2.47,
+      "fps_aggregate": 9.91,
+      "fps_aggregate_wall": 9.32,
+      "aggregate_vs_camera_hz": 0.33,
+      "gpu_mem_baseline_MiB": 902.0,
+      "gpu_mem_peak_MiB": 11546.0,
+      "gpu_mem_per_instance_MiB": 2661.0,
+      "gpu_util_mean_pct": 90.9,
+      "host_mem_available_min_GiB": 40.0,
+      "ram_guard_tripped": false,
+      "per_instance": [
+        {
+          "exit": 0,
+          "fps_steady": 2.47,
+          "fps_overall": 2.42,
+          "cuda_max_reserved_MiB": 2324.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 2.49,
+          "fps_overall": 2.45,
+          "cuda_max_reserved_MiB": 2324.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 2.47,
+          "fps_overall": 2.42,
+          "cuda_max_reserved_MiB": 2324.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 2.48,
+          "fps_overall": 2.43,
+          "cuda_max_reserved_MiB": 2324.0
+        }
+      ]
+    },
+    {
+      "instances": 6,
+      "ok": 6,
+      "failed": 0,
+      "wall_s": 189.6,
+      "fps_per_instance_mean": 1.66,
+      "fps_per_instance_min": 1.65,
+      "fps_aggregate": 9.94,
+      "fps_aggregate_wall": 9.49,
+      "aggregate_vs_camera_hz": 0.331,
+      "gpu_mem_baseline_MiB": 902.0,
+      "gpu_mem_peak_MiB": 15447.0,
+      "gpu_mem_per_instance_MiB": 2424.0,
+      "gpu_util_mean_pct": 94.5,
+      "host_mem_available_min_GiB": 33.8,
+      "ram_guard_tripped": false,
+      "per_instance": [
+        {
+          "exit": 0,
+          "fps_steady": 1.66,
+          "fps_overall": 1.63,
+          "cuda_max_reserved_MiB": 2324.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 1.66,
+          "fps_overall": 1.64,
+          "cuda_max_reserved_MiB": 2324.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 1.65,
+          "fps_overall": 1.63,
+          "cuda_max_reserved_MiB": 2324.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 1.66,
+          "fps_overall": 1.64,
+          "cuda_max_reserved_MiB": 2324.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 1.66,
+          "fps_overall": 1.63,
+          "cuda_max_reserved_MiB": 2224.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 1.65,
+          "fps_overall": 1.63,
+          "cuda_max_reserved_MiB": 1696.0
+        }
+      ]
+    },
+    {
+      "instances": 7,
+      "ok": 4,
+      "failed": 3,
+      "wall_s": 132.3,
+      "fps_per_instance_mean": 2.44,
+      "fps_per_instance_min": 2.43,
+      "fps_aggregate": 9.75,
+      "fps_aggregate_wall": 9.07,
+      "aggregate_vs_camera_hz": 0.325,
+      "gpu_mem_baseline_MiB": 862.0,
+      "gpu_mem_peak_MiB": 15693.0,
+      "gpu_mem_per_instance_MiB": 2119.0,
+      "gpu_util_mean_pct": 91.3,
+      "host_mem_available_min_GiB": 34.0,
+      "ram_guard_tripped": false,
+      "per_instance": [
+        {
+          "exit": 0,
+          "fps_steady": 2.44,
+          "fps_overall": 2.37,
+          "cuda_max_reserved_MiB": 2244.0
+        },
+        {
+          "exit": 1,
+          "fps_steady": null,
+          "fps_overall": null,
+          "cuda_max_reserved_MiB": null
+        },
+        {
+          "exit": 1,
+          "fps_steady": null,
+          "fps_overall": null,
+          "cuda_max_reserved_MiB": null
+        },
+        {
+          "exit": 0,
+          "fps_steady": 2.44,
+          "fps_overall": 2.37,
+          "cuda_max_reserved_MiB": 2324.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 2.44,
+          "fps_overall": 2.36,
+          "cuda_max_reserved_MiB": 1616.0
+        },
+        {
+          "exit": 0,
+          "fps_steady": 2.43,
+          "fps_overall": 2.36,
+          "cuda_max_reserved_MiB": 1616.0
+        },
+        {
+          "exit": 1,
+          "fps_steady": null,
+          "fps_overall": null,
+          "cuda_max_reserved_MiB": null
+        }
+      ]
+    }
+  ],
+  "max_concurrent_ok": 6,
+  "best_throughput_instances": 6,
+  "best_fps_aggregate": 9.94
+}

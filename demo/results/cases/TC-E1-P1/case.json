@@ -1,0 +1,153 @@
+{
+  "case": {
+    "id": "TC-E1-P1",
+    "flight": "rm_p1_hover",
+    "profile": "P1"
+  },
+  "g3": {
+    "track_rms_m": 0.024423251670288075,
+    "imu_drift_m": 0.03690022958258077,
+    "dynamics": "pegasus",
+    "clearance": {
+      "flight": "rm_p1_hover",
+      "source": "flown",
+      "min_clearance_m": 18.05,
+      "at_t_s": 0.0,
+      "at_xyz": [
+        40.0,
+        -40.0,
+        24.9
+      ],
+      "nearest_box_lo": [
+        -62.4,
+        -80.3,
+        6.3
+      ],
+      "nearest_box_hi": [
+        131.1,
+        22.8,
+        6.9
+      ],
+      "p5_clearance_m": 18.08
+    },
+    "pass": true
+  },
+  "vio": {
+    "7": {
+      "poses": 1108,
+      "t_first_s": 6.03333,
+      "t_last_s": 42.93333,
+      "path_m": 0.14473108643664445,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 4.582707097968039,
+      "ate_max_m": 11.045126510204499,
+      "final_err_m": 11.045126510204499,
+      "rot_rmse_deg": 0.9649966952884218,
+      "rpe10": {
+        "segments": 0
+      },
+      "scale_sim3": 0.0009406066614023805
+    },
+    "101": {
+      "poses": 1179,
+      "t_first_s": 3.63333,
+      "t_last_s": 42.93333,
+      "path_m": 0.1639557810159673,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 0.26263913314167164,
+      "ate_max_m": 0.6057037221118822,
+      "final_err_m": 0.09962323483464791,
+      "rot_rmse_deg": 1.6303347106216433,
+      "rpe10": {
+        "segments": 0
+      },
+      "scale_sim3": 0.02726834448973024
+    },
+    "102": {
+      "poses": 1178,
+      "t_first_s": 3.66667,
+      "t_last_s": 42.93333,
+      "path_m": 0.16360663893722163,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 3.3532096007748553,
+      "ate_max_m": 5.846852906361273,
+      "final_err_m": 1.08433088836183,
+      "rot_rmse_deg": 0.6858860614564416,
+      "rpe10": {
+        "segments": 0
+      },
+      "scale_sim3": 0.002509477298340312
+    }
+  },
+  "vio_seed_spread": {
+    "ates": [
+      4.582707097968039,
+      0.26263913314167164,
+      3.3532096007748553
+    ],
+    "std_over_mean": 0.6650172376270801,
+    "pass": false
+  },
+  "g1_fisheye": {
+    "gate": "g1",
+    "flight": "rm_p1_hover",
+    "run": "rig_lockstep",
+    "frames": 1290,
+    "triangulated": 0,
+    "rotation_only": 29,
+    "tracks": 28334,
+    "median_px": 0.07810558481593592,
+    "p90_px": 0.25026013746407966,
+    "per_camera_median_px": {
+      "cam0_front": 0.07581470771744935,
+      "cam1_left": 0.0802112559534443,
+      "cam2_back": 0.08018441968167964,
+      "cam3_right": 0.07658761362061711
+    },
+    "pass": true
+  },
+  "g1_stereo": {
+    "gate": "g1",
+    "flight": "rm_p1_hover",
+    "run": "rig_lockstep_stereo",
+    "frames": 1290,
+    "triangulated": 0,
+    "rotation_only": 29,
+    "tracks": 7683,
+    "median_px": 0.08809268990033299,
+    "p90_px": 0.24446547083780196,
+    "per_camera_median_px": {
+      "left": 0.08809268990033299
+    },
+    "pass": true
+  },
+  "g4": {
+    "gate": "g4",
+    "flight": "rm_p1_hover",
+    "run": "rig_lockstep_stereo",
+    "samples": 16344,
+    "median_px": 1.2854690551757812,
+    "p10_px": 0.4679656982421875,
+    "p90_px": 3.2147048950195316,
+    "pass": false
+  },
+  "macvo": {
+    "poses": 1290,
+    "t_first_s": 0.0,
+    "t_last_s": 42.966666667,
+    "path_m": 0.20781584208629814,
+    "align": "se3",
+    "scale": 1.0,
+    "ate_rmse_m": 0.37710266772436324,
+    "ate_max_m": 0.5558246840771794,
+    "final_err_m": 0.40495011160605626,
+    "rot_rmse_deg": 0.6900589289873118,
+    "rpe10": {
+      "segments": 0
+    },
+    "scale_sim3": 0.028798134665323383
+  }
+}

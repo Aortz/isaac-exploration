@@ -44,7 +44,7 @@ feat_rep_slam: "ANCHORED_MSCKF_INVERSE_DEPTH"
 feat_rep_aruco: "ANCHORED_MSCKF_INVERSE_DEPTH"
 # Feature triangulation limits: OpenVINS defaults (60 m, 40x baseline) are for indoor rigs; from
 # 100+ m altitude every feature is farther than that and would be thrown away.
-fi_max_dist: 1500.0
+fi_max_dist: {fi_max_dist}
 fi_max_baseline: 400.0
 fi_max_cond_number: 1000000.0
 try_zupt: true                       # with ZUPT on, static init fires during the start hover (no jerk needed)
@@ -137,6 +137,8 @@ def main() -> None:
     ap.add_argument("--name", default=None, help="output folder name (default rig<N>)")
     ap.add_argument("--theta-max-deg", type=float, default=80.0)
     ap.add_argument("--flight", default="marina_bay_loop", help="flight whose IMU sets the noise levels")
+    ap.add_argument("--fi-max-dist", type=float, default=1500.0, help="max feature distance (m); 1500 suits Cesium at 100+ m")
+    ap.add_argument("--noise-margin", type=float, default=2.0, help="factor on the IMU noise densities (ablation A2: 1)")
     args = ap.parse_args()
     cfg = load_config(args.config)
     rig, imu = cfg["rig"], cfg["imu"]
@@ -173,13 +175,14 @@ def main() -> None:
     gyr_vib, acc_vib = float(resid[:, :3].std(0).max()), float(resid[:, 3:].std(0).max())
     acc_vec_std = float(np.sqrt((resid[:, 3:].std(0) ** 2).sum()))
     rate = imu["rate_hz"]
-    and_ = 2 * np.hypot(imu["accel_noise_density"], acc_vib / np.sqrt(rate))
-    gnd = 2 * np.hypot(imu["gyro_noise_density"], gyr_vib / np.sqrt(rate))
+    k = args.noise_margin
+    and_ = k * np.hypot(imu["accel_noise_density"], acc_vib / np.sqrt(rate))
+    gnd = k * np.hypot(imu["gyro_noise_density"], gyr_vib / np.sqrt(rate))
     (out / "kalibr_imu_chain.yaml").write_text(IMU.format(
-        and_=f"{and_:.4e}", and0=imu["accel_noise_density"], arw=f"{2 * imu['accel_random_walk']:.4e}",
-        gnd=f"{gnd:.4e}", gnd0=imu["gyro_noise_density"], grw=f"{2 * imu['gyro_random_walk']:.4e}", rate=float(rate)))
+        and_=f"{and_:.4e}", and0=imu["accel_noise_density"], arw=f"{k * imu['accel_random_walk']:.4e}",
+        gnd=f"{gnd:.4e}", gnd0=imu["gyro_noise_density"], grw=f"{k * imu['gyro_random_walk']:.4e}", rate=float(rate)))
     masks = "\n".join(f'mask{i}: "mask{i}.png"' for i in range(len(cams)))
-    (out / "estimator_config.yaml").write_text(ESTIMATOR.format(n=len(cams), masks=masks,
+    (out / "estimator_config.yaml").write_text(ESTIMATOR.format(n=len(cams), masks=masks, fi_max_dist=args.fi_max_dist,
                                                                 init_thresh=round(max(1.0, 2 * acc_vec_std), 2)))
     print(f"OpenVINS config for {cams} -> {out}")
 

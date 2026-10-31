@@ -1,0 +1,16 @@
+{
+  "gate": "g2",
+  "env": "nurec_wormhole",
+  "median_ncc": 0.0,
+  "pass": false,
+  "threshold": 0.9,
+  "poses": [
+    {
+      "pose_index": 98,
+      "ncc": 0.0,
+      "overlap_px": 47116,
+      "fisheye_mean": 147.4,
+      "pinhole_mean": 228.0
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "flight": "rm_p3_nominal",
+  "mode": "lockstep",
+  "ros2": false,
+  "freerun_updates": 1,
+  "frames": 3259,
+  "cameras": [
+    "left",
+    "right"
+  ],
+  "resolution": [
+    640,
+    480
+  ],
+  "depth": false,
+  "sim_camera_hz": 30,
+  "sim_duration_s": 108.6,
+  "warmup_s": 168.4,
+  "wall_s": 504.36,
+  "max_fps_cap": 0.0,
+  "wall_frames_per_s": 6.46,
+  "achieved_frames_per_s": 22.96,
+  "achieved_images_per_s": 45.92,
+  "realtime_factor": 0.765,
+  "image_lag_frames_compensated": 0,
+  "renderer_updates_per_frame": {
+    "mean": 4.0,
+    "max": 4
+  },
+  "unsettled_frames": 0,
+  "imu_messages": 0,
+  "timing": {
+    "pose": {
+      "mean_ms": 1.13,
+      "p50_ms": 1.15,
+      "p95_ms": 1.27,
+      "max_ms": 2.47
+    },
+    "render": {
+      "mean_ms": 39.78,
+      "p50_ms": 39.14,
+      "p95_ms": 44.97,
+      "max_ms": 103.74
+    },
+    "readback": {
+      "mean_ms": 2.64,
+      "p50_ms": 2.64,
+      "p95_ms": 3.44,
+      "max_ms": 38.78
+    },
+    "publish": {
+      "mean_ms": 0.0,
+      "p50_ms": 0.0,
+      "p95_ms": 0.0,
+      "max_ms": 0.01
+    },
+    "frame": {
+      "mean_ms": 43.55,
+      "p50_ms": 42.85,
+      "p95_ms": 48.89,
+      "max_ms": 107.67
+    }
+  },
+  "look": {
+    "variant": "default",
+    "dome": "/World/main/Sky",
+    "texture": "../../../../../nv_core/common_assets/environments/hdri/domeskyhdri__50__0_5.HDR",
+    "intensity": 1000.0
+  },
+  "note": "achieved_* = frames / summed frame time (pose + render + readback + publish), i.e. the uncapped rate; wall_frames_per_s includes the cap's sleeps and image saving"
+}

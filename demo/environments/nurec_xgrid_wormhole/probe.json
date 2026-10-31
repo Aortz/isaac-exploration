@@ -1,0 +1,32 @@
+{
+  "usd": "/home/aortz/Coding-Projects/isaac-exploration/third_party/nurec/xgrid-wormhole/stage_particle.usd",
+  "load_s": 0.2,
+  "meters_per_unit": 1.0,
+  "up_axis": "Z",
+  "bounds_all": [
+    -35.9,
+    -6.9,
+    -16.2,
+    14.7,
+    23.7,
+    6.6
+  ],
+  "core_xy_p2_p98": [
+    -10.5,
+    6.2,
+    -3.2,
+    8.3
+  ],
+  "object_top_z_percentiles": {
+    "50": 5.4,
+    "90": 6.3,
+    "99": 6.6,
+    "99.9": 6.6
+  },
+  "ground_z_p5": -15.45,
+  "prims": 3,
+  "gprims": 2,
+  "colliders": 1,
+  "lights": 0,
+  "lights_by_type": {}
+}

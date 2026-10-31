@@ -1,0 +1,27 @@
+{
+  "case": {
+    "id": "TC-E2-P1",
+    "flight": "nx_p1_hover",
+    "profile": "P1"
+  },
+  "g3": {
+    "track_rms_m": 0.0244054784979064,
+    "imu_drift_m": 0.036421608199615124,
+    "imu_drift_whole_flight_m": 0.036421608199615124,
+    "dynamics": "pegasus",
+    "clearance": {
+      "flight": "nx_p1_hover",
+      "source": "flown",
+      "method": "occupancy_2d",
+      "min_clearance_m": 6.05,
+      "at_t_s": 0.0,
+      "at_xyz": [
+        2.0,
+        7.0,
+        1.11
+      ],
+      "p5_clearance_m": 6.05
+    },
+    "pass": true
+  }
+}

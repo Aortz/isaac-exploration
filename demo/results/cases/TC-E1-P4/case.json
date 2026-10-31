@@ -1,0 +1,175 @@
+{
+  "case": {
+    "id": "TC-E1-P4",
+    "flight": "rm_p4_aggressive",
+    "profile": "P4"
+  },
+  "g3": {
+    "track_rms_m": 0.34320539737965716,
+    "imu_drift_m": 0.23326843520108245,
+    "imu_drift_whole_flight_m": 0.23326843520108245,
+    "dynamics": "pegasus",
+    "clearance": {
+      "flight": "rm_p4_aggressive",
+      "source": "flown",
+      "method": "aabb",
+      "min_clearance_m": 17.37,
+      "at_t_s": 74.5,
+      "at_xyz": [
+        168.4,
+        -202.1,
+        34.8
+      ],
+      "nearest_box_lo": [
+        166.0,
+        -205.9,
+        17.4
+      ],
+      "nearest_box_hi": [
+        172.5,
+        -202.3,
+        17.5
+      ],
+      "p5_clearance_m": 17.45
+    },
+    "pass": true
+  },
+  "vio": {
+    "7": {
+      "poses": 2244,
+      "t_first_s": 4.1,
+      "t_last_s": 78.86667,
+      "path_m": 606.4596516622503,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 1.0729921751208413,
+      "ate_max_m": 2.6049722045222814,
+      "final_err_m": 1.5746519434474577,
+      "rot_rmse_deg": 0.8023603684790177,
+      "rpe10": {
+        "segments": 2084,
+        "seg_m": 10.0,
+        "rmse_m": 0.42587809696580897,
+        "rmse_pct": 4.25878096965809
+      },
+      "ate_pct": 0.17692721555009772,
+      "final_pct": 0.2596466127847881,
+      "scale_sim3": 0.9901743425048658
+    },
+    "101": {
+      "poses": 2243,
+      "t_first_s": 4.13333,
+      "t_last_s": 78.86667,
+      "path_m": 606.4587626470986,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 1.2297064980196672,
+      "ate_max_m": 2.9245378231631234,
+      "final_err_m": 1.4790154608184576,
+      "rot_rmse_deg": 0.8105577572388021,
+      "rpe10": {
+        "segments": 2083,
+        "seg_m": 10.0,
+        "rmse_m": 0.6066009502950559,
+        "rmse_pct": 6.066009502950559
+      },
+      "ate_pct": 0.20276836180125235,
+      "final_pct": 0.24387733377992332,
+      "scale_sim3": 0.9922508111166956
+    },
+    "102": {
+      "poses": 2243,
+      "t_first_s": 4.13333,
+      "t_last_s": 78.86667,
+      "path_m": 606.4587626470986,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 1.168227763126049,
+      "ate_max_m": 2.79330241849627,
+      "final_err_m": 2.007459682395137,
+      "rot_rmse_deg": 0.8206473154455468,
+      "rpe10": {
+        "segments": 2083,
+        "seg_m": 10.0,
+        "rmse_m": 0.5986095754664087,
+        "rmse_pct": 5.9860957546640865
+      },
+      "ate_pct": 0.19263103034852946,
+      "final_pct": 0.33101338558171484,
+      "scale_sim3": 0.9947651897943527
+    }
+  },
+  "vio_seed_spread": {
+    "ates": [
+      1.0729921751208413,
+      1.2297064980196672,
+      1.168227763126049
+    ],
+    "std_over_mean": 0.05572391995217987,
+    "pass": true
+  },
+  "g1_fisheye": {
+    "gate": "g1",
+    "flight": "rm_p4_aggressive",
+    "run": "rig_lockstep",
+    "frames": 2368,
+    "triangulated": 47,
+    "rotation_only": 6,
+    "tracks": 33776,
+    "median_px": 0.07394610273504162,
+    "p90_px": 0.19431177429306654,
+    "per_camera_median_px": {
+      "cam0_front": 0.07307973630153108,
+      "cam1_left": 0.07565636951261845,
+      "cam2_back": 0.07201247939736863,
+      "cam3_right": 0.07494603925971641
+    },
+    "pass": true
+  },
+  "g1_stereo": {
+    "gate": "g1",
+    "flight": "rm_p4_aggressive",
+    "run": "rig_lockstep_stereo",
+    "frames": 2368,
+    "triangulated": 47,
+    "rotation_only": 6,
+    "tracks": 9311,
+    "median_px": 0.08028914615973197,
+    "p90_px": 0.21507324536440545,
+    "per_camera_median_px": {
+      "left": 0.08028914615973197
+    },
+    "pass": true
+  },
+  "g4": {
+    "gate": "g4",
+    "flight": "rm_p4_aggressive",
+    "run": "rig_lockstep_stereo",
+    "samples": 28645,
+    "median_px": 1.5845794677734375,
+    "p10_px": 0.44649658203125003,
+    "p90_px": 3.7614501953125004,
+    "pass": false
+  },
+  "macvo": {
+    "poses": 2368,
+    "t_first_s": 0.0,
+    "t_last_s": 78.9,
+    "path_m": 606.5087882545985,
+    "align": "se3",
+    "scale": 1.0,
+    "ate_rmse_m": 1.119227867517427,
+    "ate_max_m": 2.6268406002621774,
+    "final_err_m": 0.6448894110832383,
+    "rot_rmse_deg": 1.3784350944418198,
+    "rpe10": {
+      "segments": 2207,
+      "seg_m": 10.0,
+      "rmse_m": 0.26292617566831344,
+      "rmse_pct": 2.6292617566831344
+    },
+    "ate_pct": 0.18453613355518284,
+    "final_pct": 0.10632812311575748,
+    "scale_sim3": 0.9966450373719802
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "flight": "marina_bay_loop",
+  "run": "build/openvins/rig4_invd/smoke",
+  "poses": 476,
+  "time_span_s": [
+    4.1,
+    19.93
+  ],
+  "first_estimate_after_s": 4.1,
+  "path_length_m": 132.3,
+  "ate_rmse_m": 5.951,
+  "ate_max_m": 10.13,
+  "final_error_m": 3.586,
+  "final_error_pct_of_path": 2.71,
+  "rotation_error_deg_rmse": 4.53,
+  "alignment_yaw_deg": -130.206
+}

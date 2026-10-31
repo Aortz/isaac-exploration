@@ -1,0 +1,129 @@
+{
+  "case": {
+    "id": "TC-E1-P6",
+    "flight": "rm_p6_close",
+    "profile": "P6"
+  },
+  "g3": {
+    "track_rms_m": 0.03878079524837576,
+    "imu_drift_m": 0.07974678195498314,
+    "imu_drift_whole_flight_m": 0.07974678195498314,
+    "dynamics": "pegasus",
+    "clearance": {
+      "flight": "rm_p6_close",
+      "source": "flown",
+      "method": "aabb",
+      "min_clearance_m": 5.14,
+      "at_t_s": 35.9,
+      "at_xyz": [
+        199.3,
+        -171.2,
+        14.0
+      ],
+      "nearest_box_lo": [
+        201.7,
+        -190.2,
+        14.6
+      ],
+      "nearest_box_hi": [
+        214.6,
+        -175.7,
+        17.4
+      ],
+      "p5_clearance_m": 5.47
+    },
+    "pass": true
+  },
+  "vio": {
+    "7": {
+      "poses": 1319,
+      "t_first_s": 16.16667,
+      "t_last_s": 60.1,
+      "path_m": 78.11999936588231,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 26.58760959487934,
+      "ate_max_m": 49.56261430227676,
+      "final_err_m": 28.445847772716395,
+      "rot_rmse_deg": 154.66140214204805,
+      "rpe10": {
+        "segments": 811,
+        "seg_m": 10.0,
+        "rmse_m": 10.047566408472667,
+        "rmse_pct": 100.47566408472667
+      },
+      "ate_pct": 34.034318754092396,
+      "final_pct": 36.41301587764691,
+      "scale_sim3": 69.95687864597024
+    },
+    "101": {
+      "poses": 1319,
+      "t_first_s": 16.16667,
+      "t_last_s": 60.1,
+      "path_m": 78.11999936588231,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 26.57548423611228,
+      "ate_max_m": 49.59159757818656,
+      "final_err_m": 28.428767092756406,
+      "rot_rmse_deg": 145.92441677775795,
+      "rpe10": {
+        "segments": 811,
+        "seg_m": 10.0,
+        "rmse_m": 10.049010577221509,
+        "rmse_pct": 100.49010577221509
+      },
+      "ate_pct": 34.0187973013716,
+      "final_pct": 36.39115120778179,
+      "scale_sim3": 1244.6134900791112
+    },
+    "102": {
+      "poses": 1319,
+      "t_first_s": 16.16667,
+      "t_last_s": 60.1,
+      "path_m": 78.11999936588231,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 26.57805391768185,
+      "ate_max_m": 49.604883471597816,
+      "final_err_m": 28.436498328085424,
+      "rot_rmse_deg": 140.18525946739572,
+      "rpe10": {
+        "segments": 811,
+        "seg_m": 10.0,
+        "rmse_m": 10.048104159453324,
+        "rmse_pct": 100.48104159453324
+      },
+      "ate_pct": 34.02208670432913,
+      "final_pct": 36.4010478224666,
+      "scale_sim3": 1359.1357930148135
+    }
+  },
+  "vio_seed_spread": {
+    "ates": [
+      26.58760959487934,
+      26.57548423611228,
+      26.57805391768185
+    ],
+    "std_over_mean": 0.00019626646195073473,
+    "pass": true
+  },
+  "g1_fisheye": {
+    "gate": "g1",
+    "flight": "rm_p6_close",
+    "run": "rig_lockstep",
+    "frames": 1805,
+    "triangulated": 27,
+    "rotation_only": 13,
+    "tracks": 30740,
+    "median_px": 0.06457300028827562,
+    "p90_px": 0.21944180190732732,
+    "per_camera_median_px": {
+      "cam0_front": 0.06099078575551745,
+      "cam1_left": 0.06756138471642752,
+      "cam2_back": 0.0668394474169389,
+      "cam3_right": 0.06267070747343322
+    },
+    "pass": true
+  }
+}

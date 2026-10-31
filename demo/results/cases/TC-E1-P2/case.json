@@ -1,0 +1,174 @@
+{
+  "case": {
+    "id": "TC-E1-P2",
+    "flight": "rm_p2_slow",
+    "profile": "P2"
+  },
+  "g3": {
+    "track_rms_m": 0.043323482133130004,
+    "imu_drift_m": 0.25415197828813,
+    "dynamics": "pegasus",
+    "clearance": {
+      "flight": "rm_p2_slow",
+      "source": "flown",
+      "method": "aabb",
+      "min_clearance_m": 9.8,
+      "at_t_s": 0.0,
+      "at_xyz": [
+        125.0,
+        200.0,
+        31.9
+      ],
+      "nearest_box_lo": [
+        125.9,
+        189.0,
+        18.1
+      ],
+      "nearest_box_hi": [
+        174.0,
+        242.2,
+        22.1
+      ],
+      "p5_clearance_m": 9.85
+    },
+    "pass": true
+  },
+  "vio": {
+    "7": {
+      "poses": 2501,
+      "t_first_s": 19.36667,
+      "t_last_s": 102.7,
+      "path_m": 132.65627789178964,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 16.986966246932653,
+      "ate_max_m": 46.04443981660292,
+      "final_err_m": 46.04443981660292,
+      "rot_rmse_deg": 25.977019181132686,
+      "rpe10": {
+        "segments": 2162,
+        "seg_m": 10.0,
+        "rmse_m": 6.368174697238757,
+        "rmse_pct": 63.68174697238758
+      },
+      "ate_pct": 12.805248659840476,
+      "final_pct": 34.70958219871228,
+      "scale_sim3": 0.6990397984241385
+    },
+    "101": {
+      "poses": 3015,
+      "t_first_s": 2.23333,
+      "t_last_s": 102.7,
+      "path_m": 159.24402345748476,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 53.20582136723293,
+      "ate_max_m": 105.69620315433053,
+      "final_err_m": 105.69620315433053,
+      "rot_rmse_deg": 10.906684350768344,
+      "rpe10": {
+        "segments": 2676,
+        "seg_m": 10.0,
+        "rmse_m": 18.34547302269046,
+        "rmse_pct": 183.4547302269046
+      },
+      "ate_pct": 33.41150280684657,
+      "final_pct": 66.37373312948822,
+      "scale_sim3": 0.31149202844889856
+    },
+    "102": {
+      "poses": 2505,
+      "t_first_s": 19.23333,
+      "t_last_s": 102.7,
+      "path_m": 132.90741224771276,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 28.25827938369663,
+      "ate_max_m": 93.6163063949362,
+      "final_err_m": 93.6163063949362,
+      "rot_rmse_deg": 39.571952854164984,
+      "rpe10": {
+        "segments": 2166,
+        "seg_m": 10.0,
+        "rmse_m": 10.939195500062425,
+        "rmse_pct": 109.39195500062424
+      },
+      "ate_pct": 21.261627854907644,
+      "final_pct": 70.43723507343155,
+      "scale_sim3": 0.4454650275750522
+    }
+  },
+  "vio_seed_spread": {
+    "ates": [
+      16.986966246932653,
+      53.20582136723293,
+      28.25827938369663
+    ],
+    "std_over_mean": 0.46115037919194724,
+    "pass": false
+  },
+  "g1_fisheye": {
+    "gate": "g1",
+    "flight": "rm_p2_slow",
+    "run": "rig_lockstep",
+    "frames": 3083,
+    "triangulated": 61,
+    "rotation_only": 8,
+    "tracks": 59515,
+    "median_px": 0.057122045692723784,
+    "p90_px": 0.1454768580449001,
+    "per_camera_median_px": {
+      "cam0_front": 0.05775886701784701,
+      "cam1_left": 0.051379083731682734,
+      "cam2_back": 0.05558796638181954,
+      "cam3_right": 0.06429990265988654
+    },
+    "pass": true
+  },
+  "g1_stereo": {
+    "gate": "g1",
+    "flight": "rm_p2_slow",
+    "run": "rig_lockstep_stereo",
+    "frames": 3083,
+    "triangulated": 61,
+    "rotation_only": 8,
+    "tracks": 11441,
+    "median_px": 0.08058636553629855,
+    "p90_px": 0.20223609373607823,
+    "per_camera_median_px": {
+      "left": 0.08058636553629855
+    },
+    "pass": true
+  },
+  "g4": {
+    "gate": "g4",
+    "flight": "rm_p2_slow",
+    "run": "rig_lockstep_stereo",
+    "samples": 39979,
+    "median_px": 1.3476829528808594,
+    "p10_px": 0.454095458984375,
+    "p90_px": 2.9585205078125014,
+    "pass": false
+  },
+  "macvo": {
+    "poses": 3083,
+    "t_first_s": 0.0,
+    "t_last_s": 102.733333333,
+    "path_m": 159.27302241760725,
+    "align": "se3",
+    "scale": 1.0,
+    "ate_rmse_m": 1.581132263050894,
+    "ate_max_m": 3.3331083696704393,
+    "final_err_m": 3.3331083696704393,
+    "rot_rmse_deg": 4.348094140332615,
+    "rpe10": {
+      "segments": 2743,
+      "seg_m": 10.0,
+      "rmse_m": 0.5335210770787471,
+      "rmse_pct": 5.335210770787471
+    },
+    "ate_pct": 0.9927181885864078,
+    "final_pct": 2.092701148679886,
+    "scale_sim3": 1.0333755176652726
+  }
+}

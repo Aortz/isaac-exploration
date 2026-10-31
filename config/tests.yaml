@@ -1,0 +1,46 @@
+# Test plan (docs/test_plans.md): thresholds fixed before the first run, plus the test-case list.
+# testplan/run_case.py runs one case; testplan/report.py builds build/tests/report.md from results.csv.
+
+thresholds:
+  vio:                                   # SUT-A: OpenVINS, 4 fisheyes + IMU, 4-DoF aligned
+    ate_pct: 1.0                         # ATE RMSE <= 1.0 % of path
+    drift_pct: 1.0                       # final position error <= 1.0 % of path
+    rot_rmse_deg: 2.0
+    init_s: 6.0                          # first estimate within 6 s of the first frame (4 s hover)
+    divergence_pct: 10.0                 # ATE above this = diverged (a failure in any profile)
+    seed_spread: 0.25                    # std / mean of ATE over the seeds
+  vo:                                    # SUT-B: MAC-VO, stereo, SE(3) aligned
+    ate_pct: 2.0
+    drift_pct: 3.0
+    rot_rmse_deg: 3.0
+    scale_err: 0.05                      # |Sim(3) scale - 1|
+    first_pose_s: 1.0
+  gates:
+    g1_median_px: 0.1                    # KLT track vs GT-pose reprojection
+    g2_ncc: 0.9                          # fisheye vs reprojected pinhole (NuRec only)
+    g3_track_rms_m: 0.5                  # Pegasus tracking error (python controller, perfect state)
+    g3_track_rms_px4_m: 2.0              # PX4 flies on its own EKF2 estimate, in wind: looser
+    g3_imu_drift_m: 0.5                  # clean IMU integration vs ground truth, worst 10 s window
+    g3_clearance_m: 5.0                  # AABB clearance along the flown path (outdoor)
+    g3_clearance_indoor_m: 1.0           # occupancy-map clearance (indoor, E2)
+    g4_disparity_px: 2.0                 # median stereo disparity
+  graded_profiles: [P2, P3]              # pass/fail; the rest are report-only (breaking points)
+  p7_ratio: 1.5                          # lighting variants: ATE <= 1.5 x the default-lighting ATE
+
+vio_seeds: [7, 101, 102]                 # 7 = imu.seed (live run, bag recorded); others replay the bag
+replay_rate: 0.5                         # sim s per wall s for bag replays
+
+cases:
+  - {id: TC-E1-P1, flight: rm_p1_hover, profile: P1}
+  - {id: TC-E1-P2, flight: rm_p2_slow, profile: P2}
+  - {id: TC-E1-P3, flight: rm_p3_nominal, profile: P3}
+  - {id: TC-E1-P4, flight: rm_p4_aggressive, profile: P4}
+  - {id: TC-E1-P5, flight: rm_p5_lowtex, profile: P5}
+  - {id: TC-E1-P6, flight: rm_p6_close, profile: P6}
+  - {id: TC-E1-P7-low_sun, flight: rm_p3_nominal, profile: P7, lighting: low_sun}
+  - {id: TC-E1-P7-overcast, flight: rm_p3_nominal, profile: P7, lighting: overcast}
+  - {id: TC-E2-P1, flight: nx_p1_hover, profile: P1}
+  - {id: TC-E2-P2, flight: nx_p2_slow, profile: P2}
+  - {id: TC-E2-P3, flight: nx_p3_nominal, profile: P3}
+  - {id: TC-E1-P3-px4, flight: rm_p3_px4, profile: P3}     # PX4 + motor lag + wind/gusts
+  - {id: TC-REG, flight: marina_bay_loop_pegasus, profile: REG}

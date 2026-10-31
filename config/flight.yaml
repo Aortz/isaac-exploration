@@ -44,6 +44,135 @@ flights:
   marina_bay_loop_pegasus:               # same loop, flown by a simulated Iris quadrotor (flight/pegasus_fly.py)
     <<: *marina_bay_loop
     dynamics: pegasus                    # the spline is the controller's reference; poses + IMU come from physics
+  # --- Rivermark (Isaac 6.0 outdoor town, docs/test_plans.md E1). z is absolute (ground ~0-5 m, roofs <= 17.5 m,
+  # tallest objects ~28 m); x east, y north. Layout: build/envs/rivermark/topdown.png
+  rm_p1_hover: &rm_base
+    env: rivermark
+    dynamics: pegasus
+    profile: hover_yaw                   # hover in place, sinusoidal yaw sweep
+    center: [40.0, -40.0, 25.0]          # over the main crossroads, mall to the north
+    yaw0_deg: 60.0
+    yaw_amplitude_deg: 90.0
+    yaw_period_s: 18.0                   # peak yaw rate 31 deg/s
+    sweep_s: 36.0
+    hover_start_s: 4.0
+    hover_end_s: 3.0
+    speed_mps: 1.0                       # unused by hover_yaw
+    yaw_mode: velocity
+    scene_description: Drone hovering over a suburban crossroads next to a shopping centre.
+    package: {depth_near_m: 2.0, depth_far_m: 500.0}
+    waypoints: [[40.0, -40.0, 25.0], [40.0, -40.0, 25.0]]
+  rm_p2_slow:                            # 25 m radius loop over the mall plaza, 2 m/s, >= 10 m over the 22 m roofs
+    <<: *rm_base
+    profile: spline
+    speed_mps: 2.0
+    waypoints: [[125.0, 200.0, 32.0], [117.7, 217.7, 32.5], [100.0, 225.0, 33.0], [82.3, 217.7, 33.5],
+                [75.0, 200.0, 33.0], [82.3, 182.3, 32.5], [100.0, 175.0, 32.0], [117.7, 182.3, 32.0],
+                [125.0, 200.0, 32.0]]
+  rm_p3_nominal:                         # ellipse 190 x 120 m around the mall centre, 6 m/s, >= 9 m over the 31 m roofs
+    <<: *rm_base
+    profile: spline
+    speed_mps: 6.0
+    waypoints: [[215.0, 180.0, 40.0], [202.3, 210.0, 41.0], [167.5, 232.0, 42.0], [120.0, 240.0, 43.0],
+                [72.5, 232.0, 44.0], [37.7, 210.0, 43.0], [25.0, 180.0, 42.0], [37.7, 150.0, 41.0],
+                [72.5, 128.0, 40.0], [120.0, 120.0, 40.0], [167.5, 128.0, 40.0], [202.3, 150.0, 40.0],
+                [215.0, 180.0, 40.0]]
+  rm_p4_aggressive:                      # figure-8 (Gerono lemniscate, half-length 80 m) over the SE townhouses, 10 m/s
+    <<: *rm_base
+    profile: spline
+    speed_mps: 10.0
+    waypoints: [[170.0, -200.0, 35.0], [200.6, -173.6, 35.0], [226.6, -200.0, 35.0], [243.9, -230.6, 35.0],
+                [250.0, -200.0, 35.0], [243.9, -169.4, 35.0], [226.6, -200.0, 35.0], [200.6, -226.4, 35.0],
+                [170.0, -200.0, 35.0], [139.4, -173.6, 35.0], [113.4, -200.0, 35.0], [96.1, -230.6, 35.0],
+                [90.0, -200.0, 35.0], [96.1, -169.4, 35.0], [113.4, -200.0, 35.0], [139.4, -226.4, 35.0],
+                [170.0, -200.0, 35.0]]
+  rm_p5_lowtex:                          # U over the bare grey ground east of the townhouses, 6 m/s
+    <<: *rm_base
+    profile: spline
+    speed_mps: 6.0
+    waypoints: [[360.0, -170.0, 25.0], [460.0, -210.0, 25.0], [560.0, -250.0, 25.0], [540.0, -330.0, 25.0],
+                [460.0, -310.0, 25.0], [380.0, -290.0, 25.0]]
+  rm_p6_close:                           # below roof level between townhouse rows, >= 5.4 m clearance (corridor search on probe boxes), 2 m/s
+    <<: *rm_base
+    profile: spline
+    speed_mps: 2.0
+    waypoints: [[148.0, -198.5, 14.0], [185.5, -178.5, 14.0], [223.1, -158.6, 14.0]]   # 8 m AGL, roofs 17.5 m
+  rm_p3_px4:                             # P3 loop flown by PX4 (EKF2 + offboard), motor lag, 4 m/s wind + turbulence + gusts
+    <<: *rm_base
+    profile: spline
+    speed_mps: 6.0
+    controller: px4
+    motor_lag: true
+    wind:
+      mean_mps: [3.0, 2.5, 0.0]          # ~4 m/s from the south-west
+      turbulence_sigma_mps: 1.0
+      gusts:
+        - {t_s: 30.0, duration_s: 3.0, peak_mps: [4.0, -2.0, 0.0]}
+        - {t_s: 70.0, duration_s: 2.0, peak_mps: [-3.0, 3.0, 1.0]}
+    waypoints: [[215.0, 180.0, 40.0], [202.3, 210.0, 41.0], [167.5, 232.0, 42.0], [120.0, 240.0, 43.0],
+                [72.5, 232.0, 44.0], [37.7, 210.0, 43.0], [25.0, 180.0, 42.0], [37.7, 150.0, 41.0],
+                [72.5, 128.0, 40.0], [120.0, 120.0, 40.0], [167.5, 128.0, 40.0], [202.3, 150.0, 40.0],
+                [215.0, 180.0, 40.0]]
+  rm_p3_coax:                            # P3 loop flown by the coaxial helicopter under PX4, same wind as rm_p3_px4
+    <<: *rm_base
+    profile: spline
+    speed_mps: 6.0
+    controller: px4
+    vehicle: coax_spirit
+    wind:
+      mean_mps: [3.0, 2.5, 0.0]
+      turbulence_sigma_mps: 1.0
+      gusts:
+        - {t_s: 30.0, duration_s: 3.0, peak_mps: [4.0, -2.0, 0.0]}
+        - {t_s: 70.0, duration_s: 2.0, peak_mps: [-3.0, 3.0, 1.0]}
+    waypoints: [[215.0, 180.0, 40.0], [202.3, 210.0, 41.0], [167.5, 232.0, 42.0], [120.0, 240.0, 43.0],
+                [72.5, 232.0, 44.0], [37.7, 210.0, 43.0], [25.0, 180.0, 42.0], [37.7, 150.0, 41.0],
+                [72.5, 128.0, 40.0], [120.0, 120.0, 40.0], [167.5, 128.0, 40.0], [202.3, 150.0, 40.0],
+                [215.0, 180.0, 40.0]]
+  rm_p3_coax_ap:                         # the coax loop again, flown by ArduCopter (the Spirit's real autopilot)
+    <<: *rm_base
+    profile: spline
+    speed_mps: 6.0
+    controller: ardupilot
+    vehicle: coax_spirit
+    wind:
+      mean_mps: [3.0, 2.5, 0.0]
+      turbulence_sigma_mps: 1.0
+      gusts:
+        - {t_s: 30.0, duration_s: 3.0, peak_mps: [4.0, -2.0, 0.0]}
+        - {t_s: 70.0, duration_s: 2.0, peak_mps: [-3.0, 3.0, 1.0]}
+    waypoints: [[215.0, 180.0, 40.0], [202.3, 210.0, 41.0], [167.5, 232.0, 42.0], [120.0, 240.0, 43.0],
+                [72.5, 232.0, 44.0], [37.7, 210.0, 43.0], [25.0, 180.0, 42.0], [37.7, 150.0, 41.0],
+                [72.5, 128.0, 40.0], [120.0, 120.0, 40.0], [167.5, 128.0, 40.0], [202.3, 150.0, 40.0],
+                [215.0, 180.0, 40.0]]
+  # --- NuRec XGRIDS "wormhole" hall (docs/test_plans.md E2): Gaussian splats, z up, floor ~0, free space around (2, 7)
+  # (build/envs/nurec_xgrid_wormhole/topdown.png; clearance from occupancy_map.png)
+  nx_p1_hover: &nx_base
+    env: nurec_xgrid_wormhole
+    dynamics: pegasus
+    profile: hover_yaw
+    center: [2.0, 7.0, 1.2]
+    yaw0_deg: 20.0
+    yaw_amplitude_deg: 90.0
+    yaw_period_s: 18.0
+    sweep_s: 36.0
+    hover_start_s: 4.0
+    hover_end_s: 3.0
+    speed_mps: 1.0
+    yaw_mode: velocity
+    scene_description: Drone hovering inside an empty indoor hall.
+    package: {depth_near_m: 0.2, depth_far_m: 30.0}
+    waypoints: [[2.0, 7.0, 1.2], [2.0, 7.0, 1.2]]
+  nx_p2_slow:                            # 2 laps of a 6 x 4 m ellipse, 1 m/s
+    <<: *nx_base
+    profile: spline
+    speed_mps: 1.0
+    waypoints: [[4.82, 8.03, 1.2], [3.51, 9.05, 1.2], [1.32, 8.88, 1.2], [-0.48, 7.6, 1.2], [-0.82, 5.97, 1.2], [0.49, 4.95, 1.2], [2.68, 5.12, 1.2], [4.48, 6.4, 1.2], [4.82, 8.03, 1.2], [3.51, 9.05, 1.2], [1.32, 8.88, 1.2], [-0.48, 7.6, 1.2], [-0.82, 5.97, 1.2], [0.49, 4.95, 1.2], [2.68, 5.12, 1.2], [4.48, 6.4, 1.2], [4.82, 8.03, 1.2]]
+  nx_p3_nominal:                         # 3 laps of a 9 x 5.6 m ellipse, 2 m/s
+    <<: *nx_base
+    profile: spline
+    speed_mps: 2.0
+    waypoints: [[6.23, 8.54, 1.3], [4.31, 9.95, 1.3], [1.04, 9.63, 1.3], [-1.67, 7.77, 1.3], [-2.23, 5.46, 1.3], [-0.31, 4.05, 1.3], [2.96, 4.37, 1.3], [5.67, 6.23, 1.3], [6.23, 8.54, 1.3], [4.31, 9.95, 1.3], [1.04, 9.63, 1.3], [-1.67, 7.77, 1.3], [-2.23, 5.46, 1.3], [-0.31, 4.05, 1.3], [2.96, 4.37, 1.3], [5.67, 6.23, 1.3], [6.23, 8.54, 1.3], [4.31, 9.95, 1.3], [1.04, 9.63, 1.3], [-1.67, 7.77, 1.3], [-2.23, 5.46, 1.3], [-0.31, 4.05, 1.3], [2.96, 4.37, 1.3], [5.67, 6.23, 1.3], [6.23, 8.54, 1.3]]
   sample_orbit:                          # no-token test flight around the public sample tileset
     site: cesium_sample                  # a ~1.4 km dragon centred on the origin
     source: sample
@@ -92,6 +221,54 @@ rig:                                     # 4-fisheye rig (flight/rig_fisheye.py)
     cam2_back: [180.0, 20.0]
     cam3_right: [-90.0, 20.0]
 
+environments:                            # Isaac USD environments (flights with env:); Cesium flights use site/source
+  rivermark:
+    usd: /Isaac/Environments/Outdoor/Rivermark/rivermark.usd   # under the Isaac assets root
+    colliders: false                     # true = Pegasus flies inside the stage; RTX then re-renders the whole town every
+                                         # update (16 physics steps took minutes), so clearance is checked on AABBs instead
+    settle_updates: 4                    # renderer updates per lockstep frame (image lags the pose by 3)
+    warmup_updates: 30                   # per warm-up pose: lets RTX stream textures in before frame 0
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.30, pitch_deg: 20.0}
+    openvins: {fi_max_dist: 300.0}
+    sky_dome: /World/main/Sky
+    ground_z: 6.0                        # approx. ground height (PX4 flights take off from here)
+    lighting:                            # docs/test_plans.md P7; "default" keeps the stage's own sky
+      default: {}
+      low_sun: {sky_hdr: /NVIDIA/Assets/Skies/Clear/venice_sunset_4k.hdr}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr}
+
+  nurec_wormhole:                        # NuRec Gaussian splats (docs/test_plans.md E2): NVIDIA "wormhole" hall, 37 x 24 m map
+    usd: third_party/nurec/nova_carter-wormhole/particle_sh_optimized.usdz   # hf download, see README
+    colliders: false                     # splats have no colliders; clearance comes from occupancy_map.png
+    kit_args: ["--/UJITSO/geometry=true", "--/renderer/multiGpu/enabled=false", "--/app/useFabricSceneDelegate=true"]   # ParticleField splats render black with Isaac's default (false)
+    settle_updates: 4
+    warmup_updates: 10
+    clip: [0.05, 200.0]
+    stereo: {baseline_m: 0.12, pitch_deg: 0.0}
+    openvins: {fi_max_dist: 50.0}
+    lighting: {default: {}}
+  nurec_xgrid_wormhole:                  # NuRec splats from an XGRIDS lidar-camera scan of the same hall (older stage_particle export)
+    usd: third_party/nurec/xgrid-wormhole/stage_particle.usd
+    occupancy: third_party/nurec/xgrid-wormhole/occupancy_map.yaml   # 2-D clearance (testplan/clearance.py)
+    colliders: false
+    kit_args: ["--/UJITSO/geometry=true"]
+    settle_updates: 4
+    warmup_updates: 10
+    clip: [0.05, 200.0]
+    stereo: {baseline_m: 0.12, pitch_deg: 0.0}
+    openvins: {fi_max_dist: 50.0}
+    lighting: {default: {}}
+  nurec_galileo:                         # NuRec Gaussian splats: "galileo" office space, 17 x 17 m map
+    usd: third_party/nurec/nova_carter-galileo/particle_sh_optimized.usdz
+    colliders: false
+    kit_args: ["--/UJITSO/geometry=true", "--/renderer/multiGpu/enabled=false", "--/app/useFabricSceneDelegate=true"]   # ParticleField splats render black with Isaac's default (false)
+    settle_updates: 4
+    warmup_updates: 10
+    clip: [0.05, 200.0]
+    stereo: {baseline_m: 0.12, pitch_deg: 0.0}
+    openvins: {fi_max_dist: 50.0}
+    lighting: {default: {}}
 stereo:                                  # pinhole stereo pair (flight/rig_fisheye.py --stereo), e.g. for MAC-VO
   width: 640                             # TartanAir geometry (MAC-VO's training data): 640x480, fx = fy = 320
   height: 480
@@ -106,6 +283,54 @@ pegasus:                                 # Pegasus Simulator multirotor (third_p
   physics_hz: 1000                       # = f1_trajectory DENSE_HZ; the IMU is box-averaged down to imu.rate_hz
   preroll_s: 3.0                         # hover at the first waypoint before t = 0 so the spawn transient dies out
   drag: [0.50, 0.30, 0.0]                # linear body drag coefficients (Pegasus default)
+  motor:                                 # first-order rotor lag (flights opt in with motor_lag: true)
+    tau_up_s: 0.0125                     # = PX4's gazebo-classic Iris motor model (timeConstantUp), which the
+    tau_down_s: 0.025                    # PX4 iris rate gains are tuned for; 35/60 ms put PX4 into a 2 Hz roll/yaw
+                                         # limit cycle (+-3 deg). Slower motors need retuned MC_*RATE gains.
+  wind_defaults:                         # merged under a flight's wind: block (pegasus_models.Wind)
+    mean_mps: [0.0, 0.0, 0.0]            # ENU
+    turbulence_sigma_mps: 0.0
+    length_scale_m: 50.0                 # MIL-F-8785C low-altitude scale is ~h..300 m; 50 m suits < 50 m AGL
+    seed: 3
+  px4:                                   # controller: px4 flights (PX4 v1.16 SITL in Docker, px4/Dockerfile)
+    image: isaac-exploration/px4:v1.16.0
+    imu_hz: 250                          # Pegasus IMU/baro/mag -> PX4 HIL_SENSOR rate (lockstep)
+    settle_s: 5.0                        # hold at the start point before the reference clock starts
+    max_setup_s: 120.0                   # boot + GPS fix + takeoff budget (sim time)
+    params:                              # set over MAVLink before arming
+      COM_RCL_EXCEPT: 4                  # no RC-loss failsafe in offboard
+      NAV_RCL_ACT: 0
+      NAV_DLL_ACT: 0                     # no data-link-loss failsafe
+      COM_RC_IN_MODE: 4                  # no RC at all
+      COM_OF_LOSS_T: 2.0
+      MPC_XY_VEL_MAX: 15.0               # let the reference's 12-13 m/s through
+      MPC_XY_CRUISE: 12.0
+  ardupilot:                             # controller: ardupilot flights (ArduCopter 4.6.3 SITL, ardupilot/Dockerfile)
+    image: isaac-exploration/ardupilot:copter-4.6.3
+    home: "38.736832,-9.137977,90,0"     # lat,lon,alt,heading; matches Pegasus' GPS origin
+    base_params: [copter-single.parm, copter-coax.parm]   # ArduPilot's own SITL defaults, then the vehicle's file
+    settle_s: 5.0
+    params: {}                           # extra params over MAVLink (most live in the vehicle's .parm)
+  vehicles:                              # flight key `vehicle:` (default: the Pegasus Iris above)
+    coax_spirit:                         # coaxial helicopter sized like the Ascent AeroSystems Spirit
+      # Public spec: 650 mm rotors, 257 mm x 106 mm core, 1.8 kg core, 6.1 kg MTOW, direct drive with
+      # 2 brushless motors, ArduPilot on a Cube. Roll/pitch therefore come from cyclic (swashplate
+      # servos) and yaw from the rotor speed difference. Everything below the spec line is an estimate.
+      mass_kg: 4.0                       # core + one 12S battery + a camera module
+      inertia_kgm2: [0.060, 0.060, 0.025]  # body x, y, z (tall cylinder + modules; z includes landing gear)
+      rotor_radius_m: 0.325
+      hub_height_m: 0.15                 # rotor plane above the centre of mass
+      thrust_coeff: 3.4e-4               # T = k w^2 per rotor  (Ct ~0.008 at sea level)
+      torque_coeff: 1.1e-5               # Q = c w^2 per rotor
+      lower_rotor_efficiency: 0.85       # lower rotor works in the upper rotor's wake
+      max_rotor_speed_rad_s: 420.0       # hover ~ 255 rad/s at 4 kg
+      motor_tau_s: 0.08                  # 650 mm rotors spin up much slower than Iris props
+      cyclic_max_deg: 10.0               # tip-path-plane tilt at full servo
+      hub_stiffness_nm_per_rad: 8.0      # rigid-rotor flapping spring
+      cyclic_tau_s: 0.03                 # servo + rotor flapping lag
+      drag: [0.25, 0.25, 0.35]           # linear body drag (compact cylinder)
+      px4_model: pegasus_coax            # px4/airframes/<id>_pegasus_coax (CA_AIRFRAME 12, coaxial helicopter)
+      ardupilot_params: ardupilot/params/coax_spirit.parm   # FRAME_CLASS 9 (coax); swap in the real Spirit .param
   gains:                                 # Pegasus NonlinearController (Mellinger-style geometric tracking)
     Kp: [10.0, 10.0, 10.0]
     Kd: [8.5, 8.5, 8.5]

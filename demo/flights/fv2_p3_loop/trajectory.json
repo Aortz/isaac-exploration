@@ -3,13 +3,13 @@
   "site": null,
   "source": null,
   "env": "forest_valley_v2",
-  "duration_s": 150.522,
+  "duration_s": 150.52239841948483,
   "frames": 4516,
   "fps": 30,
   "imu_rate_hz": 200,
-  "path_length_m": 704.6554394048981,
-  "max_speed_mps": 8.084335148826966,
-  "max_tilt_deg": 17.28666471079367,
+  "path_length_m": 688.9075124135272,
+  "max_speed_mps": 8.058033948133197,
+  "max_tilt_deg": 8.249680961735784,
   "intrinsics": {
     "width": 832,
     "height": 480,
@@ -46,65 +46,7 @@
   ],
   "camera_mount": "fixed",
   "checks": {
-    "imu_integration_drift_m": 0.5359140969553597,
-    "imu_drift_10s_m": 0.03329611166527739
-  },
-  "dynamics": "pegasus",
-  "pegasus": {
-    "flight": "fv2_p3_loop",
-    "env": "forest_valley_v2",
-    "controller": "python",
-    "vehicle": "Iris",
-    "mass_kg": 1.5,
-    "physics_hz": 1000,
-    "setup_s": 3.0,
-    "steps": 153533,
-    "wall_s": 1592.1,
-    "realtime_factor": 0.1,
-    "drag": [
-      0.5,
-      0.3,
-      0.0
-    ],
-    "motor": null,
-    "wind": null,
-    "gains": {
-      "Kp": [
-        10.0,
-        10.0,
-        10.0
-      ],
-      "Kd": [
-        8.5,
-        8.5,
-        8.5
-      ],
-      "Ki": [
-        1.5,
-        1.5,
-        1.5
-      ],
-      "Kr": [
-        3.5,
-        3.5,
-        3.5
-      ],
-      "Kw": [
-        0.5,
-        0.5,
-        0.5
-      ]
-    },
-    "autopilot": null,
-    "pegasus_commit": "fcb99c0 (PegasusSimulator PR #144, Isaac Sim 6.0 port)"
-  },
-  "tracking": {
-    "pos_err_rms_m": 0.09613985666121166,
-    "pos_err_max_m": 0.23424566867484878,
-    "pos_err_final_m": 0.13880668876637747,
-    "rotor_ref_rad_s": [
-      646.75568234,
-      708.735271065
-    ]
+    "waypoint_max_err_m": 2.842170943040401e-14,
+    "imu_integration_drift_m": 0.0054305079774308335
   }
 }

@@ -19,6 +19,7 @@ terrain:
     - {angle_deg: 90, offset_m: 220, depth_m: 0.4, width_m: 3.0, meander_m: 14, meander_wavelength_m: 280}
   material: /NVIDIA/Materials/Base/Natural/Grass_Countryside.mdl
   uv_tile_m: 3.0
+  layer_noise: {scale_m: 10, mask_jitter: 0.6, height_jitter_m: 0.25, slope_jitter_deg: 4}   # irregular material edges
   layers:
     - {material: /NVIDIA/Materials/vMaterials_2/Ground/Ground_Leaves.mdl, mask: rows}    # frond litter between palms
     - {material: /NVIDIA/Materials/Base/Natural/Dirt.mdl, mask: road}                    # laterite roads
@@ -26,8 +27,15 @@ masks:
   road: {channels: true, threshold: 0.25}
   rows: {scale_m: 90, cover: 0.55}
   remnant: {scale_m: 260, cover: 0.12}
+detail:                                       # level of detail around the flight path (lod: groups)
+  corridor: op_p3_loop
+  near_m: 150
+  far_m: 500
+  far_density: 0.4
 scatter:
   oil_palm:
+    tilt_deg: 4                                # old palms lean
+    lod: thin
     class: tree
     assets: [/NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd]
     layout: grid
@@ -40,8 +48,12 @@ scatter:
     clear_radius_m: 20
     sink_m: 0.1
   remnant_forest:                            # uncleared patches on the hilltops
+    asset_scale: [3.0, 1.0]  # Black_Oak replaced: one species cost ~0.4 s/frame on the 4-camera rig (envbuild/bench.py)
+    clumping: {scale_m: 60, strength: 0.8}     # stands and gaps, same mean density
+    tilt_deg: 3
+    lod: thin
     class: tree
-    assets: [/NVIDIA/Assets/Vegetation/Trees/Black_Oak.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Travelers_Palm.usd]
+    assets: [/NVIDIA/Assets/Vegetation/Trees/American_Beech.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Travelers_Palm.usd]
     weights: [4, 1]
     density_per_ha: 120
     scale_range: [0.8, 1.3]
@@ -49,13 +61,25 @@ scatter:
     clear_radius_m: 20
     sink_m: 0.2
   ground_cover:
+    lod: near_only                            # only near the flight path: too small to resolve further out
     class: shrub
     assets: [/NVIDIA/Assets/Vegetation/Plant_Tropical/Japanese_Painted_Fern.usd, /NVIDIA/Assets/Vegetation/Shrub/Grass_Short_A.usd,
              /NVIDIA/Assets/Vegetation/Shrub/Grass_Short_B.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Australian_Tree_Fern.usd]
     weights: [4, 3, 3, 1]
-    density_per_ha: 450
+    density_per_ha: 900                        # near the flight path only
     scale_range: [0.8, 1.6]
     mask: "!road"
+    obstacle: false
+  frond_piles:                     # pruned fronds stacked between rows (dead-palm debris)
+    class: debris
+    generate: log
+    variants: 4
+    length_m: [2, 4]
+    radius_m: [0.06, 0.12]
+    rgb: [0.45, 0.38, 0.22]
+    density_per_ha: 40
+    mask: "!road"
+    lod: near_only
     obstacle: false
 sky:
   hdr: /NVIDIA/Assets/Skies/Cloudy/kloofendal_48d_partly_cloudy_4k.hdr

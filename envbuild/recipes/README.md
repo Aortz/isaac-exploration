@@ -31,6 +31,12 @@ Procedural extras:
   and `layout: perimeter` (walls along a rectangle `rect_m` with a `gate_m` gap; yaw follows the side).
 - `generate: <type>` writes props instead of listing assets (envbuild/props.py): `ruin`, `rubble`, `vehicle_proxy`,
   `container`, `hesco`, `jersey_barrier`, `sandbags`, `tent`, `tower`, `dead_tree`.
+- Natural variety: `clumping: {scale_m, strength}` (stands and gaps at the same density), `tilt_deg` (lean),
+  `asset_scale` (per-asset size multiplier, for assets modelled at different sizes), `edge_of` masks (a band along
+  another mask's boundary, e.g. forest edges), `terrain.layer_noise` (irregular material boundaries).
+- Level of detail: a recipe `detail: {corridor: <flight>, near_m, far_m, far_density}` plus `lod: near_only` (only
+  near the flight path) or `lod: thin` (thinned beyond `far_m`) on scatter groups.
+- Mangrove `crowns`: list of `{asset, scale, hide}`; hidden parts are made invisible in one shared, instanceable crown.
 - `environment.kit_args`: renderer settings for every run in the environment, e.g. `--/rtx/fog/*` distance haze.
 
 Preview before flying: `$ISAAC_ROOT/python.sh envbuild/preview.py --env <name>` -> `build/envs/<name>/preview.jpg`.
@@ -38,3 +44,7 @@ Preview before flying: `$ISAAC_ROOT/python.sh envbuild/preview.py --env <name>` 
 Street-level flights in an `osm` environment: `uv run --with networkx python envbuild/plan_street_loop.py --env <name> --z 30`
 finds a loop around a block on the road graph, rounds the corners, checks clearance against the building and tree
 boxes, and prints the waypoints for config/flight.yaml.
+
+Render cost: `uv run python envbuild/bench.py --envs <name>` renders the 4-fisheye rig for the first frames of the
+environment's loop flight and checks it against the budget (median frame <= 300 ms, GPU memory <= 9 GB). Avoid
+NVIDIA's `Black_Oak.usd`: it costs ~20x any other tree ([docs/experiments/env_performance.md](../../docs/experiments/env_performance.md)).

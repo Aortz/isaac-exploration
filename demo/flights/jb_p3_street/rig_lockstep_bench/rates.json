@@ -1,0 +1,73 @@
+{
+  "flight": "jb_p3_street",
+  "mode": "lockstep",
+  "ros2": false,
+  "freerun_updates": 1,
+  "frames": 90,
+  "cameras": [
+    "cam0_front",
+    "cam1_left",
+    "cam2_back",
+    "cam3_right"
+  ],
+  "resolution": [
+    640,
+    480
+  ],
+  "depth": false,
+  "sim_camera_hz": 30,
+  "sim_duration_s": 2.967,
+  "warmup_s": 7.5,
+  "wall_s": 4.68,
+  "max_fps_cap": 0.0,
+  "wall_frames_per_s": 19.24,
+  "achieved_frames_per_s": 19.25,
+  "achieved_images_per_s": 76.99,
+  "realtime_factor": 0.634,
+  "image_lag_frames_compensated": 0,
+  "renderer_updates_per_frame": {
+    "mean": 4.0,
+    "max": 4
+  },
+  "unsettled_frames": 0,
+  "imu_messages": 0,
+  "timing": {
+    "pose": {
+      "mean_ms": 0.61,
+      "p50_ms": 0.58,
+      "p95_ms": 0.74,
+      "max_ms": 0.84
+    },
+    "render": {
+      "mean_ms": 45.37,
+      "p50_ms": 45.57,
+      "p95_ms": 47.34,
+      "max_ms": 54.28
+    },
+    "readback": {
+      "mean_ms": 5.98,
+      "p50_ms": 5.02,
+      "p95_ms": 5.67,
+      "max_ms": 92.81
+    },
+    "publish": {
+      "mean_ms": 0.0,
+      "p50_ms": 0.0,
+      "p95_ms": 0.0,
+      "max_ms": 0.01
+    },
+    "frame": {
+      "mean_ms": 51.96,
+      "p50_ms": 51.07,
+      "p95_ms": 53.45,
+      "max_ms": 143.64
+    }
+  },
+  "look": {
+    "variant": "default",
+    "dome": "/World/Sky/Dome",
+    "texture": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/NVIDIA/Assets/Skies/Cloudy/kloofendal_48d_partly_cloudy_4k.hdr",
+    "intensity": 900.0
+  },
+  "note": "achieved_* = frames / summed frame time (pose + render + readback + publish), i.e. the uncapped rate; wall_frames_per_s includes the cap's sleeps and image saving"
+}

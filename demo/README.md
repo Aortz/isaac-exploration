@@ -47,7 +47,7 @@ Each preview is a downscaled copy of the full render. Full-resolution videos, fr
 
 ## Environments
 
-Built with `envbuild/build_env.py` from the recipes in `envbuild/recipes/`. Each one is registered in `config/flight.yaml` and has a P3 loop flight and a test case in `config/tests.yaml`. They have not been tested yet. Previews are oblique shots from drone heights (`envbuild/preview.py`); all props on the battleground and military scenes are generated, because no such assets ship with Isaac.
+Built with `envbuild/build_env.py` from the recipes in `envbuild/recipes/`. Every built environment now renders the 4-fisheye test rig within a budget of 300 ms per frame and 9 GB of GPU memory (50–285 ms; the rainforest was 4.6 s before one costly tree model was replaced): [docs/experiments/env_performance.md](../docs/experiments/env_performance.md). Each one is registered in `config/flight.yaml` and has a P3 loop flight and a test case in `config/tests.yaml`. They have not been tested yet. Previews are oblique shots from drone heights (`envbuild/preview.py`); all props on the battleground and military scenes are generated, because no such assets ship with Isaac.
 
 | Singapore mangrove swamp (procedural) | Forest valley v2 (procedural) |
 |---|---|
@@ -67,7 +67,7 @@ Real places on Google photoreal 3D tiles (verify renders; flights over them stay
 |---|---|---|---|---|
 | ![](environments/sg_sungei_buloh/tiles_view.png) | ![](environments/sg_central_catchment/tiles_view.png) | ![](environments/my_kl_klcc/tiles_view.png) | ![](environments/my_jb_city/tiles_view.png) | ![](environments/sg_tampines_hdb/tiles_view.png) |
 
-Also built: Johor Bahru street level (`environments/my_jb_osm/`). The KL street preview predates a roof-material fix (roofs now render grey, not white).
+Also built: Johor Bahru street level (`environments/my_jb_osm/`).
 
 ## Test results so far
 
@@ -118,7 +118,7 @@ Earlier results on Cesium Marina Bay (OpenVINS, 4 fisheyes, 105 s loop): ATE 26 
 ## Not run yet
 
 - **Test cases for the 13 new environments** (`TC-EF2-P3`, `TC-SG-P3`, `TC-SB-P3`, `TC-CC-P3`, `TC-TS-P3`, `TC-KL-P3`, `TC-JB-P3`, `TC-OP-P3`, `TC-RF-P3`, `TC-BT-P3`, `TC-TF-P3`, `TC-FD-P3`, `TC-FT-P3`, tile overflights `TC-KLT/JBT/TPT-P3`). Flights exist for the swamp, forest v2, Sungei Buloh, Central Catchment, Tampines and KL streets, and the oil palm estate.
-- **Why they were stopped:** the heavier scenes rendered the 4-fisheye rig at about 1.4 s per frame (the first forest ran at 0.15 s) and nearly filled the 16 GB GPU. The next step is a render-speed benchmark and a fidelity pass that stays within about 0.3 s per frame before the cases run.
+- **Why they were stopped:** the heavier scenes rendered the 4-fisheye rig at 0.7–4.6 s per frame and nearly filled the 16 GB GPU. That is fixed (all within 300 ms per frame now), so the cases can run; the oil palm, rainforest, battleground, military and JB flights still need flying, and the forest v2 loop needs re-flying at its new 72 m altitude.
 - **Coaxial Spirit-class model:** test-flown under ArduCopter (0.22 m RMS) and PX4 (0.19 m RMS) for 20 s; no full test case yet. Mass, inertia and rotor coefficients are estimates until field data arrives ([docs/field_data_checklist.html](../docs/field_data_checklist.html)).
 
 ## Folder guide

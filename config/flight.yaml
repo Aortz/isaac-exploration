@@ -162,10 +162,11 @@ flights:
     env: desert_dunes
     scene_description: Drone circling low over a sand dune field with scattered boulders.
     waypoints: [[140.0, 0.0, 25.0], [121.2, 50.0, 25.0], [70.0, 86.6, 25.0], [0.0, 100.0, 25.0], [-70.0, 86.6, 25.0], [-121.2, 50.0, 25.0], [-140.0, 0.0, 25.0], [-121.2, -50.0, 25.0], [-70.0, -86.6, 25.0], [-0.0, -100.0, 25.0], [70.0, -86.6, 25.0], [121.2, -50.0, 25.0], [140.0, -0.0, 25.0]]
-  fv2_p3_loop:                           # forest_valley_v2: 260 x 180 m loop at 68 m, >= 6.6 m over the AABB tree tops
+  fv2_p3_loop:                           # forest_valley_v2: 260 x 180 m loop at 72 m, >= 8 m over the AABB tree tops
     <<: *fv_base
     env: forest_valley_v2
     scene_description: Drone circling over a dense temperate forest valley with meadows and rocky slopes.
+    waypoints: [[130.0, 0.0, 72.0], [112.6, 45.0, 72.0], [65.0, 77.9, 72.0], [0.0, 90.0, 72.0], [-65.0, 77.9, 72.0], [-112.6, 45.0, 72.0], [-130.0, 0.0, 72.0], [-112.6, -45.0, 72.0], [-65.0, -77.9, 72.0], [-0.0, -90.0, 72.0], [65.0, -77.9, 72.0], [112.6, -45.0, 72.0], [130.0, -0.0, 72.0]]
   sg_p3_loop:                            # sg_mangrove: 280 x 200 m loop at 30 m (canopy <= 22 m; >= 8 m clearance)
     <<: *fv_base
     env: sg_mangrove
@@ -438,60 +439,6 @@ environments:                            # Isaac USD environments (flights with 
     sky_dome: /World/Sky/Dome
     usd: build/envs/forest_valley/env.usda
 
-  sg_mangrove:   # envbuild: envbuild/recipes/sg_mangrove.yaml
-    colliders: false
-    settle_updates: 4
-    warmup_updates: 30
-    first_warmup_updates: 400
-    clip: [0.1, 5000.0]
-    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
-    openvins: {fi_max_dist: 300.0}
-    lighting:
-      default: {}
-      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
-    ground_z: 0.0
-    sky_dome: /World/Sky/Dome
-    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
-      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
-      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
-    usd: build/envs/sg_mangrove/env.usda
-
-  my_oil_palm:   # envbuild: envbuild/recipes/my_oil_palm.yaml
-    colliders: false
-    settle_updates: 4
-    warmup_updates: 30
-    first_warmup_updates: 400
-    clip: [0.1, 5000.0]
-    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
-    openvins: {fi_max_dist: 300.0}
-    lighting:
-      default: {}
-      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
-    ground_z: 0.0
-    sky_dome: /World/Sky/Dome
-    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
-      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
-      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
-    usd: build/envs/my_oil_palm/env.usda
-
-  my_rainforest:   # envbuild: envbuild/recipes/my_rainforest.yaml
-    colliders: false
-    settle_updates: 4
-    warmup_updates: 30
-    first_warmup_updates: 400
-    clip: [0.1, 5000.0]
-    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
-    openvins: {fi_max_dist: 300.0}
-    lighting:
-      default: {}
-      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
-    ground_z: 0.0
-    sky_dome: /World/Sky/Dome
-    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
-      '--/rtx/fog/fogColor=[0.80,0.83,0.86]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=250,
-      --/rtx/fog/fogEndDist=3000, --/rtx/fog/fogDistanceDensity=0.6]
-    usd: build/envs/my_rainforest/env.usda
-
   bg_ruined_town:   # envbuild: envbuild/recipes/bg_ruined_town.yaml
     colliders: false
     settle_updates: 4
@@ -546,77 +493,77 @@ environments:                            # Isaac USD environments (flights with 
       --/rtx/fog/fogEndDist=2500, --/rtx/fog/fogDistanceDensity=0.75]
     usd: build/envs/mil_fob_desert/env.usda
 
+  sg_mangrove:   # envbuild: envbuild/recipes/sg_mangrove.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 300.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    first_warmup_updates: 400
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/sg_mangrove/env.usda
+
+  my_oil_palm:   # envbuild: envbuild/recipes/my_oil_palm.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 300.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    first_warmup_updates: 400
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/my_oil_palm/env.usda
+
+  my_rainforest:   # envbuild: envbuild/recipes/my_rainforest.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 300.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    first_warmup_updates: 400
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.80,0.83,0.86]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=250,
+      --/rtx/fog/fogEndDist=3000, --/rtx/fog/fogDistanceDensity=0.6]
+    usd: build/envs/my_rainforest/env.usda
+
   mil_fob_tropical:   # envbuild: envbuild/recipes/mil_fob_tropical.yaml
     colliders: false
     settle_updates: 4
     warmup_updates: 30
-    first_warmup_updates: 400
     clip: [0.1, 5000.0]
     stereo: {baseline_m: 0.3, pitch_deg: 25.0}
     openvins: {fi_max_dist: 250.0}
     lighting:
       default: {}
       overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    first_warmup_updates: 400
     ground_z: 0.0
     sky_dome: /World/Sky/Dome
     kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
       '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
       --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
     usd: build/envs/mil_fob_tropical/env.usda
-
-  sg_tampines_osm:   # envbuild: envbuild/recipes/sg_tampines_osm.yaml
-    colliders: false
-    settle_updates: 4
-    warmup_updates: 30
-    first_warmup_updates: 400
-    clip: [0.1, 5000.0]
-    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
-    openvins: {fi_max_dist: 200.0}
-    lighting:
-      default: {}
-      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
-    ground_z: 0.0
-    sky_dome: /World/Sky/Dome
-    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
-      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
-      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
-    usd: build/envs/sg_tampines_osm/env.usda
-
-  my_kl_bukit_bintang_osm:   # envbuild: envbuild/recipes/my_kl_bukit_bintang_osm.yaml
-    colliders: false
-    settle_updates: 4
-    warmup_updates: 30
-    first_warmup_updates: 400
-    clip: [0.1, 5000.0]
-    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
-    openvins: {fi_max_dist: 200.0}
-    lighting:
-      default: {}
-      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
-    ground_z: 0.0
-    sky_dome: /World/Sky/Dome
-    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
-      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
-      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
-    usd: build/envs/my_kl_bukit_bintang_osm/env.usda
-
-  my_jb_osm:   # envbuild: envbuild/recipes/my_jb_osm.yaml
-    colliders: false
-    settle_updates: 4
-    warmup_updates: 30
-    first_warmup_updates: 400
-    clip: [0.1, 5000.0]
-    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
-    openvins: {fi_max_dist: 200.0}
-    lighting:
-      default: {}
-      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
-    ground_z: 0.0
-    sky_dome: /World/Sky/Dome
-    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
-      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
-      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
-    usd: build/envs/my_jb_osm/env.usda
 
   forest_valley_v2:   # envbuild: envbuild/recipes/forest_valley_v2.yaml
     colliders: false
@@ -635,6 +582,60 @@ environments:                            # Isaac USD environments (flights with 
       '--/rtx/fog/fogColor=[0.74,0.79,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=300,
       --/rtx/fog/fogEndDist=3500, --/rtx/fog/fogDistanceDensity=0.6]
     usd: build/envs/forest_valley_v2/env.usda
+
+  sg_tampines_osm:   # envbuild: envbuild/recipes/sg_tampines_osm.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
+    openvins: {fi_max_dist: 200.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    first_warmup_updates: 400
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/sg_tampines_osm/env.usda
+
+  my_kl_bukit_bintang_osm:   # envbuild: envbuild/recipes/my_kl_bukit_bintang_osm.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
+    openvins: {fi_max_dist: 200.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    first_warmup_updates: 400
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/my_kl_bukit_bintang_osm/env.usda
+
+  my_jb_osm:   # envbuild: envbuild/recipes/my_jb_osm.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
+    openvins: {fi_max_dist: 200.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    first_warmup_updates: 400
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/my_jb_osm/env.usda
 
 stereo:                                  # pinhole stereo pair (flight/rig_fisheye.py --stereo), e.g. for MAC-VO
   width: 640                             # TartanAir geometry (MAC-VO's training data): 640x480, fx = fy = 320

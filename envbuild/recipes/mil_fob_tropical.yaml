@@ -99,8 +99,9 @@ scatter:
     clear_radius_m: 20
     obstacle: false
   jungle:
+    asset_scale: [3.0, 1.0, 1.0]  # Black_Oak replaced: one species cost ~0.4 s/frame on the 4-camera rig (envbuild/bench.py)
     class: tree
-    assets: [/NVIDIA/Assets/Vegetation/Trees/Black_Oak.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd,
+    assets: [/NVIDIA/Assets/Vegetation/Trees/American_Beech.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd,
              /NVIDIA/Assets/Vegetation/Plant_Tropical/Travelers_Palm.usd]
     weights: [5, 2, 1]
     density_per_ha: 110

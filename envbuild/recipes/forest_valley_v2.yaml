@@ -15,17 +15,28 @@ terrain:
   valley: {depth_m: 14, width_m: 45, meander_m: 70, meander_wavelength_m: 420}
   material: /NVIDIA/Materials/Base/Natural/Grass_Countryside.mdl
   uv_tile_m: 3.0
+  layer_noise: {scale_m: 10, mask_jitter: 0.6, height_jitter_m: 0.25, slope_jitter_deg: 4}   # irregular material edges
   layers:
     - {material: /NVIDIA/Materials/vMaterials_2/Ground/Ground_Leaves.mdl, mask: forest}
-    - {material: /NVIDIA/Materials/Base/Natural/Soil_Rocky.mdl, slope_range_deg: [24, 90]}
+    - {material: /NVIDIA/Materials/vMaterials_2/Ground/Mulch.mdl, slope_range_deg: [24, 90]}   # bare soil on steep slopes (Soil_Rocky read pale)
 masks:
   forest: {scale_m: 220, cover: 0.72}
+  forest_edge: {edge_of: forest, band: 0.12}
+detail:                                       # level of detail around the flight path (lod: groups)
+  corridor: fv2_p3_loop
+  near_m: 150
+  far_m: 500
+  far_density: 0.3
 scatter:
   conifers:
+    clumping: {scale_m: 60, strength: 0.8}     # stands and gaps, same mean density
+    tilt_deg: 3
+    lod: thin
     class: tree
     assets: [/NVIDIA/Assets/Vegetation/Trees/Douglas_Fir.usd, /NVIDIA/Assets/Vegetation/Trees/Norway_Spruce.usd,
              /NVIDIA/Assets/Vegetation/Trees/White_Pine.usd, /NVIDIA/Assets/Vegetation/Trees/Eastern_Hemlock.usd,
              /NVIDIA/Assets/Vegetation/Trees/Colorado_Spruce.usd]
+    weights: [1, 1, 2, 3, 1]                   # Douglas fir / Norway spruce cost the most per tree: hemlock and pine carry the stands
     density_per_ha: 170
     scale_range: [1.3, 2.6]
     slope_max_deg: 36
@@ -34,18 +45,25 @@ scatter:
     clear_radius_m: 25
     sink_m: 0.2
   broadleaf:
+    clumping: {scale_m: 60, strength: 0.8}     # stands and gaps, same mean density
+    tilt_deg: 3
+    lod: thin
     class: tree
-    assets: [/NVIDIA/Assets/Vegetation/Trees/American_Beech.usd, /NVIDIA/Assets/Vegetation/Trees/Black_Oak.usd,
+    assets: [/NVIDIA/Assets/Vegetation/Trees/American_Beech.usd,
              /NVIDIA/Assets/Vegetation/Trees/White_Ash.usd, /NVIDIA/Assets/Vegetation/Trees/Largetooth_Aspen.usd,
-             /NVIDIA/Assets/Vegetation/Trees/Gray_Birch.usd]     # Red_Oak renders autumn red: left out
-    weights: [3, 3, 2, 2, 1]
+             /NVIDIA/Assets/Vegetation/Trees/Gray_Birch.usd]     # Red_Oak renders autumn red; Black_Oak cost ~0.4 s/frame
+    weights: [5, 1, 3, 2]                      # White_Ash leaves read yellow: kept rare
+    asset_scale: [2.0, 1.4, 1.6, 3.0]          # assets are 6 / 9 / 7.6 / 3 m tall: all 11-18 m canopy trees
     density_per_ha: 60
-    scale_range: [0.9, 1.5]
+    scale_range: [0.9, 1.4]
     slope_max_deg: 28
     mask: forest
     clear_radius_m: 25
     sink_m: 0.2
   edge_trees:                      # scattered trees and young growth in the clearings
+    clumping: {scale_m: 60, strength: 0.8}     # stands and gaps, same mean density
+    tilt_deg: 3
+    lod: thin
     class: tree
     assets: [/NVIDIA/Assets/Vegetation/Trees/Gray_Birch.usd, /NVIDIA/Assets/Vegetation/Trees/Norway_Spruce.usd,
              /NVIDIA/Assets/Vegetation/Trees/Largetooth_Aspen.usd]
@@ -54,31 +72,52 @@ scatter:
     clear_radius_m: 25
     sink_m: 0.2
   understory:
+    lod: near_only                            # only near the flight path: too small to resolve further out
     class: shrub
     assets: [/NVIDIA/Assets/Vegetation/Shrub/Yew.usd, /NVIDIA/Assets/Vegetation/Shrub/Holly.usd,
              /NVIDIA/Assets/Vegetation/Shrub/Rhododendron.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Japanese_Painted_Fern.usd]
     weights: [2, 2, 1, 4]
-    density_per_ha: 90                 # was 260: 4-camera renders ran out of VRAM (BVH) at 110k instances
+    density_per_ha: 260                # full density, near the flight path only
     scale_range: [0.8, 1.6]
     mask: forest
     obstacle: false
   meadow:
+    lod: near_only                            # only near the flight path: too small to resolve further out
     class: grass
     assets: [/NVIDIA/Assets/Vegetation/Shrub/Grass_Short_A.usd, /NVIDIA/Assets/Vegetation/Shrub/Grass_Short_B.usd,
              /NVIDIA/Assets/Vegetation/Shrub/Grass_Short_C.usd, /NVIDIA/Assets/Vegetation/Shrub/Switchgrass.usd,
              /NVIDIA/Assets/Vegetation/Shrub/Prairie_Dropseed.usd]
     weights: [3, 3, 3, 1, 1]
-    density_per_ha: 200                # was 700, same reason
+    density_per_ha: 600                # near the flight path only
     scale_range: [0.8, 1.6]
     mask: "!forest"
     obstacle: false
   rocks:
+    lod: near_only                            # only near the flight path: too small to resolve further out
     class: rock
     assets: [/NVIDIA/Assets/Vegetation/Rocks/rock_small_01.usda, /NVIDIA/Assets/Vegetation/Rocks/rock_small_05.usda,
              /NVIDIA/Assets/Vegetation/Rocks/rock_small_09.usda]
     density_per_ha: 10
     scale_range: [1.5, 5.0]
     sink_m: 0.4
+    obstacle: false
+  edge_shrubs:                     # dense shrubby margin where forest meets meadow
+    class: shrub
+    assets: [/NVIDIA/Assets/Vegetation/Shrub/Holly.usd, /NVIDIA/Assets/Vegetation/Shrub/Yew.usd,
+             /NVIDIA/Assets/Vegetation/Shrub/Vibernum.usd, /NVIDIA/Assets/Vegetation/Shrub/Privet.usd]
+    density_per_ha: 500
+    scale_range: [0.9, 1.8]
+    mask: forest_edge
+    lod: near_only
+    obstacle: false
+  logs:
+    class: debris
+    generate: log
+    variants: 6
+    density_per_ha: 12
+    mask: forest
+    scale_range: [0.8, 1.3]
+    lod: near_only
     obstacle: false
 sky:
   hdr: /NVIDIA/Assets/Skies/Cloudy/kloofendal_48d_partly_cloudy_4k.hdr

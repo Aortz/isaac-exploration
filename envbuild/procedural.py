@@ -140,19 +140,29 @@ def channels_field(tcfg: dict, x0: float, y0: float, res: float, n: int) -> np.n
     return np.max([channel_weight(v, X, Y) for v in chans], axis=0) if chans else np.zeros((n, n))
 
 
-def face_layers(heights: np.ndarray, res: float, layers: list[dict], masks: dict) -> np.ndarray:
+def face_layers(heights: np.ndarray, res: float, layers: list[dict], masks: dict, noise: dict | None = None,
+                rng=None) -> np.ndarray:
     """Material layer index per terrain quad: 0 = base, then each layer whose conditions all hold (last wins).
 
-    Conditions: mask (a recipe mask name, `!name` = outside it), height_range_m, slope_range_deg."""
+    Conditions: mask (a recipe mask name, `!name` = outside it), height_range_m, slope_range_deg.
+    `noise` (terrain.layer_noise: scale_m, mask_jitter, height_jitter_m, slope_jitter_deg) wobbles the
+    boundaries with fine fBm so materials meet along irregular edges instead of straight grid steps."""
     hc = 0.25 * (heights[:-1, :-1] + heights[:-1, 1:] + heights[1:, :-1] + heights[1:, 1:])
     sl = slope_deg(heights, res)[:-1, :-1]
+    nz = np.zeros(hc.shape)
+    if noise:
+        nz = fbm(hc.shape[0], hc.shape[1], noise.get("scale_m", 10.0) / res, 3, rng)
+        nz = nz / max(np.abs(nz).max(), 1e-9)                         # -1..1
+        hc = hc + noise.get("height_jitter_m", 0.0) * nz
+        sl = sl + noise.get("slope_jitter_deg", 0.0) * nz
     out = np.zeros(hc.shape, int)
     for k, lay in enumerate(layers[1:], start=1):
         ok = np.ones(hc.shape, bool)
         if lay.get("mask"):
             name = lay["mask"].lstrip("!")
             field, thr, inv = masks[name]
-            m = field[:-1, :-1] >= thr
+            f = field[:-1, :-1]
+            m = f + (noise or {}).get("mask_jitter", 0.0) * np.std(f) * nz >= thr
             ok &= ~m if inv != lay["mask"].startswith("!") else m
         if "height_range_m" in lay:
             ok &= (hc >= lay["height_range_m"][0]) & (hc <= lay["height_range_m"][1])
@@ -238,8 +248,23 @@ def asset_bounds(url: str) -> np.ndarray:
     return np.array([lo, hi]), mpu, up
 
 
-def scatter_points(group: dict, heights, x0, y0, res, rng, mask_fn=None) -> np.ndarray:
-    """Jittered-grid points at `density_per_ha` with min spacing, filtered by slope, height and mask."""
+def corridor_distance(x, y, corridor: np.ndarray) -> np.ndarray:
+    """Horizontal distance from points to a closed flight polyline (N x 2)."""
+    a, b = corridor, np.roll(corridor, -1, axis=0)
+    d = np.full(len(x), np.inf)
+    for (ax, ay), (bx, by) in zip(a, b):
+        ex, ey = bx - ax, by - ay
+        t = np.clip(((x - ax) * ex + (y - ay) * ey) / max(ex * ex + ey * ey, 1e-9), 0, 1)
+        d = np.minimum(d, np.hypot(x - ax - t * ex, y - ay - t * ey))
+    return d
+
+
+def scatter_points(group: dict, heights, x0, y0, res, rng, mask_fn=None, detail: dict | None = None) -> np.ndarray:
+    """Jittered-grid points at `density_per_ha` with min spacing, filtered by slope, height and mask.
+
+    `clumping: {scale_m, strength}` gathers the points into stands and gaps at the same mean density.
+    With a recipe `detail` block (flight corridor), `lod: near_only` keeps a group within `near_m` of the
+    flight path and `lod: thin` thins it to `far_density` beyond, where the cameras cannot resolve it."""
     ny, nx = heights.shape
     size_x, size_y = (nx - 1) * res, (ny - 1) * res
     if group.get("layout") == "perimeter":
@@ -273,7 +298,8 @@ def scatter_points(group: dict, heights, x0, y0, res, rng, mask_fn=None) -> np.n
         inside = (x >= x0) & (x <= x0 + size_x) & (y >= y0) & (y <= y0 + size_y)
         x, y = x[inside], y[inside]
     else:
-        spacing = 100.0 / np.sqrt(group["density_per_ha"])           # mean spacing (m) for that density
+        dens = group["density_per_ha"] * (2.0 if group.get("clumping") else 1.0)   # clumping keeps ~half
+        spacing = 100.0 / np.sqrt(dens)                              # mean spacing (m) for that density
         gx, gy = np.arange(x0 + spacing / 2, x0 + size_x, spacing), np.arange(y0 + spacing / 2, y0 + size_y, spacing)
         X, Y = np.meshgrid(gx, gy)
         jit = group.get("jitter", 0.8) * spacing / 2
@@ -290,6 +316,21 @@ def scatter_points(group: dict, heights, x0, y0, res, rng, mask_fn=None) -> np.n
         keep &= mask_fn(x, y)
     clear = group.get("clear_radius_m", 0.0)                         # keep a clearing around the origin
     keep &= np.hypot(x, y) >= clear
+    if group.get("clumping") and group.get("layout") != "grid":
+        c = group["clumping"]
+        field = fbm(ny, nx, c.get("scale_m", 60.0) / res, 3, rng)
+        f = (field - field.min()) / max(np.ptp(field), 1e-9)          # 0..1
+        p = np.clip(0.5 + c.get("strength", 0.8) * (height_at(f, x0, y0, res, x, y) - 0.5) * 2, 0, 1)
+        keep &= rng.uniform(size=len(x)) < p
+    if detail and group.get("lod") and keep.any():
+        d = corridor_distance(x, y, detail["corridor"])
+        near, far = detail.get("near_m", 150.0), detail.get("far_m", 500.0)
+        if group["lod"] == "near_only":
+            keep &= d <= near
+        else:                                                         # thin: 1 inside near, far_density beyond far
+            fd = detail.get("far_density", 0.4)
+            p = np.interp(d, [near, far], [1.0, fd])
+            keep &= rng.uniform(size=len(x)) < p
     return np.column_stack([x[keep], y[keep], z[keep]])
 
 
@@ -318,6 +359,8 @@ def write_scatter(stage, name: str, group: dict, pts: np.ndarray, rng) -> np.nda
     idx = rng.choice(len(protos), n, p=w / w.sum())
     s_lo, s_hi = group.get("scale_range", [0.8, 1.2])
     scale = rng.uniform(s_lo, s_hi, n)
+    if group.get("asset_scale"):                                     # per-asset multiplier (assets modelled at other sizes)
+        scale = scale * np.asarray(group["asset_scale"], float)[idx]
     if pts.shape[1] == 4:                                            # layout-given yaw (perimeter walls)
         yaw = pts[:, 3]
     elif group.get("align"):                                         # rows (tents, vehicles): face along the rows
@@ -330,6 +373,15 @@ def write_scatter(stage, name: str, group: dict, pts: np.ndarray, rng) -> np.nda
     inst.CreateProtoIndicesAttr(Vt.IntArray.FromNumpy(idx.astype(np.int32)))
     inst.CreatePositionsAttr(Vt.Vec3fArray.FromNumpy(pos.astype(np.float32)))
     q = np.column_stack([np.cos(yaw / 2), np.zeros(n), np.zeros(n), np.sin(yaw / 2)])   # w, x, y, z about +z
+    if group.get("tilt_deg"):
+        # Natural lean: a small tilt about a random horizontal axis, applied after the yaw.
+        tilt = np.radians(rng.uniform(0, group["tilt_deg"], n))
+        az = rng.uniform(0, 2 * np.pi, n)
+        qt = np.column_stack([np.cos(tilt / 2), np.cos(az) * np.sin(tilt / 2), np.sin(az) * np.sin(tilt / 2), np.zeros(n)])
+        w1, x1, y1, z1 = qt.T
+        w2, x2, y2, z2 = q.T
+        q = np.column_stack([w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2, w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+                             w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2, w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2])
     inst.CreateOrientationsAttr(Vt.QuathArray([Gf.Quath(*map(float, r)) for r in q]))
     inst.CreateScalesAttr(Vt.Vec3fArray.FromNumpy(np.repeat(scale[:, None], 3, 1).astype(np.float32)))
     # Instance AABBs: prototype box scaled, yaw handled by taking the larger horizontal half-extent.
@@ -391,9 +443,25 @@ def write_mangrove_assets(out_dir, gen: dict, rng) -> list[str]:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     crowns = []
-    for c in gen["crowns"]:
+    for i, c in enumerate(gen["crowns"]):
         url = asset_url(c["asset"])
-        crowns.append((c, url, *asset_bounds(url)))
+        bounds = asset_bounds(url)
+        if c.get("hide"):
+            # One shared crown asset with the hidden parts (e.g. an orange tree's fruit) made invisible; the
+            # mangrove variants reference it instanceable, so the heavy crown mesh is held once on the GPU.
+            cf = out_dir / f"crown_{i}.usda"
+            cs = Usd.Stage.CreateNew(str(cf))
+            UsdGeom.SetStageUpAxis(cs, UsdGeom.GetStageUpAxis(Usd.Stage.Open(url)))
+            UsdGeom.SetStageMetersPerUnit(cs, bounds[1])
+            root = UsdGeom.Xform.Define(cs, "/Crown").GetPrim()
+            cs.SetDefaultPrim(root)
+            root.GetReferences().AddReference(url)
+            for child in c["hide"]:
+                # Invisible rather than inactive: RTX still drew deactivated prims inside instancer prototypes.
+                UsdGeom.Imageable(cs.OverridePrim(f"/Crown/{child}")).CreateVisibilityAttr(UsdGeom.Tokens.invisible)
+            cs.GetRootLayer().Save()
+            url = str(cf)
+        crowns.append((c, url, *bounds))
     paths = []
     for k in range(int(gen.get("variants", 4))):
         c, crown_url, cb, cmpu, cup = crowns[k % len(crowns)]
@@ -449,13 +517,7 @@ def write_mangrove_assets(out_dir, gen: dict, rng) -> list[str]:
             cx.AddRotateXOp().Set(90.0)
         ref = UsdGeom.Xform.Define(st, "/Mangrove/Crown/asset").GetPrim()
         ref.GetReferences().AddReference(crown_url)
-        if c.get("hide"):
-            # e.g. the fruit on an orange tree; an instanceable asset ignores overrides below it
-            ref.SetInstanceable(False)
-            for child in c["hide"]:
-                # Invisible rather than inactive: RTX still drew deactivated prims inside instancer prototypes.
-                UsdGeom.Imageable(st.OverridePrim(f"/Mangrove/Crown/asset/{child}")).CreateVisibilityAttr(
-                    UsdGeom.Tokens.invisible)
+        ref.SetInstanceable(True)
         st.GetRootLayer().Save()
         paths.append(str(f))
     return paths

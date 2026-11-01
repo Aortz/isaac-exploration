@@ -2,6 +2,22 @@
 
 What changed in this exploration, newest first. Commits are on `main`; the evidence for the test results is in [`demo/`](demo/README.md).
 
+## 2026-11-01 (later): environments 4-65x faster to render, with more detail
+
+- **Benchmark** (`envbuild/bench.py`): renders the real 4-fisheye rig for each environment's loop flight and checks it against a budget of 300 ms per frame and 9 GB of GPU memory. It can switch parts of a scene off, drop the haze or add renderer settings, to find what costs the time. Results: [`docs/experiments/env_performance.md`](docs/experiments/env_performance.md).
+- **The cost was one tree model.** NVIDIA's `Black_Oak.usd` cost ~20x any other tree; removing it took the rainforest from 4.6 s to 0.37 s per frame. Haze, terrain, water and every renderer setting tried changed frame time by under 2 %.
+- **After the changes:** rainforest 4572 → 70 ms, forest v2 1046 → 285 ms, swamp 685 → 70 ms, OSM cities ~300 → ~50 ms, oil palm 240 → 74 ms. Every built environment is now within budget.
+- **Performance changes:**
+  - Black_Oak replaced by American_Beech (new per-asset `asset_scale`); cheaper conifer mix in forest v2.
+  - Level of detail around the flight path (`detail:` + `lod: near_only | thin`).
+  - Shared instanceable mangrove crowns.
+  - Static environments warm up once instead of at every 10th pose (85–520 s → 8–48 s).
+- **Fidelity added within the budget:**
+  - Nature scenes: trees in stands and gaps, lean, shrubby forest edges, irregular ground-material edges, fallen logs, frond piles, driftwood, mangrove breathing roots. Steep forest slopes read as soil, not pale rock.
+  - OSM cities: varied windows (curtains, blinds, lit rooms, AC units), facade tints, shopfront ground floors, rooftop AC units / tanks / lift cores, lane markings, sidewalks, street lights, darker roofs.
+- **Flights:** forest v2 loop raised from 68 to 72 m (the new tree layout left 4.1 m clearance at 68 m; now 12.2 m). Other loops re-checked: 6.3–20 m clearance.
+- **Swamp chase video:** re-recording at 1080p on the improved scene (added to the demo when it finishes).
+
 ## 2026-11-01: environment builder v2, Singapore / Malaysia / urban / battleground / military scenes
 
 ### Environment builder (`envbuild/`)

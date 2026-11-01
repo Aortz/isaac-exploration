@@ -18,7 +18,9 @@ default_heights:
 style_by_type: {apartments: 0, residential: 0, office: 3, hotel: 3, commercial: 1, retail: 2, house: 4}
 floor_m: 3.0
 bay_m: 3.6
-roof_material: /NVIDIA/Materials/Base/Masonry/Concrete_Block.mdl
+street_lights_m: 30                          # lamps along roads >= 8 m wide
+shopfront_frac: 0.15                         # share of other blocks with a shop ground floor
+roof_material: /NVIDIA/Materials/Base/Natural/Asphalt.mdl     # membrane / tar roofs (concrete read white from above)
 road_material: /NVIDIA/Materials/Base/Natural/Asphalt.mdl
 ground_material: /NVIDIA/Materials/Base/Natural/Grass_Cut.mdl
 facades:                                   # window-grid textures generated per style (envbuild/osm.py)
@@ -28,9 +30,10 @@ facades:                                   # window-grid textures generated per 
   - {wall_rgb: [0.28, 0.34, 0.40], glass_rgb: [0.10, 0.14, 0.20], window_frac: [0.88, 0.80], noise: 0.02}   # 3 glass curtain wall
   - {wall_rgb: [0.62, 0.38, 0.30], window_frac: [0.45, 0.45]}                           # 4 brick / terracotta
 trees:
-  assets: [/NVIDIA/Assets/Vegetation/Trees/Black_Oak.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd,
+  assets: [/NVIDIA/Assets/Vegetation/Trees/American_Beech.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd,
            /NVIDIA/Assets/Vegetation/Plant_Tropical/Travelers_Palm.usd]
   weights: [5, 2, 1]
+  asset_scale: [3.0, 1.0, 1.0]  # Black_Oak replaced: one species cost ~0.4 s/frame on the 4-camera rig (envbuild/bench.py)
   scale_range: [0.45, 0.75]                # rain trees / angsana at 8-13 m; palms smaller
   park_density_per_ha: 70
   street_spacing_m: 14

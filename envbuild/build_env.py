@@ -71,6 +71,12 @@ def build_procedural() -> dict:
             # Near the terrain channels (roads, creeks): weight above `threshold`.
             masks[mname] = (pg.channels_field(tcfg, x0, y0, res, n), m.get("threshold", 0.3), m.get("invert", False))
             continue
+        if m.get("edge_of"):
+            # A band either side of another mask's boundary (forest edges): |field - threshold| small.
+            f, thr, _ = masks[m["edge_of"]]
+            band = m.get("band", 0.15) * np.std(f)
+            masks[mname] = (band - np.abs(f - thr), 0.0, m.get("invert", False))
+            continue
         if m.get("craters"):
             masks[mname] = (pg.crater_field(tcfg, x0, y0, res, n), m.get("threshold", 0.05), m.get("invert", False))
             continue
@@ -89,7 +95,12 @@ def build_procedural() -> dict:
     if layers:
         layers = [{"material": tcfg["material"]}] + layers
     pg.write_terrain(stage, h, x0, y0, res, tcfg.get("material"), tcfg.get("uv_tile_m", 4.0),
-                     layers, pg.face_layers(h, res, layers, masks) if layers else None)
+                     layers, pg.face_layers(h, res, layers, masks, tcfg.get("layer_noise"), rng) if layers else None)
+    # Level of detail around the flight path: groups marked `lod:` are thinned away from it.
+    detail = dict(RECIPE["detail"]) if RECIPE.get("detail") else None
+    if detail:
+        fl = yaml.safe_load((PROJECT_ROOT / "config" / "flight.yaml").read_text())["flights"][detail["corridor"]]
+        detail["corridor"] = np.asarray(fl["waypoints"], float)[:, :2]
     water = RECIPE.get("water")
     if water:
         pg.write_water(stage, water)
@@ -116,7 +127,7 @@ def build_procedural() -> dict:
             from envbuild import props
 
             g = {**g, "assets": props.write_assets(g["generate"], OUT / "assets", g, rng, prefix=gname)}
-        pts = pg.scatter_points(g, h, x0, y0, res, rng, mask_fn(g.get("mask")))
+        pts = pg.scatter_points(g, h, x0, y0, res, rng, mask_fn(g.get("mask")), detail)
         if len(pts):
             boxes = pg.write_scatter(stage, gname, g, pts, rng)
             if g.get("obstacle", True):
@@ -161,7 +172,10 @@ def build_osm() -> dict:
         h = osm.parse_height(tags, rng, RECIPE.get("default_heights", {}), floor_m)
         # Style: by building type when the recipe maps it, else seeded.
         s = RECIPE.get("style_by_type", {}).get(tags.get("building"), int(rng.integers(len(styles))))
-        blds.append((poly, h, s))
+        # Shopfront ground floor: shops tagged, commercial types, and a share of untagged / mixed blocks.
+        shop = ("shop" in tags or tags.get("building") in RECIPE.get("shopfront_types", ["retail", "commercial", "hotel"])
+                or rng.random() < RECIPE.get("shopfront_frac", 0.15))
+        blds.append((poly, h, s, shop))
     boxes = osm.write_buildings(stage, blds, styles, OUT / "textures", floor_m, bay_m, RECIPE.get("roof_material"), rng)
     ways = []
     for el in data["elements"]:
@@ -169,7 +183,32 @@ def build_osm() -> dict:
         if el["type"] == "way" and hw in osm.ROAD_WIDTH and el.get("geometry"):
             g = el["geometry"]
             ways.append((osm.project(lat, lon, [q["lat"] for q in g], [q["lon"] for q in g]), osm.ROAD_WIDTH[hw]))
-    n_roads = osm.write_roads(stage, ways, RECIPE.get("road_material", "/NVIDIA/Materials/Base/Natural/Asphalt.mdl"))
+    n_roads = osm.write_roads(stage, ways, RECIPE.get("road_material", "/NVIDIA/Materials/Base/Natural/Asphalt.mdl"),
+                              tex_dir=OUT / "textures" if RECIPE.get("street_detail", True) else None, rng=rng)
+    if RECIPE.get("street_lights_m"):
+        # Lamps along the wider roads, alternating sides, arms facing the carriageway.
+        from envbuild import props
+
+        sp, lamps = RECIPE["street_lights_m"], []
+        for line, w in ways:
+            if w < 8:
+                continue
+            for a, b in zip(line[:-1], line[1:]):
+                d = b - a
+                L = np.linalg.norm(d)
+                if L < 1:
+                    continue
+                nrm = np.array([-d[1], d[0]]) / L
+                for k, t_ in enumerate(np.arange(sp / 2, L, sp)):
+                    side = 1 if k % 2 else -1
+                    p_ = a + d / L * t_ + side * nrm * (w / 2 + 0.6)
+                    lamps.append([p_[0], p_[1], 0.0, np.arctan2(-side * nrm[1], -side * nrm[0])])
+        lamps = np.array(lamps).reshape(-1, 4)
+        lamps = lamps[np.abs(lamps[:, :2]).max(1) < rad] if len(lamps) else lamps
+        if len(lamps):
+            lg = {"assets": props.write_assets("street_light", OUT / "assets", {"variants": 1}, rng), "class": "pole",
+                  "scale_range": [1.0, 1.0]}
+            pg.write_scatter(stage, "street_lights", lg, lamps, rng)
     osm.write_ground(stage, rad + 200.0, RECIPE.get("ground_material", "/NVIDIA/Materials/Base/Natural/Grass_Cut.mdl"))
     # Trees: OSM tree nodes + a scatter over parks / grass, kept clear of buildings and roads.
     trees = [osm.project(lat, lon, [el["lat"]], [el["lon"]])[0] for el in data["elements"]

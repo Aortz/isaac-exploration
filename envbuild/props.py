@@ -13,6 +13,8 @@ a scatter group with `generate: <type>` then instances them like any other asset
   tent            ridge tent
   tower           guard tower on legs
   dead_tree       bare, charred tree (recursive branches)
+  log             fallen trunk with branch stubs (forest floor debris)
+  pneumatophores  patch of mangrove breathing-root spikes
 
 Geometry is plain boxes / tubes with UsdPreviewSurface colours (or an MDL via `material`); the point is
 believable silhouettes, scale and texture density for VIO, not hero assets.
@@ -265,8 +267,46 @@ def dead_tree(st, g, rng):
     b.write(st, "/Prop/Wood", rgb=(0.10, 0.09, 0.08) if rng.random() < 0.6 else (0.30, 0.27, 0.23))
 
 
+def log(st, g, rng):
+    """Fallen trunk with a few broken branch stubs, resting on the ground."""
+    b = MeshBuf()
+    L, r = rng.uniform(*g.get("length_m", [4, 10])), rng.uniform(*g.get("radius_m", [0.15, 0.35]))
+    sag = rng.uniform(0, 0.15)
+    b.tube([[-L / 2, 0, r], [0, rng.normal(0, 0.2), r + sag], [L / 2, 0, r]], r, r * 0.75, 8)
+    for _ in range(int(rng.integers(2, 6))):
+        x = rng.uniform(-L / 2, L / 2)
+        d = rng.normal(0, 1, 3)
+        d[2] = abs(d[2])
+        d /= np.linalg.norm(d)
+        b.tube([[x, 0, r], np.array([x, 0, r]) + d * rng.uniform(0.4, 1.2)], r * 0.35, r * 0.2, 5)
+    b.write(st, "/Prop/Wood", rgb=_jit(g.get("rgb", [0.24, 0.20, 0.16]), rng, 0.15))
+
+
+def pneumatophores(st, g, rng):
+    """Patch of mangrove breathing roots: thin spikes poking out of the mud (Avicennia / Sonneratia)."""
+    b = MeshBuf()
+    rad = g.get("patch_radius_m", 2.5)
+    for _ in range(int(rng.integers(*g.get("count", [60, 140])))):
+        q, rr = rng.uniform(0, 2 * np.pi), rad * np.sqrt(rng.uniform())
+        h = rng.uniform(0.1, 0.35)
+        b.tube([[rr * np.cos(q), rr * np.sin(q), -0.05], [rr * np.cos(q) + rng.normal(0, 0.02), rr * np.sin(q), h]],
+               0.012, 0.004, 4)
+    b.write(st, "/Prop/Roots", rgb=_jit([0.30, 0.26, 0.21], rng))
+
+
+def street_light(st, g, rng):
+    """Street lamp: 8 m pole with an arm reaching over the road (local +x) and a lamp head."""
+    b, head = MeshBuf(), MeshBuf()
+    h = g.get("height_m", 8.0)
+    b.tube([[0, 0, 0], [0, 0, h]], 0.09, 0.06, 8)
+    b.tube([[0, 0, h - 0.3], [0.8, 0, h], [1.8, 0, h + 0.1]], 0.04, 0.035, 6)
+    head.box((1.95, 0, h + 0.05), (0.6, 0.25, 0.12))
+    b.write(st, "/Prop/Pole", rgb=(0.35, 0.36, 0.36), roughness=0.5)
+    head.write(st, "/Prop/Lamp", rgb=(0.80, 0.80, 0.75), roughness=0.3)
+
+
 GENERATORS = {f.__name__: f for f in (ruin, rubble, vehicle_proxy, container, hesco, jersey_barrier,
-                                      sandbags, tent, tower, dead_tree)}
+                                      sandbags, tent, tower, dead_tree, log, pneumatophores, street_light)}
 
 
 def write_assets(kind: str, out_dir: Path, g: dict, rng, prefix: str | None = None) -> list[str]:

@@ -144,21 +144,77 @@ def point_in_poly(pts: np.ndarray, poly: np.ndarray) -> np.ndarray:
 
 
 # --- facade textures ------------------------------------------------------------------------------
+BAYS, FLOORS = 4, 3                    # one facade tile covers 4 window bays x 3 floors
+
+
 def facade_texture(path: Path, style: dict, rng, px: int = 128) -> None:
-    """One window bay x one floor tile: wall colour, a window (dark glass with a lighter frame), noise."""
+    """A 4-bay x 3-floor facade tile: wall colour, windows with per-window variety (curtains, blinds,
+    the odd lit room, AC units under some sills), floor slab lines and grime. Varied windows give the
+    trackers distinct features instead of one window repeated across the building."""
     from PIL import Image
 
     wall = np.array(style["wall_rgb"], float)
     glass = np.array(style.get("glass_rgb", [0.12, 0.15, 0.18]), float)
-    img = np.ones((px, px, 3)) * wall
+    H, W = FLOORS * px, BAYS * px
+    img = np.ones((H, W, 3)) * wall
     wx, wy = style.get("window_frac", [0.55, 0.5])
-    x0, x1 = int(px * (1 - wx) / 2), int(px * (1 + wx) / 2)
-    y0, y1 = int(px * 0.25), int(px * (0.25 + wy))
-    img[y0 - 3:y1 + 3, x0 - 3:x1 + 3] = wall * 0.75 + 0.25                # frame / sill
-    img[y0:y1, x0:x1] = glass
-    img[y0:y1, (x0 + x1) // 2 - 1:(x0 + x1) // 2 + 1] = wall * 0.6        # mullion
-    img[int(px * 0.92):, :] *= 0.85                                       # floor slab line
-    img *= 1.0 + rng.normal(0, style.get("noise", 0.04), (px, px, 1))     # grime
+    for f in range(FLOORS):
+        for b in range(BAYS):
+            ox, oy = b * px, f * px
+            x0, x1 = ox + int(px * (1 - wx) / 2), ox + int(px * (1 + wx) / 2)
+            y0, y1 = oy + int(px * 0.25), oy + int(px * (0.25 + wy))
+            img[y0 - 3:y1 + 3, x0 - 3:x1 + 3] = wall * 0.75 + 0.25        # frame / sill
+            r = rng.random()
+            if r < 0.07:
+                pane = np.array([0.85, 0.75, 0.50])                        # lit room
+            elif r < 0.35:
+                pane = rng.choice([[0.75, 0.72, 0.65], [0.55, 0.45, 0.35], [0.60, 0.62, 0.66]])   # curtains
+            else:
+                pane = glass * rng.uniform(0.8, 1.25)
+            img[y0:y1, x0:x1] = pane
+            if rng.random() < 0.3:                                         # half-drawn blinds
+                img[y0:y0 + int((y1 - y0) * rng.uniform(0.2, 0.6)), x0:x1] = [0.80, 0.80, 0.78]
+            img[y0:y1, (x0 + x1) // 2 - 1:(x0 + x1) // 2 + 1] = wall * 0.6     # mullion
+            if rng.random() < style.get("ac_frac", 0.25):                  # AC unit under the sill
+                img[y0 - 22:y0 - 6, x0 + 4:x0 + 28] = [0.78, 0.78, 0.76]
+        img[oy + int(px * 0.92):oy + px, :] *= 0.85                       # floor slab line
+    img *= 1.0 + rng.normal(0, style.get("noise", 0.04), (H, W, 1))       # grime
+    img *= np.linspace(0.92, 1.0, H)[:, None, None]                       # weathering towards the bottom
+    Image.fromarray((np.clip(img, 0, 1)[::-1] * 255).astype(np.uint8)).save(path)
+
+
+def shopfront_texture(path: Path, rng, px: int = 128) -> None:
+    """Ground-floor shopfronts, 4 units wide: tall glazing, a coloured signage band, a kerb-level plinth."""
+    from PIL import Image
+
+    img = np.ones((px, 4 * px, 3)) * 0.55
+    for b in range(4):
+        ox = b * px
+        sign = rng.choice([[0.75, 0.15, 0.12], [0.10, 0.30, 0.60], [0.90, 0.75, 0.15], [0.15, 0.50, 0.25],
+                           [0.85, 0.85, 0.85], [0.20, 0.20, 0.22]])
+        img[int(px * 0.72):int(px * 0.88), ox + 4:ox + px - 4] = sign
+        img[int(px * 0.10):int(px * 0.68), ox + 8:ox + px - 8] = np.array([0.10, 0.12, 0.13]) * rng.uniform(0.8, 1.6)
+        if rng.random() < 0.4:                                             # roller shutter down
+            img[int(px * 0.10):int(px * 0.68), ox + 8:ox + px - 8] = 0.62
+            img[int(px * 0.10):int(px * 0.68):6, ox + 8:ox + px - 8] *= 0.8
+        img[:int(px * 0.08), ox:ox + px] = 0.45                           # plinth
+    img *= 1.0 + rng.normal(0, 0.04, (px, 4 * px, 1))
+    Image.fromarray((np.clip(img, 0, 1)[::-1] * 255).astype(np.uint8)).save(path)
+
+
+def ground_texture(path: Path, rng, kind: str, px: int = 256) -> None:
+    """Road (lane markings across u, dashes along v over 6 m) or sidewalk (paving joints) tile."""
+    from PIL import Image
+
+    if kind == "road":
+        img = np.ones((2 * px, px, 3)) * 0.18 * (1 + rng.normal(0, 0.08, (2 * px, px, 1)))
+        for u in (0.05, 0.95):                                             # edge lines
+            img[:, int(u * px) - 2:int(u * px) + 2] = 0.85
+        img[:px, px // 2 - 2:px // 2 + 2] = 0.85                           # dashed centre line (3 m of 6 m)
+    else:
+        img = np.ones((px, px, 3)) * 0.62 * (1 + rng.normal(0, 0.05, (px, px, 1)))
+        img[::px // 4, :] *= 0.75                                          # paving joints every 0.6 m
+        img[:, ::px // 4] *= 0.75
     Image.fromarray((np.clip(img, 0, 1)[::-1] * 255).astype(np.uint8)).save(path)
 
 
@@ -209,57 +265,99 @@ def _mesh(stage, path: str, pts, counts, idx, st=None, collider: bool = True):
     return m
 
 
-def write_buildings(stage, blds: list[tuple[np.ndarray, float, int]], styles: list[dict], tex_dir: Path,
-                    floor_m: float, bay_m: float, roof_mdl: str | None, rng) -> np.ndarray:
-    """blds: (footprint, height, style index). One wall mesh + one roof mesh per style. Returns AABBs."""
+def write_buildings(stage, blds: list[tuple[np.ndarray, float, int, bool]], styles: list[dict], tex_dir: Path,
+                    floor_m: float, bay_m: float, roof_mdl: str | None, rng, tints: int = 3) -> np.ndarray:
+    """blds: (footprint, height, style index, has shopfront). Walls per style and tint, one shopfront mesh,
+    roofs, rooftop clutter (AC units, water tanks, lift cores). Returns AABBs (with the clutter)."""
     from pxr import Sdf, UsdShade
 
     from envbuild.procedural import bind_mdl
 
     tex_dir.mkdir(parents=True, exist_ok=True)
     boxes = []
-    for s, style in enumerate(styles):
-        mine = [b for b in blds if b[2] == s]
-        if not mine:
-            continue
+    shop_p, shop_i, shop_st = [], [], []
+    clutter = []                                                       # (centre, size, yaw)
+    ground_h = 4.5
+    variants = {}
+    for poly, hgt, s_, shop in blds:
+        variants.setdefault((s_, int(rng.integers(tints))), []).append((poly, hgt, shop))
+    for (s_, t_), mine in sorted(variants.items()):
+        style = dict(styles[s_])
+        style["wall_rgb"] = list(np.clip(np.asarray(style["wall_rgb"]) * rng.uniform(0.88, 1.08, 3), 0, 1))
         wp, wi, wst, rp, ri = [], [], [], [], []
-        for poly, hgt, _ in mine:
+        for poly, hgt, shop in mine:
             n = len(poly)
-            base = len(wp)
             per = np.r_[0.0, np.cumsum(np.linalg.norm(np.roll(poly, -1, 0) - poly, axis=1))]
+            z0 = ground_h if shop and hgt > ground_h + 2 else 0.0
             for k in range(n):
                 a, b = poly[k], poly[(k + 1) % n]
-                wp += [[a[0], a[1], 0.0], [b[0], b[1], 0.0], [b[0], b[1], hgt], [a[0], a[1], hgt]]
-                u0, u1 = per[k] / bay_m, per[k + 1] / bay_m
-                v1 = hgt / floor_m
-                wst += [[u0, 0.0], [u1, 0.0], [u1, v1], [u0, v1]]
-                wi += [base + 4 * k, base + 4 * k + 1, base + 4 * k + 2, base + 4 * k + 3]
+                base = len(wp)
+                wp += [[a[0], a[1], z0], [b[0], b[1], z0], [b[0], b[1], hgt], [a[0], a[1], hgt]]
+                u0, u1 = per[k] / (bay_m * BAYS), per[k + 1] / (bay_m * BAYS)
+                wst += [[u0, z0 / (floor_m * FLOORS)], [u1, z0 / (floor_m * FLOORS)], [u1, hgt / (floor_m * FLOORS)],
+                        [u0, hgt / (floor_m * FLOORS)]]
+                wi += [base, base + 1, base + 2, base + 3]
+                if z0 > 0:
+                    sb = len(shop_p)
+                    shop_p += [[a[0], a[1], 0.0], [b[0], b[1], 0.0], [b[0], b[1], z0], [a[0], a[1], z0]]
+                    su0, su1 = per[k] / 24.0, per[k + 1] / 24.0                # 4 shop units per 24 m
+                    shop_st += [[su0, 0.0], [su1, 0.0], [su1, 1.0], [su0, 1.0]]
+                    shop_i += [sb, sb + 1, sb + 2, sb + 3]
             rb = len(rp)
             rp += [[x, y, hgt] for x, y in poly]
             ri += [rb + t for tri in earclip(poly) for t in tri]
             lo, hi = poly.min(0), poly.max(0)
             boxes.append([(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, hgt / 2, hi[0] - lo[0], hi[1] - lo[1], hgt])
-        tex = tex_dir / f"facade_{s}.png"
+            # Rooftop clutter: a few boxes inside the footprint, more on bigger roofs.
+            area = abs(signed_area(poly))
+            want = int(np.clip(area / 120, 0, 8))
+            if want:
+                cand = rng.uniform(lo, hi, (want * 4, 2))
+                cand = cand[point_in_poly(cand, poly)][:want]
+                for c in cand:
+                    kind = rng.choice(["ac", "ac", "tank", "core"] if hgt > 15 else ["ac", "ac", "tank"])
+                    size = {"ac": [1.4, 0.9, 1.0], "tank": [2.5, 2.5, 2.2], "core": [4.5, 4.0, 3.2]}[kind]
+                    clutter.append(([c[0], c[1], hgt + size[2] / 2], size, rng.uniform(0, np.pi)))
+        name = f"style{s_}_{t_}"
+        tex = tex_dir / f"facade_{name}.png"
         facade_texture(tex, style, rng)
-        walls = _mesh(stage, f"/World/Buildings/style{s}/Walls", wp, [4] * (len(wi) // 4), wi, wst)
-        UsdShade.MaterialBindingAPI.Apply(walls.GetPrim()).Bind(preview_material(stage, f"/World/Looks/Facade{s}", tex))
+        walls = _mesh(stage, f"/World/Buildings/{name}/Walls", wp, [4] * (len(wi) // 4), wi, wst)
+        UsdShade.MaterialBindingAPI.Apply(walls.GetPrim()).Bind(preview_material(stage, f"/World/Looks/Facade_{name}", tex))
         walls.GetPrim().CreateAttribute("semantic:class", Sdf.ValueTypeNames.String).Set("building")
-        roof = _mesh(stage, f"/World/Buildings/style{s}/Roofs", rp, [3] * (len(ri) // 3), ri,
+        roof = _mesh(stage, f"/World/Buildings/{name}/Roofs", rp, [3] * (len(ri) // 3), ri,
                      np.asarray(rp)[ri][:, :2] / 4.0)
         if roof_mdl:
-            bind_mdl(stage, roof.GetPrim(), roof_mdl, f"/World/Looks/Roof{s}")
+            bind_mdl(stage, roof.GetPrim(), roof_mdl, f"/World/Looks/Roof_{name}")
         roof.GetPrim().CreateAttribute("semantic:class", Sdf.ValueTypeNames.String).Set("roof")
+    if shop_p:
+        tex = tex_dir / "shopfront.png"
+        shopfront_texture(tex, rng)
+        m = _mesh(stage, "/World/Buildings/Shopfronts", shop_p, [4] * (len(shop_i) // 4), shop_i, shop_st)
+        UsdShade.MaterialBindingAPI.Apply(m.GetPrim()).Bind(preview_material(stage, "/World/Looks/Shopfront", tex, roughness=0.5))
+        m.GetPrim().CreateAttribute("semantic:class", Sdf.ValueTypeNames.String).Set("building")
+    if clutter:
+        from envbuild.props import MeshBuf
+
+        buf = MeshBuf()
+        for c, sz, yaw in clutter:
+            buf.box(c, sz, yaw=yaw)
+        buf.write(stage, "/World/Buildings/Rooftop", rgb=(0.58, 0.58, 0.56))
+        cl = np.array([[c[0], c[1], c[2], max(sz[0], sz[1]), max(sz[0], sz[1]), sz[2]] for c, sz, _ in clutter])
+        boxes = boxes + cl.tolist()
     return np.array(boxes)
 
 
-def write_roads(stage, ways: list[tuple[np.ndarray, float]], material: str, z: float = 0.03) -> int:
-    """Road ribbons: each centre-line segment as a quad `width` wide, plus a square cap at every joint."""
-    from pxr import Sdf
+def write_roads(stage, ways: list[tuple[np.ndarray, float]], material: str, z: float = 0.03,
+                tex_dir: Path | None = None, rng=None, sidewalk_m: float = 2.5) -> int:
+    """Road ribbons along the OSM centre lines. With `tex_dir`: a generated lane-marking texture (edge lines,
+    dashed centre line) and raised sidewalks either side; otherwise the plain `material`."""
+    from pxr import Sdf, UsdShade
 
     from envbuild.procedural import bind_mdl
 
-    pts, idx = [], []
+    pts, idx, st, sw_p, sw_i = [], [], [], [], []
     for line, w in ways:
+        along = 0.0
         for a, b in zip(line[:-1], line[1:]):
             d = b - a
             L = np.linalg.norm(d)
@@ -271,11 +369,37 @@ def write_roads(stage, ways: list[tuple[np.ndarray, float]], material: str, z: f
             base = len(pts)
             pts += [[p[0], p[1], z] for p in q]
             idx += [base, base + 3, base + 2, base + 1]               # face up
+            v0, v1 = (along - w / 2) / 6.0, (along + L + w / 2) / 6.0
+            st += [[0.0, v0], [0.0, v1], [1.0, v1], [1.0, v0]]
+            along += L
+            if tex_dir is not None and w >= 6:
+                for side in (-1, 1):
+                    off = side * (w / 2 + sidewalk_m / 2) / (w / 2)
+                    c0, c1 = a + nrm * off, b + nrm * off
+                    hw = np.array([-d[1], d[0]]) / L * sidewalk_m / 2
+                    sb = len(sw_p)
+                    sw_p += [[p[0], p[1], 0.12] for p in (c0 + hw, c1 + hw, c1 - hw, c0 - hw)]
+                    sw_i += [sb, sb + 3, sb + 2, sb + 1]
     if not pts:
         return 0
-    m = _mesh(stage, "/World/Roads", pts, [4] * (len(idx) // 4), idx,
-              np.asarray(pts)[idx][:, :2] / 6.0, collider=False)
-    bind_mdl(stage, m.GetPrim(), material, "/World/Looks/Road")
+    if tex_dir is None:
+        m = _mesh(stage, "/World/Roads", pts, [4] * (len(idx) // 4), idx,
+                  np.asarray(pts)[idx][:, :2] / 6.0, collider=False)
+        bind_mdl(stage, m.GetPrim(), material, "/World/Looks/Road")
+    else:
+        # st was authored per vertex in quad order; idx winds each quad as (0, 3, 2, 1).
+        fv = np.asarray(st).reshape(-1, 4, 2)[:, [0, 3, 2, 1]].reshape(-1, 2)
+        m = _mesh(stage, "/World/Roads", pts, [4] * (len(idx) // 4), idx, fv, collider=False)
+        tex = tex_dir / "road.png"
+        ground_texture(tex, rng, "road")
+        UsdShade.MaterialBindingAPI.Apply(m.GetPrim()).Bind(preview_material(stage, "/World/Looks/Road", tex, roughness=0.9))
+        if sw_p:
+            stex = tex_dir / "sidewalk.png"
+            ground_texture(stex, rng, "sidewalk")
+            sw = _mesh(stage, "/World/Sidewalks", sw_p, [4] * (len(sw_i) // 4), sw_i,
+                       np.asarray(sw_p)[sw_i][:, :2] / 2.4, collider=False)
+            UsdShade.MaterialBindingAPI.Apply(sw.GetPrim()).Bind(preview_material(stage, "/World/Looks/Sidewalk", stex))
+            sw.GetPrim().CreateAttribute("semantic:class", Sdf.ValueTypeNames.String).Set("sidewalk")
     m.GetPrim().CreateAttribute("semantic:class", Sdf.ValueTypeNames.String).Set("road")
     return len(idx) // 4
 

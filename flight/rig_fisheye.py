@@ -378,7 +378,9 @@ def main() -> None:
     if env and env.get("first_warmup_updates"):
         place_rig(0)
         envs.settle(app, env["first_warmup_updates"])
-    for k in range(0, len(t_frames), rcfg["warmup_stride"]):
+    # The pass along the path fills Cesium's tile cache; a static USD environment is fully loaded already,
+    # so it only needs the start pose warmed (this pass took ~70 min in the heavy procedural scenes).
+    for k in (range(0, len(t_frames), rcfg["warmup_stride"]) if env is None else [0]):
         place_rig(k)
         warm()
     warmup_s = time.time() - t0

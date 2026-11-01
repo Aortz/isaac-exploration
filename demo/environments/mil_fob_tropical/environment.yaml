@@ -1,7 +1,7 @@
 mil_fob_tropical:
   colliders: false
   settle_updates: 4
-  warmup_updates: 400
+  warmup_updates: 30
   clip:
   - 0.1
   - 5000.0
@@ -15,6 +15,7 @@ mil_fob_tropical:
     overcast:
       sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr
       sky_intensity: 1200
+  first_warmup_updates: 400
   ground_z: 0.0
   sky_dome: /World/Sky/Dome
   kit_args:

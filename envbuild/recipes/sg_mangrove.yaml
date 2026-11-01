@@ -19,6 +19,7 @@ terrain:
   shore: {direction_deg: 90, at_m: 330, width_m: 50, drop_m: 5.0}
   material: /NVIDIA/Materials/vMaterials_2/Ground/Mulch.mdl#Mulch_Wet  # tidal mud with root litter
   uv_tile_m: 3.0
+  layer_noise: {scale_m: 10, mask_jitter: 0.6, height_jitter_m: 0.25, slope_jitter_deg: 4}   # irregular material edges
   layers:
     - {material: /NVIDIA/Materials/vMaterials_2/Ground/Ground_Leaves.mdl, height_range_m: [0.7, 99]}     # leaf litter above the tide
     - {material: /NVIDIA/Materials/Base/Natural/Grass_Countryside.mdl, height_range_m: [1.6, 99], mask: "!canopy"}
@@ -29,14 +30,22 @@ water:
   uv_tile_m: 20.0
 masks:
   canopy: {scale_m: 160, cover: 0.85}
+detail:                                       # level of detail around the flight path (lod: groups)
+  corridor: sg_p3_loop
+  near_m: 150
+  far_m: 500
+  far_density: 0.4
 scatter:
   mangroves:
+    clumping: {scale_m: 60, strength: 0.8}     # stands and gaps, same mean density
+    tilt_deg: 3
+    lod: thin
     class: tree
     generate: mangrove
     crowns:
       - {asset: /NVIDIA/Assets/Vegetation/Trees/Orange_Tree.usd, scale: [2.3, 3.3], hide: [fruit]}   # dense, dark glossy: Rhizophora-like, 8-11 m
       - {asset: /NVIDIA/Assets/Vegetation/Trees/Orange_Tree.usd, scale: [2.3, 3.3], hide: [fruit]}
-      - {asset: /NVIDIA/Assets/Vegetation/Trees/Black_Oak.usd, scale: [0.40, 0.55]}                  # lighter, open: Avicennia-like, 7-10 m
+      - {asset: /NVIDIA/Assets/Vegetation/Trees/American_Beech.usd, scale: [1.2, 1.65]}             # darker, open: Avicennia-like, 7-10 m (Black_Oak cost ~0.4 s/frame)
     variants: 6
     hub_height_m: [1.0, 1.8]
     root_spread_m: [1.6, 3.0]
@@ -48,6 +57,7 @@ scatter:
     clear_radius_m: 18              # take-off clearing at the origin
     sink_m: 0.1
   nipa:                            # Nypa-like stemless palms on the creek banks: Golden Malay palm, trunk buried
+    lod: near_only                            # only near the flight path: too small to resolve further out
     class: shrub
     assets: [/NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd]
     density_per_ha: 70
@@ -57,8 +67,12 @@ scatter:
     clear_radius_m: 18
     obstacle: false
   back_forest:                     # back mangrove / secondary forest on the higher ground
+    asset_scale: [3.0, 1.0, 1.0, 1.0]  # Black_Oak replaced: one species cost ~0.4 s/frame on the 4-camera rig (envbuild/bench.py)
+    clumping: {scale_m: 60, strength: 0.8}     # stands and gaps, same mean density
+    tilt_deg: 3
+    lod: thin
     class: tree
-    assets: [/NVIDIA/Assets/Vegetation/Trees/Black_Oak.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Cuban_Royal_Palm.usd,
+    assets: [/NVIDIA/Assets/Vegetation/Trees/American_Beech.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Cuban_Royal_Palm.usd,
              /NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Travelers_Palm.usd]
     weights: [6, 2, 2, 1]
     density_per_ha: 70
@@ -67,6 +81,7 @@ scatter:
     clear_radius_m: 18
     sink_m: 0.2
   understory:
+    lod: near_only                            # only near the flight path: too small to resolve further out
     class: shrub
     assets: [/NVIDIA/Assets/Vegetation/Plant_Tropical/Australian_Tree_Fern.usd,
              /NVIDIA/Assets/Vegetation/Plant_Tropical/Japanese_Fiber_Banana.usd,
@@ -75,6 +90,26 @@ scatter:
     scale_range: [0.9, 1.6]
     height_range_m: [0.9, 99]
     clear_radius_m: 18
+    obstacle: false
+  pneumatophores:                  # breathing-root spike patches on the mud near the water line
+    class: debris
+    generate: pneumatophores
+    variants: 4
+    density_per_ha: 60
+    height_range_m: [0.0, 0.6]
+    scale_range: [0.8, 1.4]
+    lod: near_only
+    obstacle: false
+  driftwood:
+    class: debris
+    generate: log
+    variants: 4
+    length_m: [2, 6]
+    radius_m: [0.08, 0.2]
+    rgb: [0.42, 0.38, 0.32]
+    density_per_ha: 6
+    height_range_m: [-0.2, 0.8]
+    lod: near_only
     obstacle: false
 sky:
   hdr: /NVIDIA/Assets/Skies/Cloudy/kloofendal_48d_partly_cloudy_4k.hdr

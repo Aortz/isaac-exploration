@@ -1,0 +1,8 @@
+# Google photoreal 3D tiles over Kuala Lumpur city centre (KLCC / Bukit Bintang): high-rise towers,
+# dense streets, KLCC park. Overflight urban ops; tiles look right from ~60 m up.
+name: my_kl_klcc
+source: cesium
+tiles: google
+lat: 3.1520
+lon: 101.7120
+height: 57.0           # ellipsoidal: street level ~50 m above sea level + ~7 m geoid

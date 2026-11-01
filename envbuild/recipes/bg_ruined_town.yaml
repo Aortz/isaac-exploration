@@ -1,0 +1,97 @@
+# Battleground: a bombed town. A grid of ruined buildings (block walls with holes, broken tops, part-collapsed
+# slabs), rubble piles in the streets, shell craters, burned-out and abandoned armoured-vehicle proxies,
+# charred dead trees, smoke-grey haze. ~700 x 700 m, town in the middle 450 m. All props generated
+# (envbuild/props.py): no military assets ship with Isaac.
+name: bg_ruined_town
+source: procedural
+seed: 81
+terrain:
+  size_m: 700
+  resolution_m: 1.0
+  hills_m: 3.0
+  hill_scale_m: 250
+  octaves: 4
+  craters: {count: 140, radius_m: [2.0, 7.0], depth_ratio: 0.28, rim_ratio: 0.1, seed: 5, clear_radius_m: 25}
+  channels:                                   # streets (flat cuts) through the town
+    - {angle_deg: 0, offset_m: 0, depth_m: 0.05, width_m: 5, meander_m: 0, meander_wavelength_m: 1000}
+    - {angle_deg: 0, offset_m: -110, depth_m: 0.05, width_m: 4, meander_m: 0, meander_wavelength_m: 1000}
+    - {angle_deg: 0, offset_m: 110, depth_m: 0.05, width_m: 4, meander_m: 0, meander_wavelength_m: 1000}
+    - {angle_deg: 90, offset_m: 0, depth_m: 0.05, width_m: 5, meander_m: 0, meander_wavelength_m: 1000}
+    - {angle_deg: 90, offset_m: -120, depth_m: 0.05, width_m: 4, meander_m: 0, meander_wavelength_m: 1000}
+    - {angle_deg: 90, offset_m: 120, depth_m: 0.05, width_m: 4, meander_m: 0, meander_wavelength_m: 1000}
+  material: /NVIDIA/Materials/Base/Natural/Dirt.mdl
+  uv_tile_m: 3.0
+  layers:
+    - {material: /NVIDIA/Materials/Base/Natural/Grass_Winter.mdl, mask: "!town"}         # dead grass outside town
+    - {material: /NVIDIA/Materials/Base/Natural/Asphalt.mdl, mask: street}
+    - {material: /NVIDIA/Materials/vMaterials_2/Ground/Mulch.mdl#Mulch_Wet, mask: crater}  # scorched craters
+masks:
+  town: {rect_m: [460, 460]}
+  street: {channels: true, threshold: 0.02}       # wide enough to keep ruins off the streets
+  crater: {craters: true, threshold: 0.05}
+scatter:
+  ruins:
+    class: building
+    generate: ruin
+    variants: 10
+    width_m: [8, 18]
+    depth_m: [8, 14]
+    floors: [1, 5]
+    damage: [0.2, 0.75]
+    layout: grid
+    spacing_m: 26
+    row_angle_deg: 0
+    jitter_m: 3.0
+    align: true
+    yaw_jitter_deg: 4
+    mask: [town, "!street"]
+    clear_radius_m: 30
+  street_rubble:
+    class: rubble
+    generate: rubble
+    variants: 6
+    density_per_ha: 40
+    scale_range: [0.7, 1.5]
+    mask: town
+    clear_radius_m: 15
+    obstacle: false
+  vehicles:
+    class: vehicle
+    generate: vehicle_proxy
+    variants: 6
+    burned_frac: 0.6
+    density_per_ha: 1.5
+    scale_range: [1.0, 1.0]
+    clear_radius_m: 25
+  dead_trees:
+    class: tree
+    generate: dead_tree
+    variants: 6
+    height_m: [5, 12]
+    density_per_ha: 8
+    scale_range: [0.8, 1.3]
+    clear_radius_m: 25
+sky:
+  hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr
+  intensity: 1000
+  sun_intensity: 1500
+  sun_elevation_deg: 35
+  sun_azimuth_deg: 210
+environment:
+  first_warmup_updates: 400
+  ground_z: 0.0
+  stereo: {baseline_m: 0.30, pitch_deg: 25.0}
+  openvins: {fi_max_dist: 250.0}
+  lighting:
+    default: {}
+    low_sun: {sky_hdr: /NVIDIA/Assets/Skies/Clear/venice_sunset_4k.hdr}
+  sky_dome: /World/Sky/Dome
+  kit_args:
+    - --/rtx/fog/enabled=true
+    - --/rtx/fog/fogZup/enabled=true
+    - --/rtx/fog/fogHeightDensity=0.0
+    - --/rtx/fog/fogColor=[0.72,0.72,0.72]
+    - --/rtx/fog/fogColorIntensity=1.0
+    - --/rtx/fog/fogStartDist=300
+    - --/rtx/fog/fogEndDist=3500
+    - --/rtx/fog/fogDistanceDensity=0.6

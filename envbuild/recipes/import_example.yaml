@@ -1,0 +1,11 @@
+# Bring any USD in as an environment: Isaac's warehouse here; swap in your own USD/USDZ.
+name: warehouse_import
+source: import
+usd: /Isaac/Environments/Simple_Warehouse/full_warehouse.usd
+up_axis: Z
+meters_per_unit: 1.0
+add_colliders: false          # the asset has its own
+environment:
+  clip: [0.05, 500.0]
+  stereo: {baseline_m: 0.12, pitch_deg: 0.0}
+  openvins: {fi_max_dist: 60.0}

@@ -1,0 +1,39 @@
+{
+  "usd": "/home/aortz/Coding-Projects/isaac-exploration/build/envs/sg_mangrove/env.usda",
+  "load_s": 4.1,
+  "meters_per_unit": 1.0,
+  "up_axis": "Z",
+  "bounds_all": [
+    -4000.0,
+    -4000.0,
+    -7.3,
+    4000.0,
+    4000.0,
+    2.6
+  ],
+  "core_xy_p2_p98": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "object_top_z_percentiles": {
+    "50": 1.4,
+    "90": 2.3,
+    "99": 2.6,
+    "99.9": 2.6
+  },
+  "ground_z_p5": -6.92,
+  "prims": 314,
+  "gprims": 2,
+  "colliders": 1,
+  "lights": 2,
+  "lights_by_type": {
+    "DomeLight": [
+      "/World/Sky/Dome"
+    ],
+    "DistantLight": [
+      "/World/Sky/Sun"
+    ]
+  }
+}

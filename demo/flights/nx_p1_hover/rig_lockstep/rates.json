@@ -1,0 +1,71 @@
+{
+  "flight": "nx_p1_hover",
+  "mode": "lockstep",
+  "ros2": true,
+  "freerun_updates": 1,
+  "frames": 1290,
+  "cameras": [
+    "cam0_front",
+    "cam1_left",
+    "cam2_back",
+    "cam3_right"
+  ],
+  "resolution": [
+    640,
+    480
+  ],
+  "depth": false,
+  "sim_camera_hz": 30,
+  "sim_duration_s": 42.967,
+  "warmup_s": 32.6,
+  "wall_s": 269.4,
+  "max_fps_cap": 0.0,
+  "wall_frames_per_s": 4.79,
+  "achieved_frames_per_s": 20.21,
+  "achieved_images_per_s": 80.85,
+  "realtime_factor": 0.673,
+  "image_lag_frames_compensated": 0,
+  "renderer_updates_per_frame": {
+    "mean": 4.0,
+    "max": 4
+  },
+  "unsettled_frames": 0,
+  "imu_messages": 8594,
+  "timing": {
+    "pose": {
+      "mean_ms": 1.16,
+      "p50_ms": 1.15,
+      "p95_ms": 1.26,
+      "max_ms": 2.66
+    },
+    "render": {
+      "mean_ms": 39.35,
+      "p50_ms": 38.82,
+      "p95_ms": 41.0,
+      "max_ms": 100.11
+    },
+    "readback": {
+      "mean_ms": 6.49,
+      "p50_ms": 6.49,
+      "p95_ms": 7.22,
+      "max_ms": 152.43
+    },
+    "publish": {
+      "mean_ms": 2.48,
+      "p50_ms": 2.43,
+      "p95_ms": 3.09,
+      "max_ms": 5.01
+    },
+    "frame": {
+      "mean_ms": 49.47,
+      "p50_ms": 48.86,
+      "p95_ms": 51.52,
+      "max_ms": 255.74
+    }
+  },
+  "look": {
+    "variant": "default",
+    "dome": null
+  },
+  "note": "achieved_* = frames / summed frame time (pose + render + readback + publish), i.e. the uncapped rate; wall_frames_per_s includes the cap's sleeps and image saving"
+}

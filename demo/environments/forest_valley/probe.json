@@ -1,0 +1,39 @@
+{
+  "usd": "/home/aortz/Coding-Projects/isaac-exploration/build/envs/forest_valley/env.usda",
+  "load_s": 2.9,
+  "meters_per_unit": 1.0,
+  "up_axis": "Z",
+  "bounds_all": [
+    -400.0,
+    -400.0,
+    -5.5,
+    400.0,
+    400.0,
+    34.5
+  ],
+  "core_xy_p2_p98": [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "object_top_z_percentiles": {
+    "50": 34.5,
+    "90": 34.5,
+    "99": 34.5,
+    "99.9": 34.5
+  },
+  "ground_z_p5": -5.49,
+  "prims": 6349,
+  "gprims": 1,
+  "colliders": 1,
+  "lights": 2,
+  "lights_by_type": {
+    "DomeLight": [
+      "/World/Sky/Dome"
+    ],
+    "DistantLight": [
+      "/World/Sky/Sun"
+    ]
+  }
+}

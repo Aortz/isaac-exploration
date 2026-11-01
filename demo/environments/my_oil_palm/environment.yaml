@@ -1,0 +1,29 @@
+my_oil_palm:
+  colliders: false
+  settle_updates: 4
+  warmup_updates: 400
+  clip:
+  - 0.1
+  - 5000.0
+  stereo:
+    baseline_m: 0.3
+    pitch_deg: 25.0
+  openvins:
+    fi_max_dist: 300.0
+  lighting:
+    default: {}
+    overcast:
+      sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr
+      sky_intensity: 1200
+  ground_z: 0.0
+  sky_dome: /World/Sky/Dome
+  kit_args:
+  - --/rtx/fog/enabled=true
+  - --/rtx/fog/fogZup/enabled=true
+  - --/rtx/fog/fogHeightDensity=0.0
+  - --/rtx/fog/fogColor=[0.78,0.81,0.85]
+  - --/rtx/fog/fogColorIntensity=1.0
+  - --/rtx/fog/fogStartDist=400
+  - --/rtx/fog/fogEndDist=4000
+  - --/rtx/fog/fogDistanceDensity=0.5
+  usd: build/envs/my_oil_palm/env.usda

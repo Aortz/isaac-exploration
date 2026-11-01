@@ -2,6 +2,42 @@
 
 What changed in this exploration, newest first. Commits are on `main`; the evidence for the test results is in [`demo/`](demo/README.md).
 
+## 2026-11-01: environment builder v2, Singapore / Malaysia / urban / battleground / military scenes
+
+### Environment builder (`envbuild/`)
+- **Procedural terrain** (`envbuild/procedural.py`):
+  - ground material layers per terrain quad, by mask, height and slope (`terrain.layers`);
+  - meandering creeks and valleys at any angle (`channels`), flat-bottomed rivers (`floor_m`), steep trenches (`flat_frac`), a coastline falling into open water (`shore`), contour terraces, shell craters;
+  - a flat water plane (`water`); the heightmap sidecar treats it as the ground for clearance.
+- **Scatter:** planted grids (`layout: grid`, rows can face along the row), walls along a rectangle with a gate (`layout: perimeter`), masks from roads / craters / rectangles, combined masks (`[town, "!street"]`).
+- **Generated assets** (no such assets ship with Isaac):
+  - mangroves: arching prop roots plus a crown borrowed from an existing tree, with the crown's fruit hidden;
+  - battleground and military props (`envbuild/props.py`): ruined buildings, rubble, armoured-vehicle stand-ins, shipping containers, HESCO walls, jersey barriers, sandbags, tents, guard towers, dead trees.
+- **Street-level cities from OpenStreetMap** (`envbuild/osm.py`, `source: osm`): building outlines and storey counts extruded with generated window-grid facades, ear-clipped roofs, road ribbons, park and street trees, colliders, and building / tree boxes for the clearance gate.
+- **Street loop planner** (`envbuild/plan_street_loop.py`): finds a loop around a city block on the road graph, rounds the corners into flyable curves, rejects slivers, checks clearance and prints waypoints.
+- **Previews** (`envbuild/preview.py`): oblique shots from drone heights, to judge a scene before flying it.
+- **Haze:** environments can carry renderer settings (`kit_args`); distance fog hides the terrain edge.
+
+### New environments (each has a P3 loop flight and a test case; none tested yet)
+- **Singapore:** procedural mangrove swamp (Sungei Buloh type); Google tiles over Sungei Buloh, the Central Catchment rainforest and Tampines HDB estates; Tampines street level from OpenStreetMap.
+- **Malaysia:** oil palm estate on terraced hills; lowland rainforest with a river; Google tiles over KLCC and Johor Bahru; Bukit Bintang (KL) and JB city centre street level from OpenStreetMap.
+- **Battleground:** bombed town; trench field with shell craters.
+- **Military:** forward operating base, desert and jungle versions.
+- **Forest valley v2:** summer species only, closed canopy, understory, meadow grass, layered ground, haze.
+
+### Fixes
+- **Warm-up:** environments with slow-loading ground materials settle once before the first frame (`first_warmup_updates`), instead of 400 updates at every warm-up pose. The first swamp case never reached frame 0 because of this.
+- **Timeouts:** `run_case.py` allows a render 6 h (heavy scenes timed out at 2 h and left the render running); flights get 2 h.
+- **Forest v2** was thinned (110k to 43k instances) after its 4-camera render ran out of GPU memory.
+- **Demo:** `package_demo.py` adds environment previews and Google-tile views, and skips videos that are still being written.
+
+### OpenVINS multi-camera finding
+- Four separate mono cameras make OpenVINS non-repeatable on the same recorded bag; one camera is repeatable. The init crash at equal camera timestamps is patched (`ros2/openvins/Dockerfile`). Details: [`docs/experiments/openvins_multicam.md`](docs/experiments/openvins_multicam.md).
+
+### Known issues
+- The test queue for the new environments was stopped. Heavy scenes render the 4-fisheye rig at about 1.4 s per frame and nearly fill the 16 GB GPU. Next: a render benchmark, then a fidelity pass within about 0.3 s per frame.
+- Isaac quirks found: RTX fog's height axis defaults to +Y (a wall of fog across y = 0); deactivated prims inside instancer prototypes still render; Concrete_Rough and Rough_Gravel render near-white.
+
 ## 2026-10-31 (later): test plan, high-fidelity environments, PX4 / ArduPilot, coaxial vehicle
 
 ### Test plan and tooling

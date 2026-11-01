@@ -1,0 +1,7 @@
+# Google photoreal tiles over desert near Barstow, California (Mojave). High-altitude flights only.
+name: mojave
+source: cesium
+tiles: google
+lat: 34.8958
+lon: -117.0173
+height: 650

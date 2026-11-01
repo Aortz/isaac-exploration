@@ -1,0 +1,48 @@
+{
+  "flight": "kl_p3_street",
+  "env": "my_kl_bukit_bintang_osm",
+  "controller": "python",
+  "vehicle": "Iris",
+  "mass_kg": 1.5,
+  "physics_hz": 1000,
+  "setup_s": 3.0,
+  "steps": 155800,
+  "wall_s": 2088.0,
+  "realtime_factor": 0.07,
+  "drag": [
+    0.5,
+    0.3,
+    0.0
+  ],
+  "motor": null,
+  "wind": null,
+  "gains": {
+    "Kp": [
+      10.0,
+      10.0,
+      10.0
+    ],
+    "Kd": [
+      8.5,
+      8.5,
+      8.5
+    ],
+    "Ki": [
+      1.5,
+      1.5,
+      1.5
+    ],
+    "Kr": [
+      3.5,
+      3.5,
+      3.5
+    ],
+    "Kw": [
+      0.5,
+      0.5,
+      0.5
+    ]
+  },
+  "autopilot": null,
+  "pegasus_commit": "fcb99c0 (PegasusSimulator PR #144, Isaac Sim 6.0 port)"
+}

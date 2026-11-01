@@ -1,0 +1,73 @@
+{
+  "flight": "fv_p3_loop",
+  "mode": "lockstep",
+  "ros2": true,
+  "freerun_updates": 1,
+  "frames": 4516,
+  "cameras": [
+    "cam0_front",
+    "cam1_left",
+    "cam2_back",
+    "cam3_right"
+  ],
+  "resolution": [
+    640,
+    480
+  ],
+  "depth": false,
+  "sim_camera_hz": 30,
+  "sim_duration_s": 150.5,
+  "warmup_s": 905.3,
+  "wall_s": 1226.97,
+  "max_fps_cap": 0.0,
+  "wall_frames_per_s": 3.68,
+  "achieved_frames_per_s": 6.92,
+  "achieved_images_per_s": 27.67,
+  "realtime_factor": 0.231,
+  "image_lag_frames_compensated": 0,
+  "renderer_updates_per_frame": {
+    "mean": 4.0,
+    "max": 4
+  },
+  "unsettled_frames": 0,
+  "imu_messages": 30101,
+  "timing": {
+    "pose": {
+      "mean_ms": 1.26,
+      "p50_ms": 1.23,
+      "p95_ms": 1.45,
+      "max_ms": 2.84
+    },
+    "render": {
+      "mean_ms": 133.12,
+      "p50_ms": 133.0,
+      "p95_ms": 149.62,
+      "max_ms": 279.39
+    },
+    "readback": {
+      "mean_ms": 7.47,
+      "p50_ms": 7.13,
+      "p95_ms": 10.36,
+      "max_ms": 331.59
+    },
+    "publish": {
+      "mean_ms": 2.7,
+      "p50_ms": 2.65,
+      "p95_ms": 3.35,
+      "max_ms": 5.73
+    },
+    "frame": {
+      "mean_ms": 144.55,
+      "p50_ms": 144.37,
+      "p95_ms": 161.05,
+      "max_ms": 614.37
+    }
+  },
+  "look": {
+    "variant": "default",
+    "dome": "/World/Sky/Dome",
+    "texture": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/NVIDIA/Assets/Skies/Cloudy/champagne_castle_1_4k.hdr",
+    "intensity": 1000.0
+  },
+  "note": "achieved_* = frames / summed frame time (pose + render + readback + publish), i.e. the uncapped rate; wall_frames_per_s includes the cap's sleeps and image saving"
+}

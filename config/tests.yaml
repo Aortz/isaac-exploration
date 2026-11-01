@@ -43,4 +43,22 @@ cases:
   - {id: TC-E2-P2, flight: nx_p2_slow, profile: P2}
   - {id: TC-E2-P3, flight: nx_p3_nominal, profile: P3}
   - {id: TC-E1-P3-px4, flight: rm_p3_px4, profile: P3}     # PX4 + motor lag + wind/gusts
+  - {id: TC-EF-P3, flight: fv_p3_loop, profile: P3}         # envbuild forest_valley
+  - {id: TC-ED-P3, flight: dd_p3_loop, profile: P3}         # envbuild desert_dunes (low texture)
+  - {id: TC-EF2-P3, flight: fv2_p3_loop, profile: P3}       # envbuild forest_valley_v2 (denser, layered ground, haze)
+  - {id: TC-SG-P3, flight: sg_p3_loop, profile: P3}         # envbuild sg_mangrove (procedural Singapore mangrove)
+  - {id: TC-SB-P3, flight: sb_p3_loop, profile: P3}         # Google 3D tiles: Sungei Buloh wetland, Singapore
+  - {id: TC-CC-P3, flight: cc_p3_loop, profile: P3}         # Google 3D tiles: Central Catchment rainforest, Singapore
+  - {id: TC-TS-P3, flight: ts_p3_street, profile: P3}  # OSM street level: Tampines HDB estate, Singapore
+  - {id: TC-KL-P3, flight: kl_p3_street, profile: P3}  # OSM street level: Bukit Bintang, Kuala Lumpur
+  - {id: TC-JB-P3, flight: jb_p3_street, profile: P3}  # OSM street level: Johor Bahru city centre
+  - {id: TC-OP-P3, flight: op_p3_loop, profile: P3}  # envbuild my_oil_palm (Malaysian oil palm estate)
+  - {id: TC-RF-P3, flight: rf_p3_loop, profile: P3}  # envbuild my_rainforest (Malaysian rainforest + river)
+  - {id: TC-BT-P3, flight: bt_p3_loop, profile: P3}  # envbuild bg_ruined_town (battleground: bombed town)
+  - {id: TC-TF-P3, flight: tf_p3_loop, profile: P3}  # envbuild bg_trench_field (battleground: trenches + craters)
+  - {id: TC-FD-P3, flight: fd_p3_loop, profile: P3}  # envbuild mil_fob_desert (military base, desert)
+  - {id: TC-FT-P3, flight: ft_p3_loop, profile: P3}  # envbuild mil_fob_tropical (military base, jungle)
+  - {id: TC-KLT-P3, flight: klt_p3_loop, profile: P3} # Google 3D tiles: Kuala Lumpur KLCC
+  - {id: TC-JBT-P3, flight: jbt_p3_loop, profile: P3} # Google 3D tiles: Johor Bahru
+  - {id: TC-TPT-P3, flight: tpt_p3_loop, profile: P3} # Google 3D tiles: Tampines HDB, Singapore
   - {id: TC-REG, flight: marina_bay_loop_pegasus, profile: REG}

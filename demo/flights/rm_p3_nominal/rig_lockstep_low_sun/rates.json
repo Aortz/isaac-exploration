@@ -1,0 +1,73 @@
+{
+  "flight": "rm_p3_nominal",
+  "mode": "lockstep",
+  "ros2": true,
+  "freerun_updates": 1,
+  "frames": 3259,
+  "cameras": [
+    "cam0_front",
+    "cam1_left",
+    "cam2_back",
+    "cam3_right"
+  ],
+  "resolution": [
+    640,
+    480
+  ],
+  "depth": false,
+  "sim_camera_hz": 30,
+  "sim_duration_s": 108.6,
+  "warmup_s": 325.7,
+  "wall_s": 609.14,
+  "max_fps_cap": 0.0,
+  "wall_frames_per_s": 5.35,
+  "achieved_frames_per_s": 15.22,
+  "achieved_images_per_s": 60.86,
+  "realtime_factor": 0.507,
+  "image_lag_frames_compensated": 0,
+  "renderer_updates_per_frame": {
+    "mean": 4.0,
+    "max": 4
+  },
+  "unsettled_frames": 0,
+  "imu_messages": 21721,
+  "timing": {
+    "pose": {
+      "mean_ms": 1.24,
+      "p50_ms": 1.18,
+      "p95_ms": 1.39,
+      "max_ms": 16.51
+    },
+    "render": {
+      "mean_ms": 56.19,
+      "p50_ms": 49.43,
+      "p95_ms": 73.19,
+      "max_ms": 575.35
+    },
+    "readback": {
+      "mean_ms": 5.54,
+      "p50_ms": 5.47,
+      "p95_ms": 6.45,
+      "max_ms": 59.36
+    },
+    "publish": {
+      "mean_ms": 2.74,
+      "p50_ms": 2.53,
+      "p95_ms": 3.31,
+      "max_ms": 29.7
+    },
+    "frame": {
+      "mean_ms": 65.72,
+      "p50_ms": 58.64,
+      "p95_ms": 82.66,
+      "max_ms": 624.0
+    }
+  },
+  "look": {
+    "variant": "low_sun",
+    "dome": "/World/main/Sky",
+    "texture": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/NVIDIA/Assets/Skies/Clear/venice_sunset_4k.hdr",
+    "intensity": 1000.0
+  },
+  "note": "achieved_* = frames / summed frame time (pose + render + readback + publish), i.e. the uncapped rate; wall_frames_per_s includes the cap's sleeps and image saving"
+}

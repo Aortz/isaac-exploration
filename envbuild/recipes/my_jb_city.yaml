@@ -1,0 +1,8 @@
+# Google photoreal 3D tiles over Johor Bahru city centre, Malaysia: mid-rise blocks, the CIQ causeway
+# approach and the Strait. Overflight urban ops.
+name: my_jb_city
+source: cesium
+tiles: google
+lat: 1.4600
+lon: 103.7634
+height: 17.0           # ellipsoidal: ~10 m above sea level + ~7 m geoid

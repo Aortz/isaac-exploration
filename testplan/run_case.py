@@ -42,7 +42,7 @@ def log(msg: str) -> None:
     print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
 
 
-def sh(cmd: str, logfile: Path, timeout: float = 7200) -> int:
+def sh(cmd: str, logfile: Path, timeout: float = 6 * 3600) -> int:   # heavy scenes render ~1.5 s per frame
     with open(logfile, "a") as f:
         return subprocess.run(["bash", "-c", cmd], cwd=PROJECT_ROOT, stdout=f, stderr=subprocess.STDOUT,
                               timeout=timeout).returncode
@@ -120,6 +120,8 @@ def main() -> None:
     ap.add_argument("--case", required=True)
     ap.add_argument("--steps", default="flight,vio,stereo,clean")
     ap.add_argument("--seeds", type=int, nargs="*", help="override vio_seeds")
+    ap.add_argument("--gui", action="store_true",
+                    help="open the Isaac window for the renders (single cases; each render needs ~8.5 GB of GPU memory)")
     args = ap.parse_args()
     steps = set(args.steps.split(","))
     tcfg = load_config(PROJECT_ROOT / "config" / "tests.yaml")
@@ -166,12 +168,15 @@ def main() -> None:
 
     gt = load_gt(fdir / "groundtruth_200hz.csv")
     seeds = args.seeds if args.seeds is not None else tcfg["vio_seeds"]
-    if "vio" in steps:
+    replay_only = "vioreplay" in steps          # re-run OpenVINS from the recorded bag (no render)
+    if "vio" in steps or replay_only:
         cfg_name = f"tc_{flight}"
         fi = (env or {}).get("openvins", {}).get("fi_max_dist", 1500.0)
         sh(f"uv run python ros2/openvins/make_config.py --flight {flight} --name {cfg_name} --fi-max-dist {fi}", caselog)
         bag = out / f"bag{suffix}"
-        if bag.exists():
+        if replay_only and not bag.exists():
+            raise SystemExit(f"no bag at {bag}: run the vio step first")
+        if bag.exists() and not replay_only:
             shutil.rmtree(bag)
         for i, seed in enumerate(seeds):
             run = out / f"vio{suffix}_s{seed}"
@@ -182,16 +187,16 @@ def main() -> None:
             if not wait_for(run / "openvins.log", "subscribing to cam", 120):
                 docker_stop("openvins", ov)
                 raise SystemExit("OpenVINS did not start")
-            if i == 0:
+            if i == 0 and not replay_only:
                 rec = bg(f"ros2/bag/record.sh {bag}", out / "bag_record.log")
                 time.sleep(5)
                 log(f"VIO seed {seed}: live render + bag")
-                light = f"--lighting {lighting}" if lighting != "default" else ""
+                light = (f"--lighting {lighting}" if lighting != "default" else "") + (" --gui" if args.gui else "")
                 rc = sh(rig_cmd(flight, f"--ros2 --save-all {light}", cesium), out / f"render_fisheye{suffix}.log")
                 time.sleep(3)
                 docker_stop("rosbag", rec)
             else:
-                imu_csv = fdir / f"imu_seed{seed}.csv"
+                imu_csv = fdir / ("imu.csv" if i == 0 else f"imu_seed{seed}.csv")   # seed 0 = the live stream
                 log(f"VIO seed {seed}: bag replay with {imu_csv.name}")
                 rc = sh(f"ros2/bag/replay.sh {bag} --imu-csv {imu_csv} --rate {tcfg['replay_rate']}",
                         run / "replay.log")
@@ -199,6 +204,8 @@ def main() -> None:
             docker_stop("openvins", ov)
             est = run / "ov_estimate.txt"
             row = {**base, "sut": "openvins", "run": f"s{seed}" + ("_live" if i == 0 else "_replay")}
+            if replay_only:
+                row["notes"] = "replayed from bag"
             n_est = sum(1 for line in open(est) if line.strip() and not line.startswith("#")) if est.exists() else 0
             if rc != 0 or n_est < 10:
                 append_row({**row, "status": f"error rc={rc}", "verdict": "FAIL", "notes": "no estimate"})
@@ -227,7 +234,7 @@ def main() -> None:
 
     if "stereo" in steps:
         log("stereo render")
-        light = f"--lighting {lighting}" if lighting != "default" else ""
+        light = (f"--lighting {lighting}" if lighting != "default" else "") + (" --gui" if args.gui else "")
         sh(rig_cmd(flight, f"--stereo --save-all {light}", cesium), out / f"render_stereo{suffix}.log")
         state["g1_stereo"] = gates.g1(flight, stereo_run, stereo=True)
         state["g1_stereo"]["pass"] = bool((state["g1_stereo"]["median_px"] or 9) <= th["gates"]["g1_median_px"])

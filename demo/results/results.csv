@@ -27,3 +27,86 @@ TC-E1-P5,P5,rivermark,rm_p5_lowtex,default,macvo,fast,ok,476.8517,8.4269,1.7672,
 TC-E1-P6,P6,rivermark,rm_p6_close,default,openvins,s7_live,ok,78.12,26.5876,34.0343,28.4458,36.413,154.6614,69.9569,100.4757,16.1667,FAIL,diverged
 TC-E1-P6,P6,rivermark,rm_p6_close,default,openvins,s101_replay,ok,78.12,26.5755,34.0188,28.4288,36.3912,145.9244,1244.6135,100.4901,16.1667,FAIL,diverged
 TC-E1-P6,P6,rivermark,rm_p6_close,default,openvins,s102_replay,ok,78.12,26.5781,34.0221,28.4365,36.401,140.1853,1359.1358,100.481,16.1667,FAIL,diverged
+TC-E1-P6,P6,rivermark,rm_p6_close,default,macvo,fast,ok,85.159,0.4932,0.5791,0.7749,0.9099,94.292,1.0136,3.4392,0.0,report,rot
+TC-E1-P7-low_sun,P7,rivermark,rm_p3_nominal,low_sun,openvins,s7_live,ok,500.0708,40.7165,8.1421,82.1702,16.4317,6.9571,0.6784,45.2332,4.1667,report,"ate,drift,rot"
+TC-E1-P7-low_sun,P7,rivermark,rm_p3_nominal,low_sun,openvins,s101_replay,ok,500.0708,34.4179,6.8826,62.7935,12.5569,5.533,0.7159,37.5281,4.1667,report,"ate,drift,rot"
+TC-E1-P7-low_sun,P7,rivermark,rm_p3_nominal,low_sun,openvins,s102_replay,ok,500.0708,60.0005,11.9984,61.7137,12.341,33.3826,0.8797,76.1996,4.1667,FAIL,diverged
+TC-E1-P7-low_sun,P7,rivermark,rm_p3_nominal,low_sun,macvo,fast,ok,500.1208,3.9322,0.7862,7.5136,1.5024,5.3544,1.0199,4.3028,0.0,report,"rot,G4"
+TC-E1-P7-overcast,P7,rivermark,rm_p3_nominal,overcast,openvins,s7_live,ok,500.0713,49.8686,9.9723,94.4885,18.895,7.3788,0.6228,57.3544,4.1333,report,"ate,drift,rot"
+TC-E1-P7-overcast,P7,rivermark,rm_p3_nominal,overcast,openvins,s101_replay,ok,500.0708,46.1516,9.229,85.624,17.1224,6.4856,0.6415,53.1138,4.1667,report,"ate,drift,rot"
+TC-E1-P7-overcast,P7,rivermark,rm_p3_nominal,overcast,openvins,s102_replay,ok,500.0708,35.3918,7.0774,69.1427,13.8266,5.6852,0.706,41.4879,4.1667,report,"ate,drift,rot"
+TC-E1-P7-overcast,P7,rivermark,rm_p3_nominal,overcast,macvo,fast,ok,500.1208,2.8805,0.576,5.5917,1.1181,3.0364,1.0076,3.4113,0.0,report,"rot,G4"
+TC-E2-P1,P1,nurec_xgrid_wormhole,nx_p1_hover,default,openvins,s7_live,ok,0.1395,0.7044,,1.2314,,0.8627,0.0071,,6.0667,report,no path length (hover)
+TC-E2-P1,P1,nurec_xgrid_wormhole,nx_p1_hover,default,openvins,s101_replay,ok,0.1395,2.7359,,6.5403,,0.7158,0.0015,,6.0667,report,no path length (hover)
+TC-E2-P1,P1,nurec_xgrid_wormhole,nx_p1_hover,default,openvins,s102_replay,ok,0.1395,3.9261,,11.6427,,0.8961,0.0009,,6.0667,report,no path length (hover)
+TC-E2-P1,P1,nurec_xgrid_wormhole,nx_p1_hover,default,macvo,fast,ok,0.2027,0.0665,,0.0581,,0.8024,0.2272,,0.0,report,no path length (hover)
+TC-E2-P2,P2,nurec_xgrid_wormhole,nx_p2_slow,default,openvins,s7_live,ok,32.1389,3.5284,10.9786,1.4721,4.5804,1.745,0.408,67.0422,4.1667,FAIL,diverged
+TC-E2-P2,P2,nurec_xgrid_wormhole,nx_p2_slow,default,openvins,s101_replay,ok,32.1377,3.1313,9.7433,0.9014,2.8048,1.7701,0.4407,60.8913,4.2,FAIL,"ate,drift"
+TC-E2-P2,P2,nurec_xgrid_wormhole,nx_p2_slow,default,openvins,s102_replay,ok,32.1377,3.5118,10.9274,1.4806,4.6071,1.7533,0.4094,67.1962,4.2,FAIL,diverged
+TC-E2-P2,P2,nurec_xgrid_wormhole,nx_p2_slow,default,macvo,fast,ok,32.1879,0.2199,0.683,0.3649,1.1338,3.1694,0.9715,2.979,0.0,FAIL,rot
+TC-E2-P3,P3,nurec_xgrid_wormhole,nx_p3_nominal,default,openvins,s7_live,ok,70.3397,6.3501,9.0277,4.9492,7.0361,3.0463,0.3625,121.3211,4.1333,FAIL,"ate,drift,rot"
+TC-E2-P3,P3,nurec_xgrid_wormhole,nx_p3_nominal,default,openvins,s101_replay,ok,70.3375,6.2728,8.9182,5.5967,7.9569,3.181,0.3656,119.1955,4.1667,FAIL,"ate,drift,rot"
+TC-E2-P3,P3,nurec_xgrid_wormhole,nx_p3_nominal,default,openvins,s102_replay,ok,70.3375,6.372,9.0592,5.4481,7.7457,3.0638,0.3621,121.523,4.1667,FAIL,"ate,drift,rot"
+TC-E2-P3,P3,nurec_xgrid_wormhole,nx_p3_nominal,default,macvo,fast,ok,70.3892,0.3917,0.5565,0.7639,1.0852,3.9618,0.9731,2.5196,0.0,FAIL,rot
+TC-REG,REG,marina_bay,marina_bay_loop_pegasus,default,openvins,s7_live,ok,846.4157,170.6968,20.167,102.2779,12.0836,9.5349,0.38,131.2787,4.2,FAIL,diverged
+TC-REG,REG,marina_bay,marina_bay_loop_pegasus,default,openvins,s101_replay,error rc=1,,,,,,,,,,FAIL,no estimate
+TC-REG,REG,marina_bay,marina_bay_loop_pegasus,default,openvins,s102_replay,error rc=1,,,,,,,,,,FAIL,no estimate
+TC-REG,REG,marina_bay,marina_bay_loop_pegasus,default,macvo,fast,ok,846.4643,8.9657,1.0592,15.8016,1.8668,5.4093,0.9732,10.2887,0.0,report,"rot,G4"
+TC-E1-P6,P6,rivermark,rm_p6_close,default,openvins,s101_replay,ok,78.12,26.5755,34.0188,28.4288,36.3912,145.9244,1244.6135,100.4901,16.1667,FAIL,diverged (rescored)
+TC-E1-P6,P6,rivermark,rm_p6_close,default,openvins,s102_replay,ok,78.12,26.5781,34.0221,28.4365,36.401,140.1853,1359.1358,100.481,16.1667,FAIL,diverged (rescored)
+TC-E1-P6,P6,rivermark,rm_p6_close,default,openvins,s7_live,ok,78.12,26.5876,34.0343,28.4458,36.413,154.6614,69.9569,100.4757,16.1667,FAIL,diverged (rescored)
+TC-E1-P6,P6,rivermark,rm_p6_close,default,macvo,fast,ok,85.159,0.7752,0.9103,1.2238,1.4371,0.7592,1.0136,3.4392,0.0,report,(rescored)
+TC-E1-P1,P1,rivermark,rm_p1_hover,default,openvins,s101_replay,ok,0.164,0.2626,,0.0996,,1.6303,0.0273,,3.6333,report,no path length (hover) (rescored)
+TC-E1-P1,P1,rivermark,rm_p1_hover,default,openvins,s102_replay,ok,0.1636,3.3532,,1.0843,,0.6859,0.0025,,3.6667,report,no path length (hover) (rescored)
+TC-E1-P1,P1,rivermark,rm_p1_hover,default,openvins,s7_live,ok,0.1447,4.5827,,11.0451,,0.965,0.0009,,6.0333,report,no path length (hover) (rescored)
+TC-E1-P1,P1,rivermark,rm_p1_hover,default,macvo,fast,ok,0.2078,0.3771,,0.405,,0.6901,0.0288,,0.0,report,"no path length (hover),G4 (rescored)"
+TC-E1-P2,P2,rivermark,rm_p2_slow,default,openvins,s101_replay,ok,159.244,53.2058,33.4115,105.6962,66.3737,10.9067,0.3115,183.4547,2.2333,FAIL,diverged (rescored)
+TC-E1-P2,P2,rivermark,rm_p2_slow,default,openvins,s102_replay,ok,132.9074,28.2583,21.2616,93.6163,70.4372,39.572,0.4455,109.392,19.2333,FAIL,diverged (rescored)
+TC-E1-P2,P2,rivermark,rm_p2_slow,default,openvins,s7_live,ok,132.6563,16.987,12.8052,46.0444,34.7096,25.977,0.699,63.6817,19.3667,FAIL,diverged (rescored)
+TC-E1-P2,P2,rivermark,rm_p2_slow,default,macvo,fast,ok,159.273,1.5811,0.9927,3.3331,2.0927,4.3481,1.0334,5.3352,0.0,FAIL,"rot,G4 (rescored)"
+TC-E1-P3,P3,rivermark,rm_p3_nominal,default,openvins,s101_replay,ok,500.0713,108.2676,21.6504,199.6012,39.9146,9.8944,0.4127,121.5488,4.1333,FAIL,diverged (rescored)
+TC-E1-P3,P3,rivermark,rm_p3_nominal,default,openvins,s102_replay,ok,500.0713,19.2515,3.8497,46.1641,9.2315,3.8611,0.8281,22.8926,4.1333,FAIL,"ate,drift,rot (rescored)"
+TC-E1-P3,P3,rivermark,rm_p3_nominal,default,openvins,s7_live,ok,500.0713,63.7516,12.7485,119.141,23.8248,7.7841,0.5551,73.013,4.1333,FAIL,diverged (rescored)
+TC-E1-P3,P3,rivermark,rm_p3_nominal,default,macvo,fast,ok,500.1208,3.7338,0.7466,7.6512,1.5299,3.2559,1.0193,3.5387,0.0,FAIL,"rot,G4 (rescored)"
+TC-E1-P4,P4,rivermark,rm_p4_aggressive,default,openvins,s101_replay,ok,606.4588,1.2297,0.2028,1.479,0.2439,0.8106,0.9923,6.066,4.1333,report,(rescored)
+TC-E1-P4,P4,rivermark,rm_p4_aggressive,default,openvins,s102_replay,ok,606.4588,1.1682,0.1926,2.0075,0.331,0.8206,0.9948,5.9861,4.1333,report,(rescored)
+TC-E1-P4,P4,rivermark,rm_p4_aggressive,default,openvins,s7_live,ok,606.4597,1.073,0.1769,1.5747,0.2596,0.8024,0.9902,4.2588,4.1,report,(rescored)
+TC-E1-P4,P4,rivermark,rm_p4_aggressive,default,macvo,fast,ok,606.5088,1.1192,0.1845,0.6449,0.1063,1.3784,0.9966,2.6293,0.0,report,G4 (rescored)
+TC-E1-P5,P5,rivermark,rm_p5_lowtex,default,openvins,s101_replay,ok,456.098,160.6919,35.2319,478.2964,104.867,25.4543,0.2796,171.7755,14.4,FAIL,diverged (rescored)
+TC-E1-P5,P5,rivermark,rm_p5_lowtex,default,openvins,s102_replay,ok,456.098,126.1522,27.659,368.2243,80.7336,24.9539,0.3409,135.6807,14.4,FAIL,diverged (rescored)
+TC-E1-P5,P5,rivermark,rm_p5_lowtex,default,openvins,s7_live,ok,456.098,3195.8866,700.7017,6874.8452,1507.3175,82.9085,0.0147,2765.3706,14.4,FAIL,diverged (rescored)
+TC-E1-P5,P5,rivermark,rm_p5_lowtex,default,macvo,fast,ok,476.8517,8.4269,1.7672,17.2741,3.6225,5.0547,1.0367,2.9404,0.0,report,"drift,rot (rescored)"
+TC-E1-P7-low_sun,P7,rivermark,rm_p3_nominal,low_sun,openvins,s101_replay,ok,500.0708,34.4179,6.8826,62.7935,12.5569,5.533,0.7159,37.5281,4.1667,report,"ate,drift,rot (rescored)"
+TC-E1-P7-low_sun,P7,rivermark,rm_p3_nominal,low_sun,openvins,s102_replay,ok,500.0708,60.0005,11.9984,61.7137,12.341,33.3826,0.8797,76.1996,4.1667,FAIL,diverged (rescored)
+TC-E1-P7-low_sun,P7,rivermark,rm_p3_nominal,low_sun,openvins,s7_live,ok,500.0708,40.7165,8.1421,82.1702,16.4317,6.9571,0.6784,45.2332,4.1667,report,"ate,drift,rot (rescored)"
+TC-E1-P7-low_sun,P7,rivermark,rm_p3_nominal,low_sun,macvo,fast,ok,500.1208,3.9322,0.7862,7.5136,1.5024,5.3544,1.0199,4.3028,0.0,report,"rot,G4 (rescored)"
+TC-E1-P7-overcast,P7,rivermark,rm_p3_nominal,overcast,openvins,s101_replay,ok,500.0708,46.1516,9.229,85.624,17.1224,6.4856,0.6415,53.1138,4.1667,report,"ate,drift,rot (rescored)"
+TC-E1-P7-overcast,P7,rivermark,rm_p3_nominal,overcast,openvins,s102_replay,ok,500.0708,35.3918,7.0774,69.1427,13.8266,5.6852,0.706,41.4879,4.1667,report,"ate,drift,rot (rescored)"
+TC-E1-P7-overcast,P7,rivermark,rm_p3_nominal,overcast,openvins,s7_live,ok,500.0713,49.8686,9.9723,94.4885,18.895,7.3788,0.6228,57.3544,4.1333,report,"ate,drift,rot (rescored)"
+TC-E1-P7-overcast,P7,rivermark,rm_p3_nominal,overcast,macvo,fast,ok,500.1208,2.8805,0.576,5.5917,1.1181,3.0364,1.0076,3.4113,0.0,report,"rot,G4 (rescored)"
+TC-E2-P1,P1,nurec_xgrid_wormhole,nx_p1_hover,default,openvins,s101_replay,ok,0.1395,2.7359,,6.5403,,0.7158,0.0015,,6.0667,report,no path length (hover) (rescored)
+TC-E2-P1,P1,nurec_xgrid_wormhole,nx_p1_hover,default,openvins,s102_replay,ok,0.1395,3.9261,,11.6427,,0.8961,0.0009,,6.0667,report,no path length (hover) (rescored)
+TC-E2-P1,P1,nurec_xgrid_wormhole,nx_p1_hover,default,openvins,s7_live,ok,0.1395,0.7044,,1.2314,,0.8627,0.0071,,6.0667,report,no path length (hover) (rescored)
+TC-E2-P1,P1,nurec_xgrid_wormhole,nx_p1_hover,default,macvo,fast,ok,0.2027,0.0665,,0.0581,,0.8024,0.2272,,0.0,report,no path length (hover) (rescored)
+TC-E2-P2,P2,nurec_xgrid_wormhole,nx_p2_slow,default,openvins,s101_replay,ok,32.1377,3.1313,9.7433,0.9014,2.8048,1.7701,0.4407,60.8913,4.2,FAIL,"ate,drift (rescored)"
+TC-E2-P2,P2,nurec_xgrid_wormhole,nx_p2_slow,default,openvins,s102_replay,ok,32.1377,3.5118,10.9274,1.4806,4.6071,1.7533,0.4094,67.1962,4.2,FAIL,diverged (rescored)
+TC-E2-P2,P2,nurec_xgrid_wormhole,nx_p2_slow,default,openvins,s7_live,ok,32.1389,3.5284,10.9786,1.4721,4.5804,1.745,0.408,67.0422,4.1667,FAIL,diverged (rescored)
+TC-E2-P2,P2,nurec_xgrid_wormhole,nx_p2_slow,default,macvo,fast,ok,32.1879,0.2199,0.683,0.3649,1.1338,3.1694,0.9715,2.979,0.0,FAIL,rot (rescored)
+TC-E2-P3,P3,nurec_xgrid_wormhole,nx_p3_nominal,default,openvins,s101_replay,ok,70.3375,6.2728,8.9182,5.5967,7.9569,3.181,0.3656,119.1955,4.1667,FAIL,"ate,drift,rot (rescored)"
+TC-E2-P3,P3,nurec_xgrid_wormhole,nx_p3_nominal,default,openvins,s102_replay,ok,70.3375,6.372,9.0592,5.4481,7.7457,3.0638,0.3621,121.523,4.1667,FAIL,"ate,drift,rot (rescored)"
+TC-E2-P3,P3,nurec_xgrid_wormhole,nx_p3_nominal,default,openvins,s7_live,ok,70.3397,6.3501,9.0277,4.9492,7.0361,3.0463,0.3625,121.3211,4.1333,FAIL,"ate,drift,rot (rescored)"
+TC-E2-P3,P3,nurec_xgrid_wormhole,nx_p3_nominal,default,macvo,fast,ok,70.3892,0.3917,0.5565,0.7639,1.0852,3.9618,0.9731,2.5196,0.0,FAIL,rot (rescored)
+TC-REG,REG,marina_bay,marina_bay_loop_pegasus,default,openvins,s7_live,ok,846.4157,170.6968,20.167,102.2779,12.0836,9.5349,0.38,131.2787,4.2,FAIL,diverged (rescored)
+TC-REG,REG,marina_bay,marina_bay_loop_pegasus,default,macvo,fast,ok,846.4643,8.9657,1.0592,15.8016,1.8668,5.4093,0.9732,10.2887,0.0,report,"rot,G4 (rescored)"
+TC-E1-P3-px4,P3,rivermark,rm_p3_px4,default,openvins,s7_live,ok,501.7058,77.065,15.3606,86.0868,17.1588,28.6056,13.4474,99.7941,4.2667,FAIL,diverged
+TC-E1-P3-px4,P3,rivermark,rm_p3_px4,default,openvins,s101_replay,ok,501.5818,75.0304,14.9588,89.5878,17.8611,5.5452,20.983,97.0696,4.3,FAIL,diverged
+TC-E1-P3-px4,P3,rivermark,rm_p3_px4,default,openvins,s102_replay,ok,501.7008,75.5056,15.0499,88.755,17.6908,5.8837,23.9741,97.5406,4.3,FAIL,diverged
+TC-E1-P3-px4,P3,rivermark,rm_p3_px4,default,macvo,fast,ok,502.1674,4.8781,0.9714,10.4219,2.0754,4.107,1.0237,3.6582,0.0,FAIL,"rot,G4"
+TC-EF-P3,P3,forest_valley,fv_p3_loop,default,openvins,s7_live,ok,704.5874,28.1576,3.9963,15.8293,2.2466,3.3621,1.3009,26.7629,4.3,FAIL,"ate,drift,rot"
+TC-EF-P3,P3,forest_valley,fv_p3_loop,default,openvins,s101_replay,ok,704.5861,94.6161,13.4286,6.2097,0.8813,39.9134,1.5831,86.9033,4.3333,FAIL,diverged
+TC-EF-P3,P3,forest_valley,fv_p3_loop,default,openvins,s102_replay,ok,704.5861,89.5255,12.7061,196.5945,27.9021,10.4767,0.5625,70.8275,4.3333,FAIL,diverged
+TC-EF-P3,P3,forest_valley,fv_p3_loop,default,macvo,fast,ok,704.6365,3.5451,0.5031,6.7737,0.9613,3.1345,1.0009,6.0564,0.0,FAIL,"rot,G4"
+TC-ED-P3,P3,desert_dunes,dd_p3_loop,default,openvins,s7_live,ok,753.5245,10346.1944,1373.0403,21404.6915,2840.61,31.2464,0.007,5142.9003,9.7667,FAIL,diverged
+TC-ED-P3,P3,desert_dunes,dd_p3_loop,default,openvins,s101_replay,ok,753.1436,159.051,21.1183,453.4421,60.2066,34.201,0.3725,127.5523,9.8333,FAIL,diverged
+TC-ED-P3,P3,desert_dunes,dd_p3_loop,default,openvins,s102_replay,ok,753.1436,5152.7204,684.1618,12734.152,1690.8001,51.0234,0.0148,2904.7194,9.8333,FAIL,diverged
+TC-ED-P3,P3,desert_dunes,dd_p3_loop,default,macvo,fast,ok,767.0386,30.0492,3.9176,64.1499,8.3633,24.0784,1.0736,12.5821,0.0,FAIL,"ate,drift,rot,scale,G4"

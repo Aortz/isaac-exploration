@@ -1,0 +1,8 @@
+# Google photoreal 3D tiles over Tampines, Singapore: HDB public-housing slab and point blocks,
+# multi-storey car parks, void decks and estate roads. Overflight urban ops.
+name: sg_tampines_hdb
+source: cesium
+tiles: google
+lat: 1.3530
+lon: 103.9440
+height: 22.0           # ellipsoidal: ~15 m above sea level + ~7 m geoid

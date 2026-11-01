@@ -1,0 +1,176 @@
+{
+  "case": {
+    "id": "TC-E1-P7-overcast",
+    "flight": "rm_p3_nominal",
+    "profile": "P7",
+    "lighting": "overcast"
+  },
+  "g3": {
+    "track_rms_m": 0.11561256958047536,
+    "imu_drift_m": 0.2344514522020061,
+    "imu_drift_whole_flight_m": 0.2344514522020061,
+    "dynamics": "pegasus",
+    "clearance": {
+      "flight": "rm_p3_nominal",
+      "source": "flown",
+      "method": "aabb",
+      "min_clearance_m": 9.14,
+      "at_t_s": 92.11,
+      "at_xyz": [
+        175.2,
+        127.7,
+        40.0
+      ],
+      "nearest_box_lo": [
+        159.5,
+        114.1,
+        26.8
+      ],
+      "nearest_box_hi": [
+        208.1,
+        167.5,
+        30.8
+      ],
+      "p5_clearance_m": 9.15
+    },
+    "pass": true
+  },
+  "vio": {
+    "7": {
+      "poses": 3134,
+      "t_first_s": 4.13333,
+      "t_last_s": 108.56667,
+      "path_m": 500.0712628904014,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 49.8685827430258,
+      "ate_max_m": 94.77905807431031,
+      "final_err_m": 94.48852517445214,
+      "rot_rmse_deg": 7.378783720293373,
+      "rpe10": {
+        "segments": 2932,
+        "seg_m": 10.0,
+        "rmse_m": 5.7354379272713,
+        "rmse_pct": 57.354379272713004
+      },
+      "ate_pct": 9.972295239439763,
+      "final_pct": 18.89501200855063,
+      "scale_sim3": 0.6227884915014621
+    },
+    "101": {
+      "poses": 3133,
+      "t_first_s": 4.16667,
+      "t_last_s": 108.56667,
+      "path_m": 500.07081621395946,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 46.15159950978575,
+      "ate_max_m": 86.53583204208596,
+      "final_err_m": 85.62395465337951,
+      "rot_rmse_deg": 6.485615526058942,
+      "rpe10": {
+        "segments": 2931,
+        "seg_m": 10.0,
+        "rmse_m": 5.311375992354877,
+        "rmse_pct": 53.11375992354878
+      },
+      "ate_pct": 9.229012774470606,
+      "final_pct": 17.122365848429073,
+      "scale_sim3": 0.641516569309478
+    },
+    "102": {
+      "poses": 3133,
+      "t_first_s": 4.16667,
+      "t_last_s": 108.56667,
+      "path_m": 500.07081621395946,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 35.391833187861316,
+      "ate_max_m": 69.14269131886131,
+      "final_err_m": 69.14269131886131,
+      "rot_rmse_deg": 5.685215921196243,
+      "rpe10": {
+        "segments": 2931,
+        "seg_m": 10.0,
+        "rmse_m": 4.14879429584531,
+        "rmse_pct": 41.4879429584531
+      },
+      "ate_pct": 7.077364253289804,
+      "final_pct": 13.826579971681056,
+      "scale_sim3": 0.7059982176037994
+    }
+  },
+  "vio_seed_spread": {
+    "ates": [
+      49.8685827430258,
+      46.15159950978575,
+      35.391833187861316
+    ],
+    "std_over_mean": 0.14014264791456676,
+    "pass": true
+  },
+  "g1_fisheye": {
+    "gate": "g1",
+    "flight": "rm_p3_nominal",
+    "run": "rig_lockstep_overcast",
+    "frames": 3259,
+    "triangulated": 67,
+    "rotation_only": 6,
+    "tracks": 54997,
+    "median_px": 0.07566422754113275,
+    "p90_px": 0.4825485320184205,
+    "per_camera_median_px": {
+      "cam0_front": 0.07816539511065207,
+      "cam1_left": 0.07123821358223266,
+      "cam2_back": 0.07394763937579579,
+      "cam3_right": 0.07942251935840176
+    },
+    "pass": true
+  },
+  "g1_stereo": {
+    "gate": "g1",
+    "flight": "rm_p3_nominal",
+    "run": "rig_lockstep_stereo_overcast",
+    "frames": 3259,
+    "triangulated": 67,
+    "rotation_only": 6,
+    "tracks": 11425,
+    "median_px": 0.07643442512639735,
+    "p90_px": 0.1941996261051778,
+    "per_camera_median_px": {
+      "left": 0.07643442512639735
+    },
+    "pass": true
+  },
+  "g4": {
+    "gate": "g4",
+    "flight": "rm_p3_nominal",
+    "run": "rig_lockstep_stereo_overcast",
+    "samples": 42234,
+    "median_px": 1.0337982177734375,
+    "p10_px": 0.00079345703125,
+    "p90_px": 2.5475109100341804,
+    "pass": false
+  },
+  "macvo": {
+    "poses": 3259,
+    "t_first_s": 0.0,
+    "t_last_s": 108.6,
+    "path_m": 500.1208030987898,
+    "align": "se3",
+    "scale": 1.0,
+    "ate_rmse_m": 2.8805234325854157,
+    "ate_max_m": 5.910677528187242,
+    "final_err_m": 5.591728491572421,
+    "rot_rmse_deg": 3.036370451600587,
+    "rpe10": {
+      "segments": 3056,
+      "seg_m": 10.0,
+      "rmse_m": 0.34112715618793893,
+      "rmse_pct": 3.4112715618793894
+    },
+    "ate_pct": 0.5759655296755213,
+    "final_pct": 1.11807556432878,
+    "scale_sim3": 1.007577025579663
+  }
+}

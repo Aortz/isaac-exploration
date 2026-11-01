@@ -1,0 +1,48 @@
+{
+  "flight": "sg_p3_loop",
+  "env": "sg_mangrove",
+  "controller": "python",
+  "vehicle": "Iris",
+  "mass_kg": 1.5,
+  "physics_hz": 1000,
+  "setup_s": 3.0,
+  "steps": 197633,
+  "wall_s": 1738.9,
+  "realtime_factor": 0.11,
+  "drag": [
+    0.5,
+    0.3,
+    0.0
+  ],
+  "motor": null,
+  "wind": null,
+  "gains": {
+    "Kp": [
+      10.0,
+      10.0,
+      10.0
+    ],
+    "Kd": [
+      8.5,
+      8.5,
+      8.5
+    ],
+    "Ki": [
+      1.5,
+      1.5,
+      1.5
+    ],
+    "Kr": [
+      3.5,
+      3.5,
+      3.5
+    ],
+    "Kw": [
+      0.5,
+      0.5,
+      0.5
+    ]
+  },
+  "autopilot": null,
+  "pegasus_commit": "fcb99c0 (PegasusSimulator PR #144, Isaac Sim 6.0 port)"
+}

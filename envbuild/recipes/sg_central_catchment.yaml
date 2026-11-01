@@ -1,0 +1,8 @@
+# Google photoreal 3D tiles over the Central Catchment Nature Reserve, Singapore (MacRitchie): primary and
+# secondary rainforest around the reservoir. Canopy up to ~80 m above sea level here: fly >= 100 m above the origin.
+name: sg_central_catchment
+source: cesium
+tiles: google
+lat: 1.3560
+lon: 103.8110
+height: 30.0           # ellipsoidal: reservoir ~23 m above sea level + ~7 m geoid

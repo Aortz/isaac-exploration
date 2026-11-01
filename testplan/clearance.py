@@ -22,7 +22,10 @@ from pipeline.common.config import BUILD, PROJECT_ROOT, load_config  # noqa: E40
 
 
 def load_boxes(env: str) -> tuple[np.ndarray, np.ndarray]:
-    m = np.load(BUILD / "envs" / env / "meshes.npy")
+    """Object boxes: env_probe's meshes.npy plus envbuild's obstacles.npy (scattered instances), if present."""
+    parts = [np.load(f) for f in (BUILD / "envs" / env / "meshes.npy", BUILD / "envs" / env / "obstacles.npy")
+             if f.exists()]
+    m = np.vstack(parts)
     c, size = m[:, :3], m[:, 3:]
     keep = (size[:, 0] < 200) & (size[:, 1] < 200) & ~((size[:, 2] < 0.5) & ((size[:, 0] > 20) | (size[:, 1] > 20)))
     return c[keep] - size[keep] / 2, c[keep] + size[keep] / 2
@@ -75,8 +78,17 @@ def flight_clearance(flight: str, source: str = "reference", hz: float = 10.0, c
                 "p5_clearance_m": round(float(np.percentile(d, 5)), 2)}
     lo, hi = load_boxes(env)
     d, i = clearance(traj[:, 1:4], lo, hi)
+    agl = None
+    hm = BUILD / "envs" / env / "heightmap.npz"
+    if hm.exists():                       # envbuild terrain: height above the ground counts as clearance too
+        h = np.load(hm)
+        from envbuild.procedural_math import height_at
+        agl = traj[:, 3] - height_at(h["heights"], float(h["x0"]), float(h["y0"]), float(h["res"]), traj[:, 1], traj[:, 2])
+        d = np.minimum(d, agl)
     k = int(d.argmin())
-    return {"flight": flight, "source": source, "method": "aabb", "min_clearance_m": round(float(d[k]), 2),
+    return {"flight": flight, "source": source, "method": "aabb" + ("+agl" if agl is not None else ""),
+            "min_agl_m": round(float(agl.min()), 2) if agl is not None else None,
+            "min_clearance_m": round(float(d[k]), 2),
             "at_t_s": round(float(traj[k, 0]), 2), "at_xyz": [round(float(v), 1) for v in traj[k, 1:4]],
             "nearest_box_lo": [round(float(v), 1) for v in lo[i[k]]], "nearest_box_hi": [round(float(v), 1) for v in hi[i[k]]],
             "p5_clearance_m": round(float(np.percentile(d, 5)), 2)}

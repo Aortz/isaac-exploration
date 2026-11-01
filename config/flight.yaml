@@ -145,6 +145,147 @@ flights:
                 [72.5, 232.0, 44.0], [37.7, 210.0, 43.0], [25.0, 180.0, 42.0], [37.7, 150.0, 41.0],
                 [72.5, 128.0, 40.0], [120.0, 120.0, 40.0], [167.5, 128.0, 40.0], [202.3, 150.0, 40.0],
                 [215.0, 180.0, 40.0]]
+  # --- envbuild environments (envbuild/recipes/*.yaml); z absolute, terrain z = 0 at the origin
+  fv_p3_loop: &fv_base                   # forest_valley: 260 x 180 m loop at 68 m, >= 9 m over the 56 m tree tops
+    env: forest_valley
+    dynamics: pegasus
+    profile: spline
+    speed_mps: 6.0
+    hover_start_s: 4.0
+    hover_end_s: 3.0
+    yaw_mode: velocity
+    scene_description: Drone circling over a temperate forest valley with conifer stands and clearings.
+    package: {depth_near_m: 2.0, depth_far_m: 800.0}
+    waypoints: [[130.0, 0.0, 68.0], [112.6, 45.0, 68.0], [65.0, 77.9, 68.0], [0.0, 90.0, 68.0], [-65.0, 77.9, 68.0], [-112.6, 45.0, 68.0], [-130.0, 0.0, 68.0], [-112.6, -45.0, 68.0], [-65.0, -77.9, 68.0], [-0.0, -90.0, 68.0], [65.0, -77.9, 68.0], [112.6, -45.0, 68.0], [130.0, -0.0, 68.0]]
+  dd_p3_loop:                            # desert_dunes: 280 x 200 m loop at 25 m (21-36 m above the dunes)
+    <<: *fv_base
+    env: desert_dunes
+    scene_description: Drone circling low over a sand dune field with scattered boulders.
+    waypoints: [[140.0, 0.0, 25.0], [121.2, 50.0, 25.0], [70.0, 86.6, 25.0], [0.0, 100.0, 25.0], [-70.0, 86.6, 25.0], [-121.2, 50.0, 25.0], [-140.0, 0.0, 25.0], [-121.2, -50.0, 25.0], [-70.0, -86.6, 25.0], [-0.0, -100.0, 25.0], [70.0, -86.6, 25.0], [121.2, -50.0, 25.0], [140.0, -0.0, 25.0]]
+  fv2_p3_loop:                           # forest_valley_v2: 260 x 180 m loop at 68 m, >= 6.6 m over the AABB tree tops
+    <<: *fv_base
+    env: forest_valley_v2
+    scene_description: Drone circling over a dense temperate forest valley with meadows and rocky slopes.
+  sg_p3_loop:                            # sg_mangrove: 280 x 200 m loop at 30 m (canopy <= 22 m; >= 8 m clearance)
+    <<: *fv_base
+    env: sg_mangrove
+    speed_mps: 5.0
+    scene_description: Drone circling low over a tropical mangrove swamp with tidal creeks and murky water.
+    waypoints: [[140.0, 0.0, 30.0], [121.2, 50.0, 30.0], [70.0, 86.6, 30.0], [0.0, 100.0, 30.0], [-70.0, 86.6, 30.0], [-121.2, 50.0, 30.0], [-140.0, 0.0, 30.0], [-121.2, -50.0, 30.0], [-70.0, -86.6, 30.0], [-0.0, -100.0, 30.0], [70.0, -86.6, 30.0], [121.2, -50.0, 30.0], [140.0, -0.0, 30.0]]
+  # --- Singapore on Google photoreal 3D tiles (envbuild/recipes/sg_*.yaml; z = metres above the recipe origin)
+  sb_p3_loop:                            # Sungei Buloh Wetland Reserve: 300 x 220 m loop at 70 m over the mangroves
+    site: sg_sungei_buloh
+    source: google
+    dynamics: pegasus
+    speed_mps: 8.0
+    yaw_mode: velocity
+    hover_start_s: 4.0
+    hover_end_s: 3.0
+    scene_description: Drone circling over the Sungei Buloh mangrove wetland in Singapore, with tidal ponds and creeks.
+    package: {depth_near_m: 20.0, depth_far_m: 2000.0}
+    waypoints: [[150.0, 0.0, 70.0], [129.9, 55.0, 70.0], [75.0, 95.3, 70.0], [0.0, 110.0, 70.0], [-75.0, 95.3, 70.0], [-129.9, 55.0, 70.0], [-150.0, 0.0, 70.0], [-129.9, -55.0, 70.0], [-75.0, -95.3, 70.0], [-0.0, -110.0, 70.0], [75.0, -95.3, 70.0], [129.9, -55.0, 70.0], [150.0, -0.0, 70.0]]
+  cc_p3_loop:                            # Central Catchment (MacRitchie): 300 x 220 m loop at 130 m over the rainforest
+    site: sg_central_catchment
+    source: google
+    dynamics: pegasus
+    speed_mps: 8.0
+    yaw_mode: velocity
+    hover_start_s: 4.0
+    hover_end_s: 3.0
+    scene_description: Drone circling over tropical rainforest and the MacRitchie reservoir in Singapore.
+    package: {depth_near_m: 50.0, depth_far_m: 2000.0}
+    waypoints: [[150.0, 0.0, 130.0], [129.9, 55.0, 130.0], [75.0, 95.3, 130.0], [0.0, 110.0, 130.0], [-75.0, 95.3, 130.0], [-129.9, 55.0, 130.0], [-150.0, 0.0, 130.0], [-129.9, -55.0, 130.0], [-75.0, -95.3, 130.0], [-0.0, -110.0, 130.0], [75.0, -95.3, 130.0], [129.9, -55.0, 130.0], [150.0, -0.0, 130.0]]
+  # --- urban ops / Malaysia / battleground / military (envbuild/recipes; loop clearance checked before flying)
+  op_p3_loop:
+    <<: *fv_base
+    env: my_oil_palm
+    speed_mps: 5.0
+    scene_description: Drone circling low over a Malaysian oil palm estate on terraced hills with laterite roads.
+    waypoints: [[140.0, 0.0, 30.0], [121.2, 50.0, 30.0], [70.0, 86.6, 30.0], [0.0, 100.0, 30.0], [-70.0, 86.6, 30.0], [-121.2, 50.0, 30.0], [-140.0, 0.0, 30.0], [-121.2, -50.0, 30.0], [-70.0, -86.6, 30.0], [-0.0, -100.0, 30.0], [70.0, -86.6, 30.0], [121.2, -50.0, 30.0], [140.0, -0.0, 30.0]]
+  rf_p3_loop:
+    <<: *fv_base
+    env: my_rainforest
+    speed_mps: 5.0
+    scene_description: Drone circling over Malaysian lowland rainforest and a wide brown river.
+    waypoints: [[140.0, 0.0, 60.0], [121.2, 50.0, 60.0], [70.0, 86.6, 60.0], [0.0, 100.0, 60.0], [-70.0, 86.6, 60.0], [-121.2, 50.0, 60.0], [-140.0, 0.0, 60.0], [-121.2, -50.0, 60.0], [-70.0, -86.6, 60.0], [-0.0, -100.0, 60.0], [70.0, -86.6, 60.0], [121.2, -50.0, 60.0], [140.0, -0.0, 60.0]]
+  bt_p3_loop:
+    <<: *fv_base
+    env: bg_ruined_town
+    speed_mps: 5.0
+    scene_description: Drone circling low over a bombed town with ruined buildings, rubble, craters and burned vehicles.
+    waypoints: [[140.0, 0.0, 22.0], [121.2, 50.0, 22.0], [70.0, 86.6, 22.0], [0.0, 100.0, 22.0], [-70.0, 86.6, 22.0], [-121.2, 50.0, 22.0], [-140.0, 0.0, 22.0], [-121.2, -50.0, 22.0], [-70.0, -86.6, 22.0], [-0.0, -100.0, 22.0], [70.0, -86.6, 22.0], [121.2, -50.0, 22.0], [140.0, -0.0, 22.0]]
+  tf_p3_loop:
+    <<: *fv_base
+    env: bg_trench_field
+    speed_mps: 5.0
+    scene_description: Drone circling low over a front line with trenches, shell craters and charred treelines.
+    waypoints: [[140.0, 0.0, 22.0], [121.2, 50.0, 22.0], [70.0, 86.6, 22.0], [0.0, 100.0, 22.0], [-70.0, 86.6, 22.0], [-121.2, 50.0, 22.0], [-140.0, 0.0, 22.0], [-121.2, -50.0, 22.0], [-70.0, -86.6, 22.0], [-0.0, -100.0, 22.0], [70.0, -86.6, 22.0], [121.2, -50.0, 22.0], [140.0, -0.0, 22.0]]
+  fd_p3_loop:
+    <<: *fv_base
+    env: mil_fob_desert
+    speed_mps: 5.0
+    scene_description: Drone circling low over a desert military base with HESCO walls, tents, vehicles and containers.
+    waypoints: [[140.0, 0.0, 18.0], [121.2, 50.0, 18.0], [70.0, 86.6, 18.0], [0.0, 100.0, 18.0], [-70.0, 86.6, 18.0], [-121.2, 50.0, 18.0], [-140.0, 0.0, 18.0], [-121.2, -50.0, 18.0], [-70.0, -86.6, 18.0], [-0.0, -100.0, 18.0], [70.0, -86.6, 18.0], [121.2, -50.0, 18.0], [140.0, -0.0, 18.0]]
+  ft_p3_loop:
+    <<: *fv_base
+    env: mil_fob_tropical
+    speed_mps: 5.0
+    scene_description: Drone circling over a jungle military base with HESCO walls, tents, vehicles and containers.
+    waypoints: [[160.0, 0.0, 32.0], [138.6, 60.0, 32.0], [80.0, 103.9, 32.0], [0.0, 120.0, 32.0], [-80.0, 103.9, 32.0], [-138.6, 60.0, 32.0], [-160.0, 0.0, 32.0], [-138.6, -60.0, 32.0], [-80.0, -103.9, 32.0], [-0.0, -120.0, 32.0], [80.0, -103.9, 32.0], [138.6, -60.0, 32.0], [160.0, -0.0, 32.0]]
+  ts_p3_street:                          # envbuild/plan_street_loop.py road loop
+    <<: *fv_base
+    env: sg_tampines_osm
+    speed_mps: 3.5
+    scene_description: Drone flying a 33 m street-level loop between HDB blocks in Tampines, Singapore.
+    package: {depth_near_m: 2.0, depth_far_m: 600.0}
+    waypoints: [[-80.6, -132.7, 33.0], [-80.7, -92.7, 33.0], [-80.9, -52.7, 33.0], [-88.6, -16.8, 33.0], [-101.1, 20.5, 33.0], [-128.8, 49.3, 33.0], [-154.6, 48.1, 33.0], [-182.9, 19.8, 33.0], [-198.5, -14.8, 33.0], [-197.8, -54.8, 33.0], [-162.8, -62.7, 33.0], [-122.8, -62.9, 33.0], [-88.3, -76.0, 33.0], [-88.3, -116.0, 33.0], [-94.9, -136.2, 33.0], [-80.6, -132.7, 33.0]]
+  kl_p3_street:                          # envbuild/plan_street_loop.py road loop
+    <<: *fv_base
+    env: my_kl_bukit_bintang_osm
+    speed_mps: 3.5
+    scene_description: Drone flying a 45 m loop down the streets of Bukit Bintang, Kuala Lumpur, between high-rise towers.
+    package: {depth_near_m: 2.0, depth_far_m: 600.0}
+    waypoints: [[125.5, -310.0, 45.0], [111.5, -272.5, 45.0], [98.7, -234.7, 45.0], [69.1, -246.1, 45.0], [37.6, -270.8, 45.0], [6.2, -295.5, 45.0], [-11.9, -325.6, 45.0], [7.4, -359.2, 45.0], [46.3, -350.7, 45.0], [85.1, -341.1, 45.0], [124.3, -332.8, 45.0], [125.5, -310.0, 45.0]]
+  jb_p3_street:                          # envbuild/plan_street_loop.py road loop
+    <<: *fv_base
+    env: my_jb_osm
+    speed_mps: 3.5
+    scene_description: Drone flying a 25 m street-level loop through Johor Bahru city centre.
+    package: {depth_near_m: 2.0, depth_far_m: 600.0}
+    waypoints: [[207.7, -146.3, 25.0], [178.6, -140.8, 25.0], [160.2, -105.3, 25.0], [142.1, -69.6, 25.0], [124.4, -33.7, 25.0], [106.5, 2.1, 25.0], [87.7, 37.3, 25.0], [83.6, 64.1, 25.0], [120.7, 76.7, 25.0], [156.5, 94.5, 25.0], [183.4, 110.1, 25.0], [206.6, 77.5, 25.0], [229.8, 44.9, 25.0], [252.8, 12.2, 25.0], [234.5, -15.2, 25.0], [221.0, -47.5, 25.0], [237.3, -83.9, 25.0], [245.1, -122.2, 25.0], [212.1, -143.8, 25.0], [207.7, -146.3, 25.0]]
+  klt_p3_loop:
+    site: my_kl_klcc
+    source: google
+    dynamics: pegasus
+    speed_mps: 8.0
+    yaw_mode: velocity
+    hover_start_s: 4.0
+    hover_end_s: 3.0
+    scene_description: Drone circling high over Kuala Lumpur city centre near the KLCC towers.
+    package: {depth_near_m: 50.0, depth_far_m: 2000.0}
+    waypoints: [[150.0, 0.0, 220.0], [129.9, 55.0, 220.0], [75.0, 95.3, 220.0], [0.0, 110.0, 220.0], [-75.0, 95.3, 220.0], [-129.9, 55.0, 220.0], [-150.0, 0.0, 220.0], [-129.9, -55.0, 220.0], [-75.0, -95.3, 220.0], [-0.0, -110.0, 220.0], [75.0, -95.3, 220.0], [129.9, -55.0, 220.0], [150.0, -0.0, 220.0]]
+  jbt_p3_loop:
+    site: my_jb_city
+    source: google
+    dynamics: pegasus
+    speed_mps: 8.0
+    yaw_mode: velocity
+    hover_start_s: 4.0
+    hover_end_s: 3.0
+    scene_description: Drone circling over Johor Bahru city centre, Malaysia.
+    package: {depth_near_m: 50.0, depth_far_m: 2000.0}
+    waypoints: [[150.0, 0.0, 120.0], [129.9, 55.0, 120.0], [75.0, 95.3, 120.0], [0.0, 110.0, 120.0], [-75.0, 95.3, 120.0], [-129.9, 55.0, 120.0], [-150.0, 0.0, 120.0], [-129.9, -55.0, 120.0], [-75.0, -95.3, 120.0], [-0.0, -110.0, 120.0], [75.0, -95.3, 120.0], [129.9, -55.0, 120.0], [150.0, -0.0, 120.0]]
+  tpt_p3_loop:
+    site: sg_tampines_hdb
+    source: google
+    dynamics: pegasus
+    speed_mps: 8.0
+    yaw_mode: velocity
+    hover_start_s: 4.0
+    hover_end_s: 3.0
+    scene_description: Drone circling over HDB housing estates in Tampines, Singapore.
+    package: {depth_near_m: 50.0, depth_far_m: 2000.0}
+    waypoints: [[150.0, 0.0, 100.0], [129.9, 55.0, 100.0], [75.0, 95.3, 100.0], [0.0, 110.0, 100.0], [-75.0, 95.3, 100.0], [-129.9, 55.0, 100.0], [-150.0, 0.0, 100.0], [-129.9, -55.0, 100.0], [-75.0, -95.3, 100.0], [-0.0, -110.0, 100.0], [75.0, -95.3, 100.0], [129.9, -55.0, 100.0], [150.0, -0.0, 100.0]]
   # --- NuRec XGRIDS "wormhole" hall (docs/test_plans.md E2): Gaussian splats, z up, floor ~0, free space around (2, 7)
   # (build/envs/nurec_xgrid_wormhole/topdown.png; clearance from occupancy_map.png)
   nx_p1_hover: &nx_base
@@ -269,6 +410,232 @@ environments:                            # Isaac USD environments (flights with 
     stereo: {baseline_m: 0.12, pitch_deg: 0.0}
     openvins: {fi_max_dist: 50.0}
     lighting: {default: {}}
+  desert_dunes:   # envbuild: envbuild/recipes/desert_dunes.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 300.0}
+    lighting:
+      default: {}
+      low_sun: {sky_hdr: /NVIDIA/Assets/Skies/Clear/venice_sunset_4k.hdr}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    usd: build/envs/desert_dunes/env.usda
+
+  forest_valley:   # envbuild: envbuild/recipes/forest_valley.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
+    openvins: {fi_max_dist: 300.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    usd: build/envs/forest_valley/env.usda
+
+  sg_mangrove:   # envbuild: envbuild/recipes/sg_mangrove.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 300.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/sg_mangrove/env.usda
+
+  my_oil_palm:   # envbuild: envbuild/recipes/my_oil_palm.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 300.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/my_oil_palm/env.usda
+
+  my_rainforest:   # envbuild: envbuild/recipes/my_rainforest.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 300.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.80,0.83,0.86]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=250,
+      --/rtx/fog/fogEndDist=3000, --/rtx/fog/fogDistanceDensity=0.6]
+    usd: build/envs/my_rainforest/env.usda
+
+  bg_ruined_town:   # envbuild: envbuild/recipes/bg_ruined_town.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 250.0}
+    lighting:
+      default: {}
+      low_sun: {sky_hdr: /NVIDIA/Assets/Skies/Clear/venice_sunset_4k.hdr}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.72,0.72,0.72]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=300,
+      --/rtx/fog/fogEndDist=3500, --/rtx/fog/fogDistanceDensity=0.6]
+    usd: build/envs/bg_ruined_town/env.usda
+
+  bg_trench_field:   # envbuild: envbuild/recipes/bg_trench_field.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 250.0}
+    lighting:
+      default: {}
+      low_sun: {sky_hdr: /NVIDIA/Assets/Skies/Clear/venice_sunset_4k.hdr}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.72,0.72,0.72]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=300,
+      --/rtx/fog/fogEndDist=3500, --/rtx/fog/fogDistanceDensity=0.6]
+    usd: build/envs/bg_trench_field/env.usda
+
+  mil_fob_desert:   # envbuild: envbuild/recipes/mil_fob_desert.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 250.0}
+    lighting:
+      default: {}
+      low_sun: {sky_hdr: /NVIDIA/Assets/Skies/Clear/venice_sunset_4k.hdr}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.85,0.80,0.70]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=250,
+      --/rtx/fog/fogEndDist=2500, --/rtx/fog/fogDistanceDensity=0.75]
+    usd: build/envs/mil_fob_desert/env.usda
+
+  mil_fob_tropical:   # envbuild: envbuild/recipes/mil_fob_tropical.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 25.0}
+    openvins: {fi_max_dist: 250.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/mil_fob_tropical/env.usda
+
+  sg_tampines_osm:   # envbuild: envbuild/recipes/sg_tampines_osm.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
+    openvins: {fi_max_dist: 200.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/sg_tampines_osm/env.usda
+
+  my_kl_bukit_bintang_osm:   # envbuild: envbuild/recipes/my_kl_bukit_bintang_osm.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
+    openvins: {fi_max_dist: 200.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/my_kl_bukit_bintang_osm/env.usda
+
+  my_jb_osm:   # envbuild: envbuild/recipes/my_jb_osm.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    first_warmup_updates: 400
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
+    openvins: {fi_max_dist: 200.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.78,0.81,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=400,
+      --/rtx/fog/fogEndDist=4000, --/rtx/fog/fogDistanceDensity=0.5]
+    usd: build/envs/my_jb_osm/env.usda
+
+  forest_valley_v2:   # envbuild: envbuild/recipes/forest_valley_v2.yaml
+    colliders: false
+    settle_updates: 4
+    warmup_updates: 30
+    clip: [0.1, 5000.0]
+    stereo: {baseline_m: 0.3, pitch_deg: 20.0}
+    openvins: {fi_max_dist: 300.0}
+    lighting:
+      default: {}
+      overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr}
+    first_warmup_updates: 400
+    ground_z: 0.0
+    sky_dome: /World/Sky/Dome
+    kit_args: [--/rtx/fog/enabled=true, --/rtx/fog/fogZup/enabled=true, --/rtx/fog/fogHeightDensity=0.0,
+      '--/rtx/fog/fogColor=[0.74,0.79,0.85]', --/rtx/fog/fogColorIntensity=1.0, --/rtx/fog/fogStartDist=300,
+      --/rtx/fog/fogEndDist=3500, --/rtx/fog/fogDistanceDensity=0.6]
+    usd: build/envs/forest_valley_v2/env.usda
+
 stereo:                                  # pinhole stereo pair (flight/rig_fisheye.py --stereo), e.g. for MAC-VO
   width: 640                             # TartanAir geometry (MAC-VO's training data): 640x480, fx = fy = 320
   height: 480

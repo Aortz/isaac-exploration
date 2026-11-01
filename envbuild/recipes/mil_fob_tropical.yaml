@@ -1,0 +1,140 @@
+# Military forward operating base, tropical (Malaysia / Singapore training-area style): the same compound
+# layout as mil_fob_desert on red laterite and grass, ringed by secondary jungle. Props generated.
+name: mil_fob_tropical
+source: procedural
+seed: 92
+terrain:
+  size_m: 800
+  resolution_m: 2.0
+  hills_m: 10
+  hill_scale_m: 300
+  octaves: 4
+  channels:                                   # gravel access road to the gate (south)
+    - {angle_deg: 90, offset_m: 0, depth_m: 0.1, width_m: 5, meander_m: 15, meander_wavelength_m: 600}
+  material: /NVIDIA/Materials/Base/Natural/Grass_Countryside.mdl
+  uv_tile_m: 3.0
+  layers:
+    - {material: /NVIDIA/Materials/Base/Natural/Dirt.mdl, mask: clearing}               # red laterite cleared ground
+    - {material: /NVIDIA/Materials/vMaterials_2/Ground/Mulch.mdl, mask: compound}          # packed earth inside the wire
+    - {material: /NVIDIA/Materials/Base/Natural/Dirt.mdl, mask: road}
+masks:
+  compound: {rect_m: [230, 170]}
+  clearing: {rect_m: [330, 270]}
+  road: {channels: true, threshold: 0.35}
+  tents_area: {rect_m: [90, 60], centre_m: [-50, 35]}
+  motor_pool: {rect_m: [70, 50], centre_m: [55, 40]}
+  containers_area: {rect_m: [60, 40], centre_m: [60, -45]}
+scatter:
+  hesco_perimeter:
+    class: barrier
+    generate: hesco
+    variants: 2
+    cells: 4
+    height_scale: 2.0                         # 2.2 m double-height wall
+    layout: perimeter
+    rect_m: [220, 160]
+    spacing_m: 4.4
+    gate_m: 14
+    scale_range: [1.0, 1.0]
+  towers:
+    class: structure
+    generate: tower
+    variants: 2
+    layout: perimeter
+    rect_m: [214, 154]
+    spacing_m: 92
+    scale_range: [1.0, 1.0]
+  tents:
+    class: structure
+    generate: tent
+    variants: 3
+    layout: grid
+    spacing_m: 13
+    row_angle_deg: 0
+    jitter_m: 0.3
+    align: true
+    mask: tents_area
+    scale_range: [1.0, 1.0]
+  vehicles:
+    class: vehicle
+    generate: vehicle_proxy
+    variants: 6
+    burned_frac: 0.0
+    layout: grid
+    spacing_m: 11
+    row_angle_deg: 90
+    jitter_m: 0.2
+    align: true
+    mask: motor_pool
+    scale_range: [1.0, 1.0]
+  containers:
+    class: structure
+    generate: container
+    variants: 6
+    layout: grid
+    spacing_m: 8
+    row_angle_deg: 0
+    jitter_m: 0.1
+    align: true
+    mask: containers_area
+    scale_range: [1.0, 1.0]
+  jersey_barriers:
+    class: barrier
+    generate: jersey_barrier
+    variants: 1
+    layout: perimeter
+    rect_m: [40, 30]
+    centre_m: [0, -110]                       # chicane outside the gate
+    spacing_m: 3.2
+    gate_m: 8
+    scale_range: [1.0, 1.0]
+    obstacle: false
+  sandbags:
+    class: barrier
+    generate: sandbags
+    variants: 2
+    density_per_ha: 4
+    mask: compound
+    scale_range: [1.0, 1.0]
+    clear_radius_m: 20
+    obstacle: false
+  jungle:
+    class: tree
+    assets: [/NVIDIA/Assets/Vegetation/Trees/Black_Oak.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd,
+             /NVIDIA/Assets/Vegetation/Plant_Tropical/Travelers_Palm.usd]
+    weights: [5, 2, 1]
+    density_per_ha: 110
+    scale_range: [0.7, 1.2]
+    mask: "!clearing"
+    sink_m: 0.2
+  understory:
+    class: shrub
+    assets: [/NVIDIA/Assets/Vegetation/Plant_Tropical/Australian_Tree_Fern.usd,
+             /NVIDIA/Assets/Vegetation/Plant_Tropical/Japanese_Fiber_Banana.usd]
+    density_per_ha: 120
+    mask: "!clearing"
+    obstacle: false
+sky:
+  hdr: /NVIDIA/Assets/Skies/Cloudy/kloofendal_48d_partly_cloudy_4k.hdr
+  intensity: 900
+  sun_intensity: 2800
+  sun_elevation_deg: 62
+  sun_azimuth_deg: 110
+environment:
+  first_warmup_updates: 400
+  ground_z: 0.0
+  stereo: {baseline_m: 0.30, pitch_deg: 25.0}
+  openvins: {fi_max_dist: 250.0}
+  lighting:
+    default: {}
+    overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+  sky_dome: /World/Sky/Dome
+  kit_args:
+    - --/rtx/fog/enabled=true
+    - --/rtx/fog/fogZup/enabled=true
+    - --/rtx/fog/fogHeightDensity=0.0
+    - --/rtx/fog/fogColor=[0.78,0.81,0.85]
+    - --/rtx/fog/fogColorIntensity=1.0
+    - --/rtx/fog/fogStartDist=400
+    - --/rtx/fog/fogEndDist=4000
+    - --/rtx/fog/fogDistanceDensity=0.5

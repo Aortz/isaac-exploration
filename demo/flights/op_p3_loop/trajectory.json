@@ -1,0 +1,110 @@
+{
+  "flight": "op_p3_loop",
+  "site": null,
+  "source": null,
+  "env": "my_oil_palm",
+  "duration_s": 194.625,
+  "frames": 5839,
+  "fps": 30,
+  "imu_rate_hz": 200,
+  "path_length_m": 766.9089125288244,
+  "max_speed_mps": 6.7229461641764,
+  "max_tilt_deg": 13.47809984701134,
+  "intrinsics": {
+    "width": 832,
+    "height": 480,
+    "fx": 555.8577905034598,
+    "fy": 555.8577905034598,
+    "cx": 416.0,
+    "cy": 240.0
+  },
+  "T_body_camera_cv": [
+    [
+      0.0,
+      -0.49999999999999994,
+      0.8660254037844387,
+      0.0
+    ],
+    [
+      -1.0,
+      -0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      -0.8660254037844387,
+      -0.49999999999999994,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "camera_mount": "fixed",
+  "checks": {
+    "imu_integration_drift_m": 1.1021496530288917,
+    "imu_drift_10s_m": 0.014217700504296691
+  },
+  "dynamics": "pegasus",
+  "pegasus": {
+    "flight": "op_p3_loop",
+    "env": "my_oil_palm",
+    "controller": "python",
+    "vehicle": "Iris",
+    "mass_kg": 1.5,
+    "physics_hz": 1000,
+    "setup_s": 3.0,
+    "steps": 197633,
+    "wall_s": 2969.3,
+    "realtime_factor": 0.07,
+    "drag": [
+      0.5,
+      0.3,
+      0.0
+    ],
+    "motor": null,
+    "wind": null,
+    "gains": {
+      "Kp": [
+        10.0,
+        10.0,
+        10.0
+      ],
+      "Kd": [
+        8.5,
+        8.5,
+        8.5
+      ],
+      "Ki": [
+        1.5,
+        1.5,
+        1.5
+      ],
+      "Kr": [
+        3.5,
+        3.5,
+        3.5
+      ],
+      "Kw": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "autopilot": null,
+    "pegasus_commit": "fcb99c0 (PegasusSimulator PR #144, Isaac Sim 6.0 port)"
+  },
+  "tracking": {
+    "pos_err_rms_m": 0.06911676733903625,
+    "pos_err_max_m": 0.17453220017332494,
+    "pos_err_final_m": 0.10137252467776064,
+    "rotor_ref_rad_s": [
+      649.952104168,
+      705.307722026
+    ]
+  }
+}

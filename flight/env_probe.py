@@ -59,7 +59,7 @@ def main() -> None:
         counts["prims"] += 1
         counts["colliders"] += p.HasAPI(UsdPhysics.CollisionAPI)
         counts["lights"] += "Light" in p.GetTypeName()
-        if not p.IsA(UsdGeom.Gprim):
+        if not p.IsA(UsdGeom.Gprim) or "/Prototypes/" in str(p.GetPath()):   # instancer prototypes sit at the origin
             continue
         counts["gprims"] += 1
         r = bb.ComputeWorldBound(p).ComputeAlignedRange()
@@ -79,6 +79,8 @@ def main() -> None:
     np.save(out / "meshes.npy", m)
     lo, hi = m[:, :3] - m[:, 3:] / 2, m[:, :3] + m[:, 3:] / 2
     small = (m[:, 3] < 200) & (m[:, 4] < 200)          # drop ground planes / backdrops for the "core"
+    if not small.any():                                # e.g. one big terrain mesh + instanced scatter only
+        small[:] = True
     tops = hi[small, 2]
     report = {
         "usd": url, "load_s": round(time.time() - t0, 1),

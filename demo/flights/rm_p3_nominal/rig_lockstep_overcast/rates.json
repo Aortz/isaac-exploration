@@ -1,0 +1,73 @@
+{
+  "flight": "rm_p3_nominal",
+  "mode": "lockstep",
+  "ros2": true,
+  "freerun_updates": 1,
+  "frames": 3259,
+  "cameras": [
+    "cam0_front",
+    "cam1_left",
+    "cam2_back",
+    "cam3_right"
+  ],
+  "resolution": [
+    640,
+    480
+  ],
+  "depth": false,
+  "sim_camera_hz": 30,
+  "sim_duration_s": 108.6,
+  "warmup_s": 219.9,
+  "wall_s": 610.11,
+  "max_fps_cap": 0.0,
+  "wall_frames_per_s": 5.34,
+  "achieved_frames_per_s": 16.9,
+  "achieved_images_per_s": 67.6,
+  "realtime_factor": 0.563,
+  "image_lag_frames_compensated": 0,
+  "renderer_updates_per_frame": {
+    "mean": 4.0,
+    "max": 4
+  },
+  "unsettled_frames": 0,
+  "imu_messages": 21721,
+  "timing": {
+    "pose": {
+      "mean_ms": 1.18,
+      "p50_ms": 1.17,
+      "p95_ms": 1.26,
+      "max_ms": 2.38
+    },
+    "render": {
+      "mean_ms": 50.03,
+      "p50_ms": 48.13,
+      "p95_ms": 66.17,
+      "max_ms": 109.86
+    },
+    "readback": {
+      "mean_ms": 5.43,
+      "p50_ms": 5.4,
+      "p95_ms": 6.31,
+      "max_ms": 60.26
+    },
+    "publish": {
+      "mean_ms": 2.53,
+      "p50_ms": 2.48,
+      "p95_ms": 3.13,
+      "max_ms": 4.53
+    },
+    "frame": {
+      "mean_ms": 59.17,
+      "p50_ms": 57.19,
+      "p95_ms": 75.46,
+      "max_ms": 150.11
+    }
+  },
+  "look": {
+    "variant": "overcast",
+    "dome": "/World/main/Sky",
+    "texture": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.0/NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr",
+    "intensity": 1000.0
+  },
+  "note": "achieved_* = frames / summed frame time (pose + render + readback + publish), i.e. the uncapped rate; wall_frames_per_s includes the cap's sleeps and image saving"
+}

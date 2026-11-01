@@ -1,0 +1,19 @@
+forest_valley:
+  colliders: false
+  settle_updates: 4
+  warmup_updates: 30
+  clip:
+  - 0.1
+  - 5000.0
+  stereo:
+    baseline_m: 0.3
+    pitch_deg: 20.0
+  openvins:
+    fi_max_dist: 300.0
+  lighting:
+    default: {}
+    overcast:
+      sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr
+  ground_z: 0.0
+  sky_dome: /World/Sky/Dome
+  usd: build/envs/forest_valley/env.usda

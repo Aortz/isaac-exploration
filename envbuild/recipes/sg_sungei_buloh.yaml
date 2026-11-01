@@ -1,0 +1,8 @@
+# Google photoreal 3D tiles over Sungei Buloh Wetland Reserve, Singapore: real mangrove swamp, tidal
+# ponds and creeks on the Johor Strait. Photogrammetry tiles: fine from ~60 m up, blobby close to the canopy.
+name: sg_sungei_buloh
+source: cesium
+tiles: google
+lat: 1.4470
+lon: 103.7280
+height: 9.0            # ellipsoidal: ground ~2 m above sea level + ~7 m geoid

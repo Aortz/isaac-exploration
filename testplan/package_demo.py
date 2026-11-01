@@ -14,6 +14,7 @@ import json
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -33,6 +34,8 @@ def copy(src: Path, dst: Path) -> None:
 def preview(src: Path, dst: Path, width: int) -> None:
     """Small H.264 preview (about 2-6 MB for a 100 s flight) and a still from the middle."""
     if not src.exists() or (dst.exists() and dst.stat().st_mtime > src.stat().st_mtime):
+        return
+    if time.time() - src.stat().st_mtime < 120:                      # still being written (a render in progress)
         return
     dst.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", str(src), "-vf", f"scale={width}:-2",
@@ -65,11 +68,15 @@ def main() -> None:
             preview(run / "grid.mp4", DEMO / "media" / f"{fdir.name}__{run.name}_grid.mp4", 640)
             preview(run / "stereo.mp4", DEMO / "media" / f"{fdir.name}__{run.name}_stereo.mp4", 960)
         preview(fdir / "render" / f"{fdir.name}.mp4", DEMO / "media" / f"{fdir.name}__render.mp4", 832)
-    # Environments.
+        preview(fdir / "watch" / "chase.mp4", DEMO / "media" / f"{fdir.name}__chase.mp4", 960)
+    # Environments (envbuild recipes keep their manifest and config block too).
     for env in sorted(p for p in (BUILD / "envs").glob("*") if p.is_dir()):
         for f in env.glob("*"):
-            if f.suffix == ".png" or f.name in SMALL:
+            if f.suffix == ".png" or f.name in SMALL or f.name in ("env.json", "environment.yaml", "preview.jpg"):
                 copy(f, DEMO / "environments" / env.name / f.name)
+    # Google-tile environments: the verify render of each georeferenced stage.
+    for png in (BUILD / "cesium").glob("*_google.png"):
+        copy(png, DEMO / "environments" / png.stem.removesuffix("_google") / "tiles_view.png")
     # Earlier evaluations: OpenVINS on Cesium, MAC-VO stress test.
     for ev in (BUILD / "openvins").rglob("eval.*"):
         copy(ev, DEMO / "openvins_cesium" / ev.parent.relative_to(BUILD / "openvins") / ev.name)

@@ -1,0 +1,61 @@
+{
+  "flight": "rm_p3_coax",
+  "env": "rivermark",
+  "controller": "px4",
+  "vehicle": "coax_spirit",
+  "mass_kg": 4.0,
+  "physics_hz": 1000,
+  "setup_s": 81.69,
+  "steps": 101700,
+  "wall_s": 496.9,
+  "realtime_factor": 0.2,
+  "drag": [
+    0.25,
+    0.25,
+    0.35
+  ],
+  "motor": null,
+  "wind": {
+    "mean_mps": [
+      3.0,
+      2.5,
+      0.0
+    ],
+    "turbulence_sigma_mps": 1.0,
+    "length_scale_m": 50.0,
+    "seed": 3,
+    "gusts": [
+      {
+        "t_s": 30.0,
+        "duration_s": 3.0,
+        "peak_mps": [
+          4.0,
+          -2.0,
+          0.0
+        ]
+      },
+      {
+        "t_s": 70.0,
+        "duration_s": 2.0,
+        "peak_mps": [
+          -3.0,
+          3.0,
+          1.0
+        ]
+      }
+    ]
+  },
+  "gains": null,
+  "autopilot": {
+    "name": "px4",
+    "events": [
+      "wait_gps at t=1.13 (wall 15:22:42)",
+      "arm at t=13.13 (wall 15:23:22)",
+      "climb at t=15.13 (wall 15:23:36)",
+      "settle at t=76.69 (wall 15:28:28)",
+      "track at t=81.69 (wall 15:28:41)",
+      "done at t=101.69 (wall 15:30:55)"
+    ]
+  },
+  "pegasus_commit": "fcb99c0 (PegasusSimulator PR #144, Isaac Sim 6.0 port)"
+}

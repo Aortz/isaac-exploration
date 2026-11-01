@@ -1,0 +1,48 @@
+# Sand dune field with sparse desert plants and rock outcrops; low texture, strong sun. ~1 x 1 km.
+name: desert_dunes
+source: procedural
+seed: 23
+terrain:
+  size_m: 1000
+  resolution_m: 2.5
+  hills_m: 6
+  hill_scale_m: 400
+  octaves: 4
+  dunes: {height_m: 14, wavelength_m: 90, direction_deg: 30, warp_m: 25}
+  material: /NVIDIA/Materials/Base/Natural/Sand.mdl
+  uv_tile_m: 5.0
+masks:
+  outcrops: {scale_m: 300, cover: 0.12}
+scatter:
+  rocks:
+    class: rock
+    assets: [/NVIDIA/Assets/Vegetation/Rocks/rock_small_02.usda, /NVIDIA/Assets/Vegetation/Rocks/rock_small_07.usda,
+             /NVIDIA/Assets/Vegetation/Rocks/rock_small_12.usda]
+    density_per_ha: 40
+    scale_range: [4.0, 12.0]          # rock_small assets are ~0.3 m: make 1-4 m boulders
+    mask: outcrops
+    sink_m: 0.8
+  plants:
+    class: shrub
+    assets: [/NVIDIA/Assets/Vegetation/Plant_Tropical/Agave.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Dagger.usd,
+             /NVIDIA/Assets/Vegetation/Shrub/Acacia.usd]
+    weights: [3, 2, 1]
+    density_per_ha: 3
+    scale_range: [0.8, 1.5]
+    slope_max_deg: 15
+    clear_radius_m: 20
+    obstacle: false
+sky:
+  hdr: /NVIDIA/Assets/Skies/Clear/noon_grass_4k.hdr
+  intensity: 500                 # bright sand: keep the total low or it washes out
+  sun_intensity: 1500
+  sun_elevation_deg: 35           # low enough to shade the dune faces
+  sun_azimuth_deg: 160
+environment:
+  ground_z: 0.0
+  stereo: {baseline_m: 0.30, pitch_deg: 25.0}
+  openvins: {fi_max_dist: 300.0}
+  lighting:
+    default: {}
+    low_sun: {sky_hdr: /NVIDIA/Assets/Skies/Clear/venice_sunset_4k.hdr}
+  sky_dome: /World/Sky/Dome

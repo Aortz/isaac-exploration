@@ -17,13 +17,13 @@
   "depth": false,
   "sim_camera_hz": 30,
   "sim_duration_s": 108.6,
-  "warmup_s": 217.1,
-  "wall_s": 610.78,
+  "warmup_s": 326.8,
+  "wall_s": 757.37,
   "max_fps_cap": 0.0,
-  "wall_frames_per_s": 5.34,
-  "achieved_frames_per_s": 17.04,
-  "achieved_images_per_s": 68.15,
-  "realtime_factor": 0.568,
+  "wall_frames_per_s": 4.3,
+  "achieved_frames_per_s": 11.54,
+  "achieved_images_per_s": 46.15,
+  "realtime_factor": 0.384,
   "image_lag_frames_compensated": 0,
   "renderer_updates_per_frame": {
     "mean": 4.0,
@@ -33,34 +33,34 @@
   "imu_messages": 21721,
   "timing": {
     "pose": {
-      "mean_ms": 1.18,
-      "p50_ms": 1.17,
-      "p95_ms": 1.29,
-      "max_ms": 3.22
+      "mean_ms": 1.4,
+      "p50_ms": 1.3,
+      "p95_ms": 1.63,
+      "max_ms": 19.7
     },
     "render": {
-      "mean_ms": 49.97,
-      "p50_ms": 48.51,
-      "p95_ms": 62.84,
-      "max_ms": 112.88
+      "mean_ms": 73.48,
+      "p50_ms": 58.94,
+      "p95_ms": 162.03,
+      "max_ms": 619.26
     },
     "readback": {
-      "mean_ms": 5.44,
-      "p50_ms": 5.42,
-      "p95_ms": 6.28,
-      "max_ms": 61.15
+      "mean_ms": 5.91,
+      "p50_ms": 5.72,
+      "p95_ms": 7.12,
+      "max_ms": 67.83
     },
     "publish": {
-      "mean_ms": 2.1,
-      "p50_ms": 1.87,
-      "p95_ms": 2.81,
-      "max_ms": 7.65
+      "mean_ms": 5.89,
+      "p50_ms": 4.96,
+      "p95_ms": 11.52,
+      "max_ms": 60.36
     },
     "frame": {
-      "mean_ms": 58.69,
-      "p50_ms": 57.2,
-      "p95_ms": 71.88,
-      "max_ms": 153.03
+      "mean_ms": 86.67,
+      "p50_ms": 71.11,
+      "p95_ms": 181.11,
+      "max_ms": 696.92
     }
   },
   "look": {

@@ -372,8 +372,12 @@ def main() -> None:
         write_camchain(out / "camchain.yaml", rig, extrinsics, imu_cfg)
     ros = RosOut(mounts, intr, extrinsics, offsets) if args.ros2 else None
 
-    # Warm the tile cache along the path (as F2 does), then fly.
+    # Warm the tile cache along the path (as F2 does), then fly. Environments with heavy MDL materials
+    # also get one long settle at the start (shader compile + texture streaming), not one per warm-up pose.
     t0 = time.time()
+    if env and env.get("first_warmup_updates"):
+        place_rig(0)
+        envs.settle(app, env["first_warmup_updates"])
     for k in range(0, len(t_frames), rcfg["warmup_stride"]):
         place_rig(k)
         warm()

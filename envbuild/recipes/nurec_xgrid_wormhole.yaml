@@ -1,0 +1,9 @@
+name: nurec_xgrid_wormhole
+source: nurec
+usd: third_party/nurec/xgrid-wormhole/stage_particle.usd
+occupancy: third_party/nurec/xgrid-wormhole/occupancy_map.yaml
+environment:
+  clip: [0.05, 200.0]
+  stereo: {baseline_m: 0.12, pitch_deg: 0.0}
+  openvins: {fi_max_dist: 50.0}
+  warmup_updates: 10

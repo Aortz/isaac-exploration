@@ -22,7 +22,8 @@ def align(est: np.ndarray, ref: np.ndarray, mode: str, r_est: R | None = None, r
           ) -> tuple[float, np.ndarray, np.ndarray]:
     """Least-squares (scale, R, t) with ref ~ s R est + t. mode: '4dof' (yaw + translation), 'se3', 'sim3'.
 
-    Rotation (4-DoF: yaw) comes from the positions, unless they barely move (hover): then from the attitudes.
+    Rotation (4-DoF: yaw) comes from the positions, unless they barely move (hover) or lie on a line (SE(3)/Sim(3)):
+    then from the attitudes.
     """
     mu_e, mu_r = est.mean(0), ref.mean(0)
     e, r = est - mu_e, ref - mu_r
@@ -34,8 +35,10 @@ def align(est: np.ndarray, ref: np.ndarray, mode: str, r_est: R | None = None, r
             yaw = np.arctan2((e[:, 0] * r[:, 1] - e[:, 1] * r[:, 0]).sum(), (e[:, 0] * r[:, 0] + e[:, 1] * r[:, 1]).sum())
         rot = R.from_euler("z", yaw).as_matrix()
         return 1.0, rot, mu_r - rot @ mu_e
-    if np.sqrt((r ** 2).sum(1).mean()) < 1.0 and r_est is not None:
-        # Hover: positions cannot fix the rotation, so take it from the attitudes.
+    sv_ref = np.linalg.svd(r, compute_uv=False)
+    if r_est is not None and (np.sqrt((r ** 2).sum(1).mean()) < 1.0 or sv_ref[1] / np.sqrt(len(r)) < 1.0):
+        # Hover, or a straight line (rotation about the line is unobservable from positions): take the
+        # rotation from the attitudes.
         rot = (r_ref * r_est.inv()).mean().as_matrix()
         return 1.0, rot, mu_r - rot @ mu_e
     u, sv, vt = np.linalg.svd(r.T @ e / len(e))

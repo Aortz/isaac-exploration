@@ -1,0 +1,110 @@
+{
+  "flight": "ts_p3_street",
+  "site": null,
+  "source": null,
+  "env": "sg_tampines_osm",
+  "duration_s": 195.779,
+  "frames": 5874,
+  "fps": 30,
+  "imu_rate_hz": 200,
+  "path_length_m": 559.3544004442789,
+  "max_speed_mps": 6.363383768843606,
+  "max_tilt_deg": 13.778525571049373,
+  "intrinsics": {
+    "width": 832,
+    "height": 480,
+    "fx": 555.8577905034598,
+    "fy": 555.8577905034598,
+    "cx": 416.0,
+    "cy": 240.0
+  },
+  "T_body_camera_cv": [
+    [
+      0.0,
+      -0.49999999999999994,
+      0.8660254037844387,
+      0.0
+    ],
+    [
+      -1.0,
+      -0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      -0.8660254037844387,
+      -0.49999999999999994,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "camera_mount": "fixed",
+  "checks": {
+    "imu_integration_drift_m": 1.1073509368863763,
+    "imu_drift_10s_m": 0.017675918500207183
+  },
+  "dynamics": "pegasus",
+  "pegasus": {
+    "flight": "ts_p3_street",
+    "env": "sg_tampines_osm",
+    "controller": "python",
+    "vehicle": "Iris",
+    "mass_kg": 1.5,
+    "physics_hz": 1000,
+    "setup_s": 3.0,
+    "steps": 198783,
+    "wall_s": 2581.1,
+    "realtime_factor": 0.08,
+    "drag": [
+      0.5,
+      0.3,
+      0.0
+    ],
+    "motor": null,
+    "wind": null,
+    "gains": {
+      "Kp": [
+        10.0,
+        10.0,
+        10.0
+      ],
+      "Kd": [
+        8.5,
+        8.5,
+        8.5
+      ],
+      "Ki": [
+        1.5,
+        1.5,
+        1.5
+      ],
+      "Kr": [
+        3.5,
+        3.5,
+        3.5
+      ],
+      "Kw": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "autopilot": null,
+    "pegasus_commit": "fcb99c0 (PegasusSimulator PR #144, Isaac Sim 6.0 port)"
+  },
+  "tracking": {
+    "pos_err_rms_m": 0.07243880591566834,
+    "pos_err_max_m": 0.2709399273392165,
+    "pos_err_final_m": 0.05853828244040592,
+    "rotor_ref_rad_s": [
+      651.713614083,
+      713.495254908
+    ]
+  }
+}

@@ -1,0 +1,60 @@
+# Street-level Bukit Bintang, Kuala Lumpur, from OpenStreetMap: dense mixed high-rise, malls, shophouse
+# rows, arterial roads. Low urban-canyon flights with clearance ground truth.
+name: my_kl_bukit_bintang_osm
+source: osm
+seed: 72
+lat: 3.1466
+lon: 101.7110
+radius_m: 400
+default_heights:
+  apartments: [30, 80]
+  residential: [20, 60]
+  commercial: [12, 40]
+  retail: [8, 20]
+  office: [30, 120]
+  hotel: [40, 120]
+  house: [7, 10]
+  yes: [8, 24]
+style_by_type: {apartments: 0, residential: 0, office: 3, hotel: 3, commercial: 1, retail: 2, house: 4}
+floor_m: 3.0
+bay_m: 3.6
+roof_material: /NVIDIA/Materials/Base/Masonry/Concrete_Block.mdl
+road_material: /NVIDIA/Materials/Base/Natural/Asphalt.mdl
+ground_material: /NVIDIA/Materials/Base/Natural/Grass_Cut.mdl
+facades:                                   # window-grid textures generated per style (envbuild/osm.py)
+  - {wall_rgb: [0.86, 0.84, 0.78], window_frac: [0.45, 0.45]}                           # 0 white / cream residential block
+  - {wall_rgb: [0.62, 0.62, 0.60], window_frac: [0.55, 0.50]}                           # 1 grey concrete
+  - {wall_rgb: [0.82, 0.70, 0.55], window_frac: [0.50, 0.45]}                           # 2 warm stucco
+  - {wall_rgb: [0.28, 0.34, 0.40], glass_rgb: [0.10, 0.14, 0.20], window_frac: [0.88, 0.80], noise: 0.02}   # 3 glass curtain wall
+  - {wall_rgb: [0.62, 0.38, 0.30], window_frac: [0.45, 0.45]}                           # 4 brick / terracotta
+trees:
+  assets: [/NVIDIA/Assets/Vegetation/Trees/Black_Oak.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd,
+           /NVIDIA/Assets/Vegetation/Plant_Tropical/Travelers_Palm.usd]
+  weights: [5, 2, 1]
+  scale_range: [0.45, 0.75]                # rain trees / angsana at 8-13 m; palms smaller
+  park_density_per_ha: 70
+  street_spacing_m: 14
+sky:
+  hdr: /NVIDIA/Assets/Skies/Cloudy/kloofendal_48d_partly_cloudy_4k.hdr
+  intensity: 900
+  sun_intensity: 2800
+  sun_elevation_deg: 62
+  sun_azimuth_deg: 110
+environment:
+  first_warmup_updates: 400
+  ground_z: 0.0
+  stereo: {baseline_m: 0.30, pitch_deg: 20.0}
+  openvins: {fi_max_dist: 200.0}
+  lighting:
+    default: {}
+    overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+  sky_dome: /World/Sky/Dome
+  kit_args:
+    - --/rtx/fog/enabled=true
+    - --/rtx/fog/fogZup/enabled=true
+    - --/rtx/fog/fogHeightDensity=0.0
+    - --/rtx/fog/fogColor=[0.78,0.81,0.85]
+    - --/rtx/fog/fogColorIntensity=1.0
+    - --/rtx/fog/fogStartDist=400
+    - --/rtx/fog/fogEndDist=4000
+    - --/rtx/fog/fogDistanceDensity=0.5

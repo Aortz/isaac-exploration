@@ -260,3 +260,59 @@ First result, the 20 s test of `rm_p3_px4` (4 m/s wind from the south-west, σ =
 - **Hover:** PX4 held the hover to 0.10 m, leaning 4° into the wind.
 - **Tracking:** it followed the loop to 0.50 m RMS (0.98 m max).
 - **Comparison:** the Pegasus geometric controller tracks to 0.24 m with perfect state and no wind.
+
+## Watching flights (GUI and chase camera)
+
+Everything runs headless by default. Three ways to watch:
+
+- **Cameras of a render:**
+  - Add `--gui` to `flight/rig_fisheye.py`.
+  - For a test case, add `--gui` to `testplan/run_case.py --case <id>`.
+  - Every Isaac render takes about 8.5 GB of GPU memory, so don't open a GUI while a batch is rendering.
+- **Physics pass:** `flight/pegasus_fly.py --gui` shows the drone under PX4 or ArduPilot. It flies on an empty slab; the scene isn't loaded in the physics pass.
+- **Chase camera through the scene** (`flight/watch_flight.py`). It replays the flight's ground truth as the drone model (Iris, or the coax asset) inside the flight's environment, with a camera following from behind and above. Nothing is simulated, so it runs at about real time.
+
+```bash
+$ISAAC_ROOT/python.sh flight/watch_flight.py --flight rm_p3_px4 --speed 2 --loop      # GUI
+$ISAAC_ROOT/python.sh flight/watch_flight.py --flight rm_p3_px4 --record              # -> build/flight/<flight>/watch/chase.mp4
+```
+
+## Environment builder
+
+`envbuild/build_env.py` turns a recipe (`envbuild/recipes/*.yaml`) into a sim-ready environment. It writes Z-up metres, colliders, a ground height, semantic classes and the sidecars used for flight planning. With `--register` it also adds the environment to `config/flight.yaml`, so flights and the whole test plan can use it unchanged.
+
+```bash
+$ISAAC_ROOT/python.sh envbuild/build_env.py --recipe envbuild/recipes/forest_valley.yaml --register
+$ISAAC_ROOT/python.sh envbuild/build_env.py --recipe envbuild/recipes/desert_dunes.yaml --register
+```
+
+| Source | What it does | Example recipe |
+|---|---|---|
+| `procedural` | Heightfield terrain from fBm noise: hills, dunes, valleys, creeks, rivers, coastline, terraces, craters, trenches, water. Ground material layers, scatter groups as PointInstancers (NVIDIA vegetation, rocks, SimReady, or generated mangroves and military props), masks, planted grids and perimeter walls, a sky dome plus sun, optional haze | `forest_valley_v2`, `desert_dunes`, `sg_mangrove`, `my_oil_palm`, `my_rainforest`, `bg_ruined_town`, `bg_trench_field`, `mil_fob_desert`, `mil_fob_tropical` |
+| `import` | Any USD / USDZ. Fixes the up-axis and units, adds triangle-mesh colliders where missing, and an optional ground slab | `import_example` |
+| `nurec` | A Gaussian-splat scene (3DGRuT / NuRec export) plus its occupancy map | `nurec_xgrid_wormhole` |
+| `cesium` | Google photoreal or OSM tiles at a given latitude / longitude | `sg_sungei_buloh`, `sg_central_catchment`, `sg_tampines_hdb`, `my_kl_klcc`, `my_jb_city` |
+| `osm` | Street-level city from OpenStreetMap: extruded buildings with window-grid facades, roads, street and park trees, colliders | `sg_tampines_osm`, `my_kl_bukit_bintang_osm`, `my_jb_osm` |
+| `photogrammetry` | Runs the repo's ODM → Blender → Isaac pipeline on a site config, then imports the result | `config/site.yaml` |
+
+Outputs go to `build/envs/<name>/`:
+- `env.usda` and `env.json`;
+- `environment.yaml`, the config block;
+- `heightmap.npz`, used for ground clearance;
+- `obstacles.npy`, the bounding box of each scattered instance;
+- the `flight/env_probe.py` top view.
+
+`testplan/clearance.py` uses both sidecars, so flights over generated terrain are checked against the terrain and the trees.
+
+The first two procedural environments:
+- **`forest_valley`:** 800 × 800 m of hills with a meandering valley. It has 3,738 conifers and 1,036 broadleaf trees (9 m median, up to about 42 m tall), plus shrubs and rocks, with 35% clearings.
+- **`desert_dunes`:** 1 × 1 km of asymmetric dunes, 14 m high on a 90 m wavelength, with boulder outcrops and sparse desert plants. It is a low-texture case.
+
+Each has a loop flight that passes the clearance check:
+- **`fv_p3_loop`:** 68 m altitude, at least 11 m over the trees.
+- **`dd_p3_loop`:** 25 m altitude, 21–36 m above the dunes.
+
+Later environments (Singapore, Malaysia, street-level cities, battleground, military) and their previews are listed in [`demo/README.md`](demo/README.md#environments). Tools around the builder:
+- `envbuild/preview.py --env <name>`: oblique preview shots from drone heights, `build/envs/<name>/preview.jpg`.
+- `envbuild/plan_street_loop.py --env <osm env> --z 30`: a flyable loop around a city block with a clearance check, as waypoints for `config/flight.yaml`.
+- Recipe options are documented in [`envbuild/recipes/README.md`](envbuild/recipes/README.md).

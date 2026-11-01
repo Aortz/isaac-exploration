@@ -1,0 +1,83 @@
+# Malaysian oil palm estate: palms planted on a 9 m triangular grid over terraced hills, laterite estate
+# roads, ferns and grass between the rows, remnant forest on the hilltops. ~800 x 800 m.
+# No oil palm asset ships with Isaac: the Golden Malay palm, scaled to ~9 m, stands in.
+name: my_oil_palm
+source: procedural
+seed: 51
+terrain:
+  size_m: 800
+  resolution_m: 2.0
+  hills_m: 28
+  hill_scale_m: 320
+  octaves: 4
+  terraces: {step_m: 2.5, blend: 0.35}      # contour terraces cut for planting
+  channels:                                 # estate roads (shallow cuts, laterite surface)
+    - {angle_deg: 0, offset_m: 0, depth_m: 0.4, width_m: 3.5, meander_m: 12, meander_wavelength_m: 380}
+    - {angle_deg: 0, offset_m: 260, depth_m: 0.4, width_m: 3.0, meander_m: 15, meander_wavelength_m: 300}
+    - {angle_deg: 0, offset_m: -240, depth_m: 0.4, width_m: 3.0, meander_m: 15, meander_wavelength_m: 340}
+    - {angle_deg: 90, offset_m: 0, depth_m: 0.4, width_m: 3.5, meander_m: 10, meander_wavelength_m: 420}
+    - {angle_deg: 90, offset_m: 220, depth_m: 0.4, width_m: 3.0, meander_m: 14, meander_wavelength_m: 280}
+  material: /NVIDIA/Materials/Base/Natural/Grass_Countryside.mdl
+  uv_tile_m: 3.0
+  layers:
+    - {material: /NVIDIA/Materials/vMaterials_2/Ground/Ground_Leaves.mdl, mask: rows}    # frond litter between palms
+    - {material: /NVIDIA/Materials/Base/Natural/Dirt.mdl, mask: road}                    # laterite roads
+masks:
+  road: {channels: true, threshold: 0.25}
+  rows: {scale_m: 90, cover: 0.55}
+  remnant: {scale_m: 260, cover: 0.12}
+scatter:
+  oil_palm:
+    class: tree
+    assets: [/NVIDIA/Assets/Vegetation/Plant_Tropical/Golden_Malay_Palm.usd]
+    layout: grid
+    spacing_m: 9.0
+    row_angle_deg: 15
+    jitter_m: 0.4
+    scale_range: [2.6, 3.3]
+    slope_max_deg: 35
+    mask: "!road"
+    clear_radius_m: 20
+    sink_m: 0.1
+  remnant_forest:                            # uncleared patches on the hilltops
+    class: tree
+    assets: [/NVIDIA/Assets/Vegetation/Trees/Black_Oak.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Travelers_Palm.usd]
+    weights: [4, 1]
+    density_per_ha: 120
+    scale_range: [0.8, 1.3]
+    mask: remnant
+    clear_radius_m: 20
+    sink_m: 0.2
+  ground_cover:
+    class: shrub
+    assets: [/NVIDIA/Assets/Vegetation/Plant_Tropical/Japanese_Painted_Fern.usd, /NVIDIA/Assets/Vegetation/Shrub/Grass_Short_A.usd,
+             /NVIDIA/Assets/Vegetation/Shrub/Grass_Short_B.usd, /NVIDIA/Assets/Vegetation/Plant_Tropical/Australian_Tree_Fern.usd]
+    weights: [4, 3, 3, 1]
+    density_per_ha: 450
+    scale_range: [0.8, 1.6]
+    mask: "!road"
+    obstacle: false
+sky:
+  hdr: /NVIDIA/Assets/Skies/Cloudy/kloofendal_48d_partly_cloudy_4k.hdr
+  intensity: 900
+  sun_intensity: 2800
+  sun_elevation_deg: 65
+  sun_azimuth_deg: 100
+environment:
+  first_warmup_updates: 400
+  ground_z: 0.0
+  stereo: {baseline_m: 0.30, pitch_deg: 25.0}
+  openvins: {fi_max_dist: 300.0}
+  lighting:
+    default: {}
+    overcast: {sky_hdr: /NVIDIA/Assets/Skies/Cloudy/abandoned_parking_4k.hdr, sky_intensity: 1200}
+  sky_dome: /World/Sky/Dome
+  kit_args:
+    - --/rtx/fog/enabled=true
+    - --/rtx/fog/fogZup/enabled=true
+    - --/rtx/fog/fogHeightDensity=0.0
+    - --/rtx/fog/fogColor=[0.78,0.81,0.85]
+    - --/rtx/fog/fogColorIntensity=1.0
+    - --/rtx/fog/fogStartDist=400
+    - --/rtx/fog/fogEndDist=4000
+    - --/rtx/fog/fogDistanceDensity=0.5

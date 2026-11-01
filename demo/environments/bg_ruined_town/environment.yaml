@@ -1,0 +1,28 @@
+bg_ruined_town:
+  colliders: false
+  settle_updates: 4
+  warmup_updates: 400
+  clip:
+  - 0.1
+  - 5000.0
+  stereo:
+    baseline_m: 0.3
+    pitch_deg: 25.0
+  openvins:
+    fi_max_dist: 250.0
+  lighting:
+    default: {}
+    low_sun:
+      sky_hdr: /NVIDIA/Assets/Skies/Clear/venice_sunset_4k.hdr
+  ground_z: 0.0
+  sky_dome: /World/Sky/Dome
+  kit_args:
+  - --/rtx/fog/enabled=true
+  - --/rtx/fog/fogZup/enabled=true
+  - --/rtx/fog/fogHeightDensity=0.0
+  - --/rtx/fog/fogColor=[0.72,0.72,0.72]
+  - --/rtx/fog/fogColorIntensity=1.0
+  - --/rtx/fog/fogStartDist=300
+  - --/rtx/fog/fogEndDist=3500
+  - --/rtx/fog/fogDistanceDensity=0.6
+  usd: build/envs/bg_ruined_town/env.usda

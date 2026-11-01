@@ -1,0 +1,107 @@
+{
+  "case": {
+    "id": "TC-REG",
+    "flight": "marina_bay_loop_pegasus",
+    "profile": "REG"
+  },
+  "g3": {
+    "track_rms_m": 0.23822597827761363,
+    "imu_drift_m": 0.14233608422120242,
+    "imu_drift_whole_flight_m": 0.14233608422120242,
+    "dynamics": "pegasus",
+    "pass": true
+  },
+  "vio": {
+    "7": {
+      "poses": 3022,
+      "t_first_s": 4.2,
+      "t_last_s": 104.9,
+      "path_m": 846.4156761542308,
+      "align": "4dof",
+      "scale": 1.0,
+      "ate_rmse_m": 170.69684969507128,
+      "ate_max_m": 325.6191079190776,
+      "final_err_m": 102.27785093629845,
+      "rot_rmse_deg": 9.534922502927536,
+      "rpe10": {
+        "segments": 2825,
+        "seg_m": 10.0,
+        "rmse_m": 13.127871496927815,
+        "rmse_pct": 131.27871496927816
+      },
+      "ate_pct": 20.167023662728987,
+      "final_pct": 12.083643275725644,
+      "scale_sim3": 0.38001448514284675
+    },
+    "101": {
+      "error": 1
+    },
+    "102": {
+      "error": 1
+    }
+  },
+  "g1_fisheye": {
+    "gate": "g1",
+    "flight": "marina_bay_loop_pegasus",
+    "run": "rig_lockstep",
+    "frames": 3149,
+    "triangulated": 64,
+    "rotation_only": 6,
+    "tracks": 18428,
+    "median_px": 0.03714884542165577,
+    "p90_px": 0.10833847575834449,
+    "per_camera_median_px": {
+      "cam0_front": 0.03763466818932708,
+      "cam1_left": 0.036983237453219506,
+      "cam2_back": 0.035265151536961845,
+      "cam3_right": 0.037804569954488665
+    },
+    "pass": true
+  },
+  "g1_stereo": {
+    "gate": "g1",
+    "flight": "marina_bay_loop_pegasus",
+    "run": "rig_lockstep_stereo",
+    "frames": 3149,
+    "triangulated": 64,
+    "rotation_only": 6,
+    "tracks": 6378,
+    "median_px": 0.05014755035729214,
+    "p90_px": 0.679489472632937,
+    "per_camera_median_px": {
+      "left": 0.05014755035729214
+    },
+    "pass": true
+  },
+  "g4": {
+    "gate": "g4",
+    "flight": "marina_bay_loop_pegasus",
+    "run": "rig_lockstep_stereo",
+    "samples": 38790,
+    "median_px": 0.5916748046875,
+    "p10_px": 0.2553375244140625,
+    "p90_px": 1.1625762939453124,
+    "pass": false
+  },
+  "macvo": {
+    "poses": 3149,
+    "t_first_s": 0.0,
+    "t_last_s": 104.933333333,
+    "path_m": 846.4642541626752,
+    "align": "se3",
+    "scale": 1.0,
+    "ate_rmse_m": 8.965691940935901,
+    "ate_max_m": 17.539492425737304,
+    "final_err_m": 15.801644161421022,
+    "rot_rmse_deg": 5.40927950057414,
+    "rpe10": {
+      "segments": 2951,
+      "seg_m": 10.0,
+      "rmse_m": 1.0288708558129085,
+      "rmse_pct": 10.288708558129084
+    },
+    "ate_pct": 1.059193214225542,
+    "final_pct": 1.8667822159899774,
+    "scale_sim3": 0.9732235282244022
+  }
+}

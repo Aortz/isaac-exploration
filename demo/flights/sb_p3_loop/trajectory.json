@@ -1,0 +1,110 @@
+{
+  "flight": "sb_p3_loop",
+  "site": "sg_sungei_buloh",
+  "source": "google",
+  "env": null,
+  "duration_s": 133.93,
+  "frames": 4018,
+  "fps": 30,
+  "imu_rate_hz": 200,
+  "path_length_m": 830.1044339321213,
+  "max_speed_mps": 10.721583629193194,
+  "max_tilt_deg": 23.13869601484635,
+  "intrinsics": {
+    "width": 832,
+    "height": 480,
+    "fx": 555.8577905034598,
+    "fy": 555.8577905034598,
+    "cx": 416.0,
+    "cy": 240.0
+  },
+  "T_body_camera_cv": [
+    [
+      0.0,
+      -0.49999999999999994,
+      0.8660254037844387,
+      0.0
+    ],
+    [
+      -1.0,
+      -0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      -0.8660254037844387,
+      -0.49999999999999994,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "camera_mount": "fixed",
+  "checks": {
+    "imu_integration_drift_m": 0.3792676318959829,
+    "imu_drift_10s_m": 0.0352351081594922
+  },
+  "dynamics": "pegasus",
+  "pegasus": {
+    "flight": "sb_p3_loop",
+    "env": null,
+    "controller": "python",
+    "vehicle": "Iris",
+    "mass_kg": 1.5,
+    "physics_hz": 1000,
+    "setup_s": 3.0,
+    "steps": 136933,
+    "wall_s": 1020.0,
+    "realtime_factor": 0.13,
+    "drag": [
+      0.5,
+      0.3,
+      0.0
+    ],
+    "motor": null,
+    "wind": null,
+    "gains": {
+      "Kp": [
+        10.0,
+        10.0,
+        10.0
+      ],
+      "Kd": [
+        8.5,
+        8.5,
+        8.5
+      ],
+      "Ki": [
+        1.5,
+        1.5,
+        1.5
+      ],
+      "Kr": [
+        3.5,
+        3.5,
+        3.5
+      ],
+      "Kw": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "autopilot": null,
+    "pegasus_commit": "fcb99c0 (PegasusSimulator PR #144, Isaac Sim 6.0 port)"
+  },
+  "tracking": {
+    "pos_err_rms_m": 0.13314217443058476,
+    "pos_err_max_m": 0.31327823268753524,
+    "pos_err_final_m": 0.1871342317936933,
+    "rotor_ref_rad_s": [
+      639.340381586,
+      712.623579389
+    ]
+  }
+}

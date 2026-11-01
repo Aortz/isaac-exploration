@@ -16,7 +16,7 @@ What changed in this exploration, newest first. Commits are on `main`; the evide
   - Nature scenes: trees in stands and gaps, lean, shrubby forest edges, irregular ground-material edges, fallen logs, frond piles, driftwood, mangrove breathing roots. Steep forest slopes read as soil, not pale rock.
   - OSM cities: varied windows (curtains, blinds, lit rooms, AC units), facade tints, shopfront ground floors, rooftop AC units / tanks / lift cores, lane markings, sidewalks, street lights, darker roofs.
 - **Flights:** forest v2 loop raised from 68 to 72 m (the new tree layout left 4.1 m clearance at 68 m; now 12.2 m). Other loops re-checked: 6.3–20 m clearance.
-- **Swamp chase video:** re-recording at 1080p on the improved scene (added to the demo when it finishes).
+- **Swamp chase video:** recorded at 1080p on the improved scene (195 s); a 960-wide preview is in `demo/media/sg_p3_loop__chase.mp4`.
 
 ## 2026-11-01: environment builder v2, Singapore / Malaysia / urban / battleground / military scenes
 

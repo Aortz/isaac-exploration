@@ -52,6 +52,8 @@ Built with `envbuild/build_env.py` from the recipes in `envbuild/recipes/`. Ever
 | Singapore mangrove swamp (procedural) | Forest valley v2 (procedural) |
 |---|---|
 | ![](environments/sg_mangrove/preview.jpg) | ![](environments/forest_valley_v2/preview.jpg) |
+| **Swamp flight, chase camera (replay of the flown loop)** | |
+| [![](media/sg_p3_loop__chase.jpg)](media/sg_p3_loop__chase.mp4) | |
 | **Malaysian oil palm estate** | **Malaysian lowland rainforest** |
 | ![](environments/my_oil_palm/preview.jpg) | ![](environments/my_rainforest/preview.jpg) |
 | **Tampines, Singapore, street level (OpenStreetMap)** | **Bukit Bintang, Kuala Lumpur, street level (OpenStreetMap)** |
